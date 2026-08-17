@@ -1,0 +1,59 @@
+name: Legacy baseline QA
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  legacy-baseline-qa:
+    name: legacy-baseline-qa
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: password
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 14.21.3
+          cache: yarn
+      - name: Start disposable MinIO
+        run: |
+          docker run --detach --rm --name staticdeploy-test-minio \
+            --publish 127.0.0.1:9000:9000 \
+            --env MINIO_ACCESS_KEY=accessKeyId \
+            --env MINIO_SECRET_KEY=secretAccessKey \
+            minio/minio:RELEASE.2021-11-24T23-19-33Z server /data
+          for _ in {1..30}; do
+            curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live && exit 0
+            sleep 1
+          done
+          docker logs staticdeploy-test-minio
+          exit 1
+      - name: Install frozen dependencies
+        run: yarn install --frozen-lockfile
+      - name: Compile workspaces
+        run: yarn compile
+      - name: Lint workspaces
+        run: yarn lint
+      - name: Run tests and collect coverage
+        run: npm run coverage
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: legacy-coverage
+          path: coverage/
+          if-no-files-found: warn
