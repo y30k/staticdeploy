@@ -3,73 +3,60 @@ id: getting-started-quickstart
 title: Quickstart
 ---
 
-For this quickstart you'll need:
+This legacy quickstart builds the source locally; this fork publishes neither
+the service image nor the CLI. You need Docker, Git, Node 14, and Yarn 1.
 
-- a recent version of [docker](https://docs.docker.com/install/)
-- a recent version of [nodejs](https://nodejs.org/en/)
+## Check out and start StaticDeploy
 
-## Set up StaticDeploy with docker
+```sh
+git clone https://github.com/y30k/staticdeploy.git
+cd staticdeploy
+docker build -f staticdeploy/Dockerfile -t staticdeploy-service:local .
+docker run --rm --init \
+  -e MANAGEMENT_HOSTNAME=localhost \
+  -e ENFORCE_AUTH=false \
+  -e PORT=8080 \
+  -p 127.0.0.1:8080:8080 \
+  staticdeploy-service:local
+```
 
-- start StaticDeploy:
+The loopback-only port binding is required because authentication is disabled.
+Visit the Management Console at <http://localhost:8080/>.
 
-  ```sh
-  docker run --rm --init \
-    -e MANAGEMENT_HOSTNAME=local.staticdeploy.io \
-    -e ENFORCE_AUTH=false \
-    -p 80:80 \
-    staticdeploy/staticdeploy
-  ```
+## Build the repository-local CLI
 
-- visit the Management Console at
-  [local.staticdeploy.io](http://local.staticdeploy.io/) (which points to
-  `127.0.0.1`)
+In another terminal, from the same checkout:
 
-## Publish a static app
+```sh
+yarn install --frozen-lockfile
+yarn lerna run compile \
+  --scope=@staticdeploy/cli \
+  --include-dependencies \
+  --stream \
+  --concurrency 1
+alias staticdeploy='node cli/bin/staticdeploy.js'
+export STATICDEPLOY_API_URL=http://localhost:8080/api
+```
 
-- install the StaticDeploy CLI:
+## Publish a repository-owned fixture
 
-  ```sh
-  npm install --global @staticdeploy/cli
-  ```
+```sh
+staticdeploy bundle \
+  --from website/demo-static-app \
+  --name demo-static-app \
+  --tag local \
+  --description "local characterization fixture"
 
-- configure the CLI using environment variables:
+staticdeploy deploy \
+  --app demo-static-app \
+  --entrypoint demo-static-app.localhost/ \
+  --bundle demo-static-app:local
 
-  ```sh
-  export STATICDEPLOY_API_URL=http://local.staticdeploy.io/api
-  ```
+curl --fail \
+  --header 'Host: demo-static-app.localhost' \
+  http://127.0.0.1:8080/
+```
 
-- clone the StaticDeploy repository and `cd` into it:
-
-  ```sh
-  git clone https://github.com/staticdeploy/staticdeploy.git
-  cd staticdeploy
-  ```
-
-- create a bundle for the demo static app in `website/demo-static-app`:
-
-  ```sh
-  staticdeploy bundle \
-    --from website/demo-static-app \
-    --name demo-static-app \
-    --tag master \
-    --description "version 1.0.0"
-  ```
-
-- deploy the bundle to `demo-static-app.staticdeploy.io`:
-
-  ```sh
-  staticdeploy deploy \
-    --app demo-static-app \
-    --entrypoint demo-static-app.staticdeploy.io/ \
-    --bundle demo-static-app:master
-  ```
-
-- visit
-  [demo-static-app.staticdeploy.io](http://demo-static-app.staticdeploy.io/)
-  (which also points to `127.0.0.1`)
-
-- check out the deployment on the Management Console at
-  [local.staticdeploy.io](http://local.staticdeploy.io/). Try modifying the
-  entrypoint configuration and see how
-  [demo-static-app.staticdeploy.io](http://demo-static-app.staticdeploy.io/)
-  changes
+The final command should return the fixture HTML. Stop the container when the
+characterization run is complete; memory-backed state is intentionally
+discarded.

@@ -2,9 +2,6 @@
   "name": "@staticdeploy/sdk",
   "description": "Browser and nodejs sdk for the StaticDeploy API",
   "version": "0.15.5",
-  "publishConfig": {
-    "access": "public"
-  },
   "main": "lib/index.js",
   "module": "es/index.js",
   "typings": "lib/index.d.js",

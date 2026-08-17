@@ -35,7 +35,7 @@ const HomeSplash = () => (
                     <div className="section promoSection">
                         <div className="promoRow">
                             <code>
-                                {"docker run staticdeploy/staticdeploy"}
+                                {"docker build -f staticdeploy/Dockerfile ."}
                             </code>
                             <Button
                                 href={withBaseUrl(

@@ -2,10 +2,19 @@
 
 CLI tool to create and deploy bundles.
 
-## Install
+## Run from this repository
+
+The CLI is retained for legacy characterization only and is not published by
+this fork. Build and run it from a frozen workspace checkout:
 
 ```sh
-npm i -g @staticdeploy/cli
+yarn install --frozen-lockfile
+yarn lerna run compile \
+  --scope=@staticdeploy/cli \
+  --include-dependencies \
+  --stream \
+  --concurrency 1
+node cli/bin/staticdeploy.js --help
 ```
 
 ## Use

@@ -11,7 +11,8 @@
 
 - CircleCI configuration, README badge, contribution instructions, and Prettier exemption are removed.
 - Codecov upload commands and dependencies are removed.
-- Docker Hub tag/push commands are removed. The retained image-build commands do not push.
+- Docker Hub tag/push commands, public npm `publishConfig`, tag-based release scripts, the legacy CLI image path, and CircleCI website variables are removed.
+- Legacy documentation directs characterization users to local source builds rather than retired public artifacts.
 - No replacement release or deployment workflow is introduced.
 
 ## External integration attestation

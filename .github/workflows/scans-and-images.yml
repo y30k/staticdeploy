@@ -39,8 +39,6 @@ jobs:
             semgrep scan --config p/default --json --output /src/reports/semgrep.json /src
       - name: Build service image without publishing
         run: docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
-      - name: Build CLI image without publishing
-        run: docker build --file cli/Dockerfile --tag staticdeploy-cli:ci .
       - name: Upload scan reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

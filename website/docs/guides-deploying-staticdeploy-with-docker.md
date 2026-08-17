@@ -3,10 +3,11 @@ id: guides-deploying-staticdeploy-with-docker
 title: Deploying StaticDeploy with docker
 ---
 
-StaticDeploy is distributed as the single docker image
-`staticdeploy/staticdeploy:$VERSION` (e.g. `staticdeploy/staticdeploy:v0.12.0`).
-The image is stateless, so it should be straightforward to deploy it on any
-container platform like [Kubernetes](https://kubernetes.io/) or
+This legacy guide describes the baseline service image, which this fork no
+longer publishes. Build it locally from the repository root as
+`staticdeploy-service:local` when characterization requires it. It is stateless,
+so it can be evaluated on a container platform such as
+[Kubernetes](https://kubernetes.io/) or
 [Amazon ECS](https://aws.amazon.com/ecs/).
 
 The image contains the **staticdeploy** service that hosts:

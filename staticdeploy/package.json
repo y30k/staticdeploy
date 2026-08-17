@@ -21,8 +21,7 @@
     "lint:tslint": "tslint 'src/**/*.ts' 'test/**/*.ts'",
     "lint": "yarn lint:prettier && yarn lint:tslint",
     "test": "NODE_ENV=test TS_NODE_FILES=true mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'",
-    "start": "NODE_ENV=production node build/server.js",
-    "docker:build": "docker build -f ./Dockerfile -t staticdeploy/staticdeploy:$DOCKER_TAG ../"
+    "start": "NODE_ENV=production node build/server.js"
   },
   "dependencies": {
     "@mondora/env": "^1.3.0",
