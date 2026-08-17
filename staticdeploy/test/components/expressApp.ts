@@ -65,7 +65,7 @@ describe("staticdeploy expressApp", () => {
                 .expect(404);
         });
 
-        it("doesn't serve the management API at $MANAGEMENT_HOSTNAME/api/", async () => {
+        it("returns the management-disabled error from the management host", async () => {
             const logger = getLogger(config);
             const expressApp = getExpressApp({
                 config: config,
@@ -81,8 +81,25 @@ describe("staticdeploy expressApp", () => {
             return request(expressApp)
                 .get("/api/health")
                 .set("host", config.managementHostname)
-                .expect(404);
+                .expect(404)
+                .expect({ message: "Management endpoints not enabled" });
         });
+    });
+
+    it("rejects an unauthenticated management API request when auth is enforced", async () => {
+        const logger = getLogger(config);
+        const expressApp = getExpressApp({
+            config: config,
+            authenticationStrategies: [],
+            storagesModule: getStoragesModule(config, logger),
+            managementRouter: await getManagementRouter(config),
+            usecases: usecases,
+            logger: logger,
+        });
+        return request(expressApp)
+            .get("/api/apps")
+            .set("host", config.managementHostname)
+            .expect(401);
     });
 
     it("serves deployed bundles at other endpoints (w/ and w/o hostname trailing dot)", async () => {
