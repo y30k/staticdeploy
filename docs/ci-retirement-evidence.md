@@ -14,14 +14,8 @@
 - Docker Hub tag/push commands are removed. The retained image-build commands do not push.
 - No replacement release or deployment workflow is introduced.
 
-## External owner handoff
+## External integration attestation
 
-GitHub does not expose CircleCI project state or CircleCI, Docker Hub, npm, Codecov, website-hosting, DNS, or third-party credential inventories. The DEC-01 record confirms this fork has no CircleCI integration and that GitHub Actions is the only CI system.
+Maintainer attestation: this fork has never had CircleCI, Docker Hub, npm, Codecov, or website-publication connectivity; no corresponding project, webhook, credential, or publisher exists to disable or revoke. Consequently, no owner-side retirement action is required.
 
-A repository owner must separately verify and record, without exposing credential material:
-
-1. the upstream/legacy CircleCI project and any webhook are disabled;
-2. retired CircleCI, Docker Hub, npm, Codecov, and website-deployment credentials are revoked; and
-3. no external publisher can still release an artifact for this fork.
-
-This handoff does not authorize creation of replacement publication or deployment workflows.
+The DEC-01 record and the empty GitHub repository webhook inventory corroborate the absence of GitHub-side CircleCI coupling. GitHub Actions is the only CI system for this fork. This retirement does not authorize creation of replacement publication or deployment workflows.
