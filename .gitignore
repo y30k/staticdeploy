@@ -22,3 +22,6 @@ lerna-error.log*
 
 # Ignore dotenv files
 .env
+
+# Agentic directories
+.pi
