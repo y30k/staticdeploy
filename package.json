@@ -33,8 +33,6 @@
     "lint": "lerna run lint --stream --concurrency 1",
     "test": "lerna run test --stream --concurrency 1",
     "coverage": "nyc --all npm test",
-    "docker:build": "lerna run docker:build --stream --concurrency 1",
-    "release": "lerna version --force-publish=* --allow-branch master --push false",
     "lerna": "lerna"
   },
   "devDependencies": {

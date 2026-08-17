@@ -2,9 +2,6 @@
   "name": "@staticdeploy/cli",
   "description": "CLI tool for StaticDeploy",
   "version": "0.15.5",
-  "publishConfig": {
-    "access": "public"
-  },
   "bin": {
     "staticdeploy": "./bin/staticdeploy.js"
   },
@@ -29,8 +26,7 @@
     "lint:prettier": "yarn prettier --list-different",
     "lint:tslint": "tslint 'src/**/*.ts' 'test/**/*.ts'",
     "lint": "yarn lint:prettier && yarn lint:tslint",
-    "test": "NODE_ENV=test mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'",
-    "docker:build": "docker build -f ./Dockerfile -t staticdeploy/cli:$DOCKER_TAG ../"
+    "test": "NODE_ENV=test mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'"
   },
   "dependencies": {
     "@staticdeploy/core": "^0.15.5",

@@ -4,8 +4,12 @@ Main service of the StaticDeploy platform.
 
 ## Run
 
-The service is distributed as a Docker image (`staticdeploy/staticdeploy`) that
-can be run without modifications on docker-compose, ECS, Kubernetes, etc.
+This fork does not publish a legacy service image. Build the current baseline
+locally from the repository root when characterization requires it:
+
+```sh
+docker build -f staticdeploy/Dockerfile -t staticdeploy-service:local .
+```
 
 You can check the health status of the service via
 `GET $MANAGEMENT_HOSTNAME/api/health`: the server will return a `200` if the

@@ -2,10 +2,18 @@
 
 Browser and nodejs SDK for the StaticDeploy API.
 
-## Install
+## Build from this repository
+
+The SDK is retained for legacy characterization only and is not published by
+this fork. Build it with its workspace dependencies from a frozen checkout:
 
 ```sh
-yarn add @staticdeploy/sdk
+yarn install --frozen-lockfile
+yarn lerna run compile \
+  --scope=@staticdeploy/sdk \
+  --include-dependencies \
+  --stream \
+  --concurrency 1
 ```
 
 ## Quickstart

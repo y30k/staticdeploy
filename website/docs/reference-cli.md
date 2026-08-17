@@ -3,10 +3,9 @@ id: reference-cli
 title: Using StaticDeploy's CLI
 ---
 
-The StaticDeploy CLI is distributed via [npm](https://npmjs.com), and you can
-install it with a simple `npm install --global @staticdeploy/cli`. After running
-the command, the `staticdeploy` executable will be available in your shell's
-`$PATH`.
+The legacy StaticDeploy CLI is retained for characterization but is not
+published by this fork. Build it from a frozen workspace checkout and invoke
+`node cli/bin/staticdeploy.js` when legacy testing requires it.
 
 ## Using the staticdeploy executable
 

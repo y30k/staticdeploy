@@ -2,9 +2,6 @@
   "name": "@staticdeploy/serve-static",
   "description": "Express middleware for serving files in a local directory",
   "version": "0.15.5",
-  "publishConfig": {
-    "access": "public"
-  },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "author": "Paolo Scanferla <paolo.scanferla@gmail.com>",

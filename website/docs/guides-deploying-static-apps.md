@@ -11,13 +11,9 @@ you can now deploy your static apps on it.
 
 ## Setting up the CLI
 
-Apps are deployed using the StaticDeploy CLI, which you can install from npm:
-
-```sh
-npm install --global @staticdeploy/cli
-# Or, if you prefer yarn
-yarn global add @staticdeploy/cli
-```
+Apps in this legacy guide use the repository-local StaticDeploy CLI. This fork
+does not publish the CLI. From a frozen workspace checkout, compile it and use
+`node cli/bin/staticdeploy.js` in place of `staticdeploy` below.
 
 You need to provide the CLI the address of your StaticDeploy Management API, as
 well as a valid authentication token for making requests to it. You can do so by

@@ -53,25 +53,6 @@ yarn lerna add dependency-subproject --scope=dependant-subproject
 
 ## Releasing
 
-To release a new version of StaticDeploy, run:
-
-```sh
-yarn release
-```
-
-This will prompt you for the version number to use, which must be in the format
-`X.X.X` (eg `1.0.0`). The command will then:
-
-- update all versions of all sub-packages
-- update the versions in the top level `package.json` and in `lerna.json`
-- commit the changes
-- tag the commit as `vX.X.X`
-
-Then, push everything to the default remote:
-
-```sh
-git push --tags origin master
-```
-
-This fork has no automated publication workflow. A pushed tag does not publish
-packages, images, coverage, or the website.
+This fork has no package, image, website, or deployment publication workflow.
+Do not create or push release tags until an approved GitHub Actions release
+workflow and GitHub-hosted artifact contract are implemented.
