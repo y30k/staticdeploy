@@ -33,10 +33,7 @@
     "lint": "lerna run lint --stream --concurrency 1",
     "test": "lerna run test --stream --concurrency 1",
     "coverage": "nyc --all npm test",
-    "publish-coverage": "codecov",
     "docker:build": "lerna run docker:build --stream --concurrency 1",
-    "docker:tag-latest": "lerna run docker:tag-latest --stream --concurrency 1",
-    "docker:push": "lerna run docker:push --stream --concurrency 1",
     "release": "lerna version --force-publish=* --allow-branch master --push false",
     "lerna": "lerna"
   },
@@ -44,7 +41,6 @@
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
     "@commitlint/config-lerna-scopes": "^15.0.0",
-    "codecov": "^3.8.3",
     "husky": "^4.3.5",
     "lerna": "^4.0.0",
     "nyc": "^15.1.0",

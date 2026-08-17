@@ -73,5 +73,5 @@ Then, push everything to the default remote:
 git push --tags origin master
 ```
 
-The CI server (CircleCI) will pick up from here, running tests on the tag,
-compiling the code and publishing public modules to npm.
+This fork has no automated publication workflow. A pushed tag does not publish
+packages, images, coverage, or the website.
