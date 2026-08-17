@@ -25,7 +25,7 @@ jobs:
           path: ./
           base: ""
           head: HEAD
-          extra_args: --only-verified
+          extra_args: --json
       - name: Install frozen dependencies
         run: yarn install --frozen-lockfile
       - name: Write dependency and license reports
@@ -33,6 +33,12 @@ jobs:
           mkdir -p reports
           yarn audit --json > reports/yarn-audit.json || true
           yarn licenses list --json > reports/yarn-licenses.json
+      - name: Scan source code
+        run: |
+          mkdir -p reports
+          docker run --rm --volume "$PWD:/src" \
+            returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700 \
+            semgrep scan --config p/default --json --output /src/reports/semgrep.json /src
       - name: Build service image without publishing
         run: docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
       - name: Build CLI image without publishing
