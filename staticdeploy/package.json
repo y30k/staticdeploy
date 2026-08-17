@@ -32,6 +32,7 @@
     "@staticdeploy/http-adapters": "^0.15.5",
     "@staticdeploy/jwt-authentication-strategy": "^0.15.5",
     "@staticdeploy/management-console": "^0.15.5",
+    "@staticdeploy/oidc-authentication-strategy": "^0.15.5",
     "@staticdeploy/memory-storages": "^0.15.5",
     "@staticdeploy/pg-s3-storages": "^0.15.5",
     "@staticdeploy/serve-static": "^0.15.5",
