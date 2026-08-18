@@ -598,6 +598,25 @@ try {
             "image-sbom"
         ].payload.packages.filter((item) => item.name !== "node");
     });
+    expectPass(
+        "stable-purl-ignores-syft-spdxid-churn",
+        (fixture) => {
+            fixture.reports["image-sbom"].payload.packages.find(
+                (item) => item.name === "fixture-package"
+            ).SPDXID = "SPDXRef-Package-regenerated-fixture";
+        },
+        { freezeApprovedInventory: true }
+    );
+    expectFail(
+        "stable-purl-drift-remains-blocking",
+        (fixture) => {
+            fixture.reports["image-sbom"].payload.packages.find(
+                (item) => item.name === "fixture-package"
+            ).externalRefs[0].referenceLocator =
+                "pkg:npm/fixture-package@1.0.1";
+        },
+        { freezeApprovedInventory: true }
+    );
     expectFail("runtime-base-digest-drift", undefined, {
         runtimeBaseDigest: `sha256:${"f".repeat(64)}`,
     });
