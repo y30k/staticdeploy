@@ -19,7 +19,6 @@ jobs:
             - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24.19.0
-                  cache: yarn
             - name: Scan tracked content for verified secrets
               uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318 # v3.97.0
               with:
