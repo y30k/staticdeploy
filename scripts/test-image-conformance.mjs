@@ -66,6 +66,7 @@ try {
     );
     assert.equal(has("licenses/node/LICENSE"), true);
     assert.equal(has("licenses/staticdeploy/LICENSE"), true);
+    assert.equal(has("licenses/THIRD_PARTY_NOTICES.txt"), true);
     const verboseEntries = execFileSync(
         "tar",
         ["--numeric-owner", "-tvf", archive],
@@ -76,6 +77,7 @@ try {
         "opt/staticdeploy/staticdeploy/build/server.js",
         "licenses/node/LICENSE",
         "licenses/staticdeploy/LICENSE",
+        "licenses/THIRD_PARTY_NOTICES.txt",
     ]) {
         const line = verboseEntries.find((entry) =>
             entry.endsWith(` ${required}`)

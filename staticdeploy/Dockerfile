@@ -3,9 +3,11 @@ FROM node:24.19.0-bookworm-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba
 
 WORKDIR /opt/staticdeploy
 
-COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json ./
+COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json LICENSE ./
 COPY config/install-scripts.json config/dependency-resolutions.json ./config/
-COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs ./scripts/
+COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs scripts/generate-runtime-notices.mjs ./scripts/
+COPY docs/security/license-evidence/m2-runtime-third-party-notices.txt /reviewed-runtime-third-party-notices.txt
+COPY docs/security/license-evidence/base-runtime-license-texts ./docs/security/license-evidence/base-runtime-license-texts/
 COPY management-console/package.json management-console/tsconfig.json management-console/index.html management-console/vite.config.mts ./management-console/
 COPY management-console/scripts ./management-console/scripts/
 COPY cli/package.json ./cli/
@@ -44,6 +46,8 @@ RUN corepack enable && \
     yarn lerna run compile --scope=@staticdeploy/staticdeploy --include-dependencies --stream --concurrency 1 && \
     rm -rf node_modules */node_modules && \
     yarn workspaces focus @staticdeploy/staticdeploy --production && \
+    node scripts/generate-runtime-notices.mjs /runtime-third-party-notices.txt && \
+    cmp /reviewed-runtime-third-party-notices.txt /runtime-third-party-notices.txt && \
     rm -f yarn.lock tsconfig.json lerna.json .yarnrc.yml && \
     rm -rf .yarn config scripts && \
     rm -rf management-console/tsconfig.json management-console/vite.config.mts management-console/index.html management-console/public management-console/scripts management-console/src && \
@@ -65,6 +69,7 @@ FROM cgr.dev/chainguard/glibc-dynamic@sha256:df4e22a4b5dcd8e15a51fe9b04e16717d41
 
 COPY --from=builder /usr/local/LICENSE /licenses/node/LICENSE
 COPY LICENSE /licenses/staticdeploy/LICENSE
+COPY --from=builder /runtime-third-party-notices.txt /licenses/THIRD_PARTY_NOTICES.txt
 COPY --from=builder /usr/local/bin/node /nodejs/bin/node
 WORKDIR /opt/staticdeploy/staticdeploy
 COPY --from=builder /opt/staticdeploy/package.json /opt/staticdeploy/package.json

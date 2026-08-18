@@ -218,13 +218,14 @@ builder and a digest-pinned package-manager-free Chainguard glibc runtime. The
 builder performs the immutable full install and compilation, deletes every
 installed dependency, and recreates a clean production-only StaticDeploy focus
 before copying an explicit runtime closure. Only the exact Node `24.19.0`
-binary, its upstream license, production dependencies, compiled CommonJS, and
-compiled console are copied onto the runtime's current CA/C++/glibc libraries
-and embedded package SBOMs; npm, Corepack, Yarn, shells, build layers,
-TypeScript/declarations/source maps, and dependency tests/examples never enter a
-runtime layer. Files stay root-owned and the process runs as numeric
-unprivileged user `65532:65532`. The TCP health check uses the exact copied Node
-binary and remains valid when management endpoints are disabled.
+binary, its upstream license, the project license, the deterministically
+regenerated and byte-checked third-party notice bundle, production dependencies,
+compiled CommonJS, and compiled console are copied onto the runtime's current
+CA/C++/glibc libraries and embedded package SBOMs; npm, Corepack, Yarn, shells,
+build layers, TypeScript/declarations/source maps, and dependency tests/examples
+never enter a runtime layer. Files stay root-owned and the process runs as
+numeric unprivileged user `65532:65532`. The TCP health check uses the exact
+copied Node binary and remains valid when management endpoints are disabled.
 
 `scripts/test-image-conformance.mjs` verifies the runtime user, command,
 healthcheck, layer history, absence of build tooling/source/tests, and a live

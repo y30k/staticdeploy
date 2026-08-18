@@ -1,0 +1,2 @@
+# Preserve third-party license texts byte-for-byte, including upstream whitespace.
+docs/security/license-evidence/m2-runtime-third-party-notices.txt whitespace=-trailing-space,-space-before-tab,-blank-at-eof

@@ -1,6 +1,6 @@
 # M2 license and notice approval request
 
-**Candidate:** `feature/m2-06-backend-dependencies` at `3f2e841` or later
+**Candidate:** `feature/m2-06-backend-dependencies` at `9490ffd` or later
 
 **Status:** Blocking decision; no approval or waiver is implied by this
 document.
@@ -33,9 +33,10 @@ expressions account for 1,295 records. The remaining review set is:
 ## Exact runtime image inventory
 
 Image configuration digest
-`sha256:968d0cdc29245c1d2ccf72638b6803efccb941b9ee4caafc3d2df164640c36a6` is
-package-manager-free, runs exact Node `24.19.0`, and has zero current Grype
-findings. Its non-initial license review set is:
+`sha256:c7b7192b1ca002f87079926c93d7450502cfa44ce90ef75539c5600fea068508` is
+package-manager-free and runs exact Node `24.19.0`; its vulnerability posture
+must be confirmed by a fresh exact-digest Grype scan. Its non-initial license
+review set is:
 
 | Component/version                                                    | SPDX expression                           | Requested disposition/evidence                                                                        |
 | -------------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -46,10 +47,17 @@ findings. Its non-initial license review set is:
 | `node@24.19.0`                                                       | scanner `NOASSERTION`                     | Review an exact MIT assertion against `/licenses/node/LICENSE`; do not suppress without that evidence |
 
 The project MIT license and upstream Node license are copied into the runtime at
-`/licenses/staticdeploy/LICENSE` and `/licenses/node/LICENSE`. A complete
-third-party notice artifact for all accepted source and image components still
-must be generated, reviewed, digest-recorded in `config/license-policy.json`,
-and uploaded beside policy evidence.
+`/licenses/staticdeploy/LICENSE` and `/licenses/node/LICENSE`. The deterministic
+runtime notice candidate is retained at
+`docs/security/license-evidence/m2-runtime-third-party-notices.txt` with digest
+`sha256:38e8127b5564aa37f190a3e31dc1fe064d1ad18b32fb99bbcbc1052889a8c485`. The
+image build regenerates and byte-compares it before shipping it at
+`/licenses/THIRD_PARTY_NOTICES.txt`. It contains the exact production npm
+closure's retained texts, Node/application texts, standard base-runtime texts,
+and the GCC Runtime Library Exception 3.1 text pinned from SPDX
+license-list-data commit `5bf6d9610255540bfbee6890765a616042bf1e11`. It remains
+unapproved until a named owner reviews it; `config/license-policy.json`
+therefore stays fail closed.
 
 ## Approval needed
 
