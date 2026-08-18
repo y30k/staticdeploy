@@ -44,6 +44,23 @@ describe("OidcAuthStrategy", () => {
         expect(strategy.displayName).to.equal("Example Identity");
     });
 
+    it("preserves path-based issuers for realm and authorization-server discovery", () => {
+        const strategy = new OidcAuthStrategy(
+            "https://issuer.example/realms/customer/.well-known/openid-configuration",
+            "management-console",
+            "https://console.example/",
+            "Realm Identity"
+        );
+        const settings = (strategy as any).userManager.settings;
+
+        expect(settings.authority).to.equal(
+            "https://issuer.example/realms/customer"
+        );
+        expect(settings.metadataUrl).to.equal(
+            "https://issuer.example/realms/customer/.well-known/openid-configuration"
+        );
+    });
+
     it("completes the interactive callback without propagating provider errors", async () => {
         window.history.replaceState(null, "", "/?oidcRedirect=true");
         const strategy = makeStrategy();

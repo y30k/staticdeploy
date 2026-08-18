@@ -23,8 +23,13 @@ export default class OidcAuthStrategy implements IAuthStrategy {
             openidConfigurationUrl,
             window.location.href
         );
+        const discoverySuffix = "/.well-known/openid-configuration";
+        const issuerPath = metadataUrl.pathname.endsWith(discoverySuffix)
+            ? metadataUrl.pathname.slice(0, -discoverySuffix.length)
+            : "";
+        const authority = `${metadataUrl.origin}${issuerPath}`;
         this.userManager = new UserManager({
-            authority: metadataUrl.origin,
+            authority,
             metadataUrl: metadataUrl.href,
             client_id: clientId,
             redirect_uri: urlUtils.getRedirectUrl(baseRedirectUrl),
