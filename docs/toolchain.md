@@ -96,8 +96,8 @@ because GitHub Actions required checks are authoritative.
 
 `@staticdeploy/management-console` builds with exact Vite `8.2.1` and the React
 plugin `6.0.5`; CRA, Webpack 4, the OpenSSL legacy provider, preflight bypass,
-and embedded-lint bypass are removed. React `18.3.1` and Ant Design `5.29.3`
-are the supported compatibility line while M4-11 still owns routing and form
+and embedded-lint bypass are removed. React `18.3.1` and Ant Design `5.29.3` are
+the supported compatibility line while M4-11 still owns routing and form
 replacement. The console's Vitest `4.1.10` suite uses Testing Library rather
 than Enzyme and tests rendered behavior in JSDOM.
 
@@ -109,6 +109,27 @@ exact `oidc-client-ts@3.5.0`, while the local mock token endpoint uses the same
 bounded `jose@5.10.0` CommonJS-compatible release already accepted for backend
 tests. The local mock API is repository-owned and runs loopback-only with
 `yarn workspace @staticdeploy/management-console dev:mock-server`.
+
+## Exact registry security corrections
+
+The root manifest carries three reviewed, exact Yarn resolutions because the
+current supported parent releases pin newly disclosed vulnerable children:
+
+- `nx@23.1.1`'s exact `brace-expansion@5.0.8` is corrected to `5.0.9`;
+- `lerna@10.0.0`'s exact `js-yaml@4.3.0` is corrected to `4.3.1`; and
+- Mocha `11.8.0`'s `serialize-javascript@^6.0.2` range is corrected to `7.1.0`.
+
+All corrected packages remain registry-backed. The first two corrections are
+security patch releases on the same API line. The serializer correction crosses
+a major boundary because no secure 6.x exists; Mocha uses it only for reporter
+metadata serialization, and the complete backend test suite is the compatibility
+contract. These are not wildcard suppressions or vulnerability exceptions: raw
+audit output sees the corrected resolved graph, and no finding is hidden.
+
+`config/dependency-resolutions.json` records each exact selector, result, owner,
+rationale, and removal condition. The install-policy checker rejects unreviewed,
+wildcard, non-registry, changed, or ownerless resolution decisions. Remove each
+correction as soon as its supported parent accepts the secure child version.
 
 ## Bounded CommonJS package bridges
 
@@ -126,11 +147,11 @@ the server-oriented barrel. The Vite console now consumes the narrow
 `@staticdeploy/core/browser` facade and receives no Node crypto polyfill; M4-05
 still owns separating the server-only bundle finalizer from the package's main
 exports, replacing the legacy MD5 implementation with Node crypto, and replacing
-the MIME bridge when the v2 release finalizer takes over content detection. The M4 application
-and content-route implementation owns removing the legacy role-matcher escape
-bridge. No browser shim, hidden require, crypto polyfill, or newer ESM-only
-major may be loaded through an ad hoc dynamic-import wrapper in the current
-output.
+the MIME bridge when the v2 release finalizer takes over content detection. The
+M4 application and content-route implementation owns removing the legacy
+role-matcher escape bridge. No browser shim, hidden require, crypto polyfill, or
+newer ESM-only major may be loaded through an ad hoc dynamic-import wrapper in
+the current output.
 
 The only remaining direct Bluebird owner is immutable PostgreSQL migration `02`;
 current core, archive, and storage concurrency paths use native promises. The
