@@ -1,0 +1,41 @@
+{
+    "schemaVersion": 1,
+    "fallbacks": [
+        {
+            "name": "@aws-sdk/credential-provider-http",
+            "version": "3.972.71",
+            "license": "Apache-2.0",
+            "packageJsonDigest": "sha256:7458afd42674a9ed7072e243550e9c53a5b90363c589a9d623f696443b8b5d3b",
+            "evidencePath": "docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE",
+            "evidenceDigest": "sha256:edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+            "sourceReference": "https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE"
+        },
+        {
+            "name": "@aws-sdk/credential-provider-login",
+            "version": "3.972.76",
+            "license": "Apache-2.0",
+            "packageJsonDigest": "sha256:1a9afe55e42e0d1051e3bb10de850db441b6f6ed2e0291d50e37c2f411530521",
+            "evidencePath": "docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE",
+            "evidenceDigest": "sha256:edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+            "sourceReference": "https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE"
+        },
+        {
+            "name": "@aws-sdk/nested-clients",
+            "version": "3.997.43",
+            "license": "Apache-2.0",
+            "packageJsonDigest": "sha256:27aec9e0af580df87143042ded32a0be85ec59a8610c2e2682198b91d05cf2aa",
+            "evidencePath": "docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE",
+            "evidenceDigest": "sha256:edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d",
+            "sourceReference": "https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE"
+        },
+        {
+            "name": "boolbase",
+            "version": "1.0.0",
+            "license": "ISC",
+            "packageJsonDigest": "sha256:ca09c0dccbfc43be6be0ac89e9ffa19b64b30f9c74c64da27f719a7244a25e30",
+            "evidencePath": "docs/security/license-evidence/npm-fallbacks/boolbase-1.0.0-LICENSE",
+            "evidenceDigest": "sha256:cdf4d87ae0a6c160227263bf4e39a0a10e30e89ae7256e0f7ac7bde0836552c6",
+            "sourceReference": "https://github.com/fb55/boolbase/blob/be0bcd8a4e917a0a5895e95b523fbbed05a64871/LICENSE"
+        }
+    ]
+}

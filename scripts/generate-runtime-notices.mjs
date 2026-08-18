@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -7,8 +8,15 @@ const [
 ] = process.argv.slice(2);
 const root = process.cwd();
 const modulesRoot = path.join(root, "node_modules");
-const licenseName = /^(?:licen[cs]e|copying|notice)(?:\..*)?$/i;
+const nodeLicensePath =
+    process.env.RUNTIME_NOTICE_NODE_LICENSE || "/usr/local/LICENSE";
+const commonLicensesRoot =
+    process.env.RUNTIME_NOTICE_COMMON_LICENSES || "/usr/share/common-licenses";
+const licenseName = /^(?:licen[cs]e|copying|notice)(?:[._-].*)?$/i;
+const readmeName = /^readme(?:\..*)?$/i;
 const packages = new Map();
+const digest = (value) =>
+    `sha256:${crypto.createHash("sha256").update(value).digest("hex")}`;
 
 function visitModules(directory) {
     if (!fs.existsSync(directory)) return;
@@ -34,11 +42,20 @@ function visitPackage(directory) {
         typeof manifest.version === "string" &&
         !manifest.name.startsWith("@staticdeploy/")
     ) {
-        const files = fs
+        const directoryFiles = fs
             .readdirSync(directory, { withFileTypes: true })
-            .filter((entry) => entry.isFile() && licenseName.test(entry.name))
+            .filter((entry) => entry.isFile())
             .map((entry) => entry.name)
             .sort();
+        let files = directoryFiles.filter((file) => licenseName.test(file));
+        if (!files.length)
+            files = directoryFiles.filter(
+                (file) =>
+                    readmeName.test(file) &&
+                    /(?:licen[cs]e|copyright)/i.test(
+                        fs.readFileSync(path.join(directory, file), "utf8")
+                    )
+            );
         const key = `${manifest.name}@${manifest.version}`;
         if (!packages.has(key))
             packages.set(key, {
@@ -48,6 +65,9 @@ function visitPackage(directory) {
                     typeof manifest.license === "string"
                         ? manifest.license
                         : "NOASSERTION",
+                attribution: manifest.author ?? manifest.repository ?? null,
+                manifestDigest: digest(fs.readFileSync(manifestPath)),
+                fallbackSource: null,
                 files: files.map((file) => ({
                     name: file,
                     content: fs.readFileSync(
@@ -62,22 +82,71 @@ function visitPackage(directory) {
 
 visitModules(modulesRoot);
 if (!packages.size) throw new Error("No production registry packages found");
-const exemplars = new Map();
-for (const item of packages.values())
-    if (item.files.length && !exemplars.has(item.declared))
-        exemplars.set(item.declared, item);
+const fallbackPolicy = JSON.parse(
+    fs.readFileSync(
+        path.join(root, "config/runtime-license-fallbacks.json"),
+        "utf8"
+    )
+);
+if (
+    fallbackPolicy.schemaVersion !== 1 ||
+    !Array.isArray(fallbackPolicy.fallbacks)
+)
+    throw new Error("Invalid runtime license fallback policy");
+const fallbacks = new Map();
+for (const fallback of fallbackPolicy.fallbacks) {
+    const keys = Object.keys(fallback).sort();
+    const expected = [
+        "evidenceDigest",
+        "evidencePath",
+        "license",
+        "name",
+        "packageJsonDigest",
+        "sourceReference",
+        "version",
+    ].sort();
+    if (JSON.stringify(keys) !== JSON.stringify(expected))
+        throw new Error("Runtime license fallback has unexpected fields");
+    const key = `${fallback.name}@${fallback.version}`;
+    if (fallbacks.has(key))
+        throw new Error(`Duplicate runtime fallback: ${key}`);
+    if (
+        !fallback.evidencePath.startsWith(
+            "docs/security/license-evidence/npm-fallbacks/"
+        ) ||
+        path.normalize(fallback.evidencePath) !== fallback.evidencePath
+    )
+        throw new Error(`Unsafe runtime fallback path: ${key}`);
+    const evidence = fs.readFileSync(path.join(root, fallback.evidencePath));
+    if (digest(evidence) !== fallback.evidenceDigest)
+        throw new Error(`Runtime fallback evidence digest mismatch: ${key}`);
+    fallbacks.set(key, { ...fallback, evidence });
+}
+const usedFallbacks = new Set();
 for (const item of packages.values()) {
     if (item.files.length) continue;
-    const exemplar = exemplars.get(item.declared);
-    if (!exemplar)
+    const key = `${item.name}@${item.version}`;
+    const fallback = fallbacks.get(key);
+    if (
+        !fallback ||
+        fallback.license !== item.declared ||
+        fallback.packageJsonDigest !== item.manifestDigest
+    )
         throw new Error(
-            `${item.name}@${item.version} has no license file or exact-expression exemplar for ${item.declared}`
+            `${key} lacks exact package/version/license/digest-bound notice evidence`
         );
-    item.files = exemplar.files.map((file) => ({
-        name: `shared ${item.declared} text from ${exemplar.name}@${exemplar.version}/${file.name}`,
-        content: file.content,
-    }));
+    usedFallbacks.add(key);
+    item.fallbackSource = fallback.sourceReference;
+    item.files = [
+        {
+            name: fallback.evidencePath,
+            content: fallback.evidence.toString("utf8"),
+        },
+    ];
 }
+for (const key of fallbacks.keys())
+    if (!usedFallbacks.has(key))
+        throw new Error(`Unused runtime fallback: ${key}`);
 
 const sections = [
     "StaticDeploy M2 runtime third-party notices",
@@ -93,6 +162,11 @@ for (const item of [...packages.values()].sort((a, b) =>
     sections.push("=".repeat(78));
     sections.push(`${item.name}@${item.version}`);
     sections.push(`Declared package license: ${item.declared}`);
+    sections.push(
+        `Package attribution metadata: ${JSON.stringify(item.attribution)}`
+    );
+    if (item.fallbackSource)
+        sections.push(`Exact fallback source: ${item.fallbackSource}`);
     for (const file of item.files) {
         sections.push(`--- ${file.name} ---`);
         sections.push(file.content.trimEnd());
@@ -101,14 +175,14 @@ for (const item of [...packages.values()].sort((a, b) =>
 }
 for (const [label, file] of [
     ["StaticDeploy application", path.join(root, "LICENSE")],
-    ["Node.js runtime", "/usr/local/LICENSE"],
-    ["Apache-2.0 standard text", "/usr/share/common-licenses/Apache-2.0"],
-    ["CC0-1.0 standard text", "/usr/share/common-licenses/CC0-1.0"],
-    ["GPL-2.0 standard text", "/usr/share/common-licenses/GPL-2"],
-    ["GPL-3.0 standard text", "/usr/share/common-licenses/GPL-3"],
-    ["LGPL-2.1 standard text", "/usr/share/common-licenses/LGPL-2.1"],
-    ["LGPL-3.0 standard text", "/usr/share/common-licenses/LGPL-3"],
-    ["MPL-2.0 standard text", "/usr/share/common-licenses/MPL-2.0"],
+    ["Node.js runtime", nodeLicensePath],
+    ["Apache-2.0 standard text", path.join(commonLicensesRoot, "Apache-2.0")],
+    ["CC0-1.0 standard text", path.join(commonLicensesRoot, "CC0-1.0")],
+    ["GPL-2.0 standard text", path.join(commonLicensesRoot, "GPL-2")],
+    ["GPL-3.0 standard text", path.join(commonLicensesRoot, "GPL-3")],
+    ["LGPL-2.1 standard text", path.join(commonLicensesRoot, "LGPL-2.1")],
+    ["LGPL-3.0 standard text", path.join(commonLicensesRoot, "LGPL-3")],
+    ["MPL-2.0 standard text", path.join(commonLicensesRoot, "MPL-2.0")],
     [
         "GCC Runtime Library Exception 3.1",
         path.join(

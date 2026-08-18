@@ -7,6 +7,7 @@ license texts are appended from their retained build inputs.
 ==============================================================================
 @aws-sdk/checksums@3.1000.28
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -213,6 +214,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @aws-sdk/client-s3@3.1112.0
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -419,6 +421,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @aws-sdk/core@3.977.8
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -625,6 +628,7 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-env@3.972.69
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -831,9 +835,10 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-http@3.972.71
 Declared package license: Apache-2.0
---- shared Apache-2.0 text from @aws/lambda-invoke-store@0.3.0/LICENSE ---
-
-                                 Apache License
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
+Exact fallback source: https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE
+--- docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE ---
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -1008,9 +1013,37 @@ Declared package license: Apache-2.0
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
 ==============================================================================
 @aws-sdk/credential-provider-ini@3.973.14
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -1217,9 +1250,10 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-login@3.972.76
 Declared package license: Apache-2.0
---- shared Apache-2.0 text from @aws/lambda-invoke-store@0.3.0/LICENSE ---
-
-                                 Apache License
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
+Exact fallback source: https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE
+--- docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE ---
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -1394,9 +1428,37 @@ Declared package license: Apache-2.0
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
 ==============================================================================
 @aws-sdk/credential-provider-node@3.972.80
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -1603,6 +1665,7 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-process@3.972.69
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -1809,6 +1872,7 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-sso@3.973.13
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -2015,6 +2079,7 @@ Apache License
 ==============================================================================
 @aws-sdk/credential-provider-web-identity@3.972.75
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -2221,6 +2286,7 @@ Apache License
 ==============================================================================
 @aws-sdk/middleware-sdk-s3@3.972.74
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -2427,9 +2493,10 @@ Declared package license: Apache-2.0
 ==============================================================================
 @aws-sdk/nested-clients@3.997.43
 Declared package license: Apache-2.0
---- shared Apache-2.0 text from @aws/lambda-invoke-store@0.3.0/LICENSE ---
-
-                                 Apache License
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
+Exact fallback source: https://github.com/aws/aws-sdk-js-v3/blob/637dcf0ea7467a0b9e432575da50579bc432b3c5/LICENSE
+--- docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE ---
+Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -2604,9 +2671,37 @@ Declared package license: Apache-2.0
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
 ==============================================================================
 @aws-sdk/signature-v4-multi-region@3.996.45
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -2813,6 +2908,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @aws-sdk/token-providers@3.1111.0
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -3019,6 +3115,7 @@ Apache License
 ==============================================================================
 @aws-sdk/types@3.974.4
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -3225,6 +3322,7 @@ Apache License
 ==============================================================================
 @aws-sdk/xml-builder@3.972.39
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -3431,6 +3529,7 @@ Apache License
 ==============================================================================
 @aws/lambda-invoke-store@0.3.0
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"Amazon Web Services","url":"http://aws.amazon.com"}
 --- LICENSE ---
 
                                  Apache License
@@ -3611,6 +3710,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @isaacs/fs-minipass@4.0.1
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter"
 --- LICENSE ---
 The ISC License
 
@@ -3631,6 +3731,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 @mondora/env@1.3.0
 Declared package license: MIT
+Package attribution metadata: "Paolo Scanferla <paolo.scanferla@mondora.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -3657,6 +3758,7 @@ THE SOFTWARE.
 ==============================================================================
 @pinojs/redact@0.4.0
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 MIT License
 
@@ -3683,6 +3785,7 @@ SOFTWARE.
 ==============================================================================
 @smithy/core@3.33.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS Smithy Team","email":"","url":"https://smithy.io"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -3889,6 +3992,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @smithy/credential-provider-imds@4.5.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -4095,6 +4199,7 @@ Apache License
 ==============================================================================
 @smithy/fetch-http-handler@5.7.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -4301,6 +4406,7 @@ Apache License
 ==============================================================================
 @smithy/node-http-handler@4.11.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","email":"","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -4507,6 +4613,7 @@ Apache License
 ==============================================================================
 @smithy/signature-v4@5.7.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS SDK for JavaScript Team","url":"https://aws.amazon.com/sdk-for-javascript/"}
 --- LICENSE ---
 Apache License
                            Version 2.0, January 2004
@@ -4713,6 +4820,7 @@ Apache License
 ==============================================================================
 @smithy/types@4.17.2
 Declared package license: Apache-2.0
+Package attribution metadata: {"name":"AWS Smithy Team","email":"","url":"https://smithy.io"}
 --- LICENSE ---
                                 Apache License
                            Version 2.0, January 2004
@@ -4919,6 +5027,7 @@ Declared package license: Apache-2.0
 ==============================================================================
 @types/body-parser@1.19.2
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/body-parser"}
 --- LICENSE ---
     MIT License
 
@@ -4945,6 +5054,7 @@ Declared package license: MIT
 ==============================================================================
 @types/connect@3.4.35
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/connect"}
 --- LICENSE ---
     MIT License
 
@@ -4971,6 +5081,7 @@ Declared package license: MIT
 ==============================================================================
 @types/express-serve-static-core@4.19.9
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/express-serve-static-core"}
 --- LICENSE ---
     MIT License
 
@@ -4997,6 +5108,7 @@ Declared package license: MIT
 ==============================================================================
 @types/express@4.17.25
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/express"}
 --- LICENSE ---
     MIT License
 
@@ -5023,6 +5135,7 @@ Declared package license: MIT
 ==============================================================================
 @types/http-errors@2.0.5
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/http-errors"}
 --- LICENSE ---
     MIT License
 
@@ -5049,6 +5162,7 @@ Declared package license: MIT
 ==============================================================================
 @types/mime@1.3.2
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/mime"}
 --- LICENSE ---
     MIT License
 
@@ -5075,6 +5189,7 @@ Declared package license: MIT
 ==============================================================================
 @types/node@16.11.12
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/node"}
 --- LICENSE ---
     MIT License
 
@@ -5101,6 +5216,7 @@ Declared package license: MIT
 ==============================================================================
 @types/qs@6.9.7
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/qs"}
 --- LICENSE ---
     MIT License
 
@@ -5127,6 +5243,7 @@ Declared package license: MIT
 ==============================================================================
 @types/range-parser@1.2.4
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/range-parser"}
 --- LICENSE ---
     MIT License
 
@@ -5153,6 +5270,7 @@ Declared package license: MIT
 ==============================================================================
 @types/send@0.17.6
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/send"}
 --- LICENSE ---
     MIT License
 
@@ -5179,6 +5297,7 @@ Declared package license: MIT
 ==============================================================================
 @types/send@1.2.1
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/send"}
 --- LICENSE ---
     MIT License
 
@@ -5205,6 +5324,7 @@ Declared package license: MIT
 ==============================================================================
 @types/serve-static@1.15.10
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/DefinitelyTyped/DefinitelyTyped.git","directory":"types/serve-static"}
 --- LICENSE ---
     MIT License
 
@@ -5231,6 +5351,7 @@ Declared package license: MIT
 ==============================================================================
 accepts@1.3.8
 Declared package license: MIT
+Package attribution metadata: "jshttp/accepts"
 --- LICENSE ---
 (The MIT License)
 
@@ -5259,32 +5380,158 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 agent-base@6.0.2
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: "Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)"
+--- README.md ---
+agent-base
+==========
+### Turn a function into an [`http.Agent`][http.Agent] instance
+[![Build Status](https://github.com/TooTallNate/node-agent-base/workflows/Node%20CI/badge.svg)](https://github.com/TooTallNate/node-agent-base/actions?workflow=Node+CI)
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+This module provides an `http.Agent` generator. That is, you pass it an async
+callback function, and it returns a new `http.Agent` instance that will invoke the
+given callback function when sending outbound HTTP requests.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+#### Some subclasses:
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+Here's some more interesting uses of `agent-base`.
+Send a pull request to list yours!
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ * [`http-proxy-agent`][http-proxy-agent]: An HTTP(s) proxy `http.Agent` implementation for HTTP endpoints
+ * [`https-proxy-agent`][https-proxy-agent]: An HTTP(s) proxy `http.Agent` implementation for HTTPS endpoints
+ * [`pac-proxy-agent`][pac-proxy-agent]: A PAC file proxy `http.Agent` implementation for HTTP and HTTPS
+ * [`socks-proxy-agent`][socks-proxy-agent]: A SOCKS proxy `http.Agent` implementation for HTTP and HTTPS
+
+
+Installation
+------------
+
+Install with `npm`:
+
+``` bash
+$ npm install agent-base
+```
+
+
+Example
+-------
+
+Here's a minimal example that creates a new `net.Socket` connection to the server
+for every HTTP request (i.e. the equivalent of `agent: false` option):
+
+```js
+var net = require('net');
+var tls = require('tls');
+var url = require('url');
+var http = require('http');
+var agent = require('agent-base');
+
+var endpoint = 'http://nodejs.org/api/';
+var parsed = url.parse(endpoint);
+
+// This is the important part!
+parsed.agent = agent(function (req, opts) {
+  var socket;
+  // `secureEndpoint` is true when using the https module
+  if (opts.secureEndpoint) {
+    socket = tls.connect(opts);
+  } else {
+    socket = net.connect(opts);
+  }
+  return socket;
+});
+
+// Everything else works just like normal...
+http.get(parsed, function (res) {
+  console.log('"response" event!', res.headers);
+  res.pipe(process.stdout);
+});
+```
+
+Returning a Promise or using an `async` function is also supported:
+
+```js
+agent(async function (req, opts) {
+  await sleep(1000);
+  // etc…
+});
+```
+
+Return another `http.Agent` instance to "pass through" the responsibility
+for that HTTP request to that agent:
+
+```js
+agent(function (req, opts) {
+  return opts.secureEndpoint ? https.globalAgent : http.globalAgent;
+});
+```
+
+
+API
+---
+
+## Agent(Function callback[, Object options]) → [http.Agent][]
+
+Creates a base `http.Agent` that will execute the callback function `callback`
+for every HTTP request that it is used as the `agent` for. The callback function
+is responsible for creating a `stream.Duplex` instance of some kind that will be
+used as the underlying socket in the HTTP request.
+
+The `options` object accepts the following properties:
+
+  * `timeout` - Number - Timeout for the `callback()` function in milliseconds. Defaults to Infinity (optional).
+
+The callback function should have the following signature:
+
+### callback(http.ClientRequest req, Object options, Function cb) → undefined
+
+The ClientRequest `req` can be accessed to read request headers and
+and the path, etc. The `options` object contains the options passed
+to the `http.request()`/`https.request()` function call, and is formatted
+to be directly passed to `net.connect()`/`tls.connect()`, or however
+else you want a Socket to be created. Pass the created socket to
+the callback function `cb` once created, and the HTTP request will
+continue to proceed.
+
+If the `https` module is used to invoke the HTTP request, then the
+`secureEndpoint` property on `options` _will be set to `true`_.
+
+
+License
+-------
+
+(The MIT License)
+
+Copyright (c) 2013 Nathan Rajlich &lt;nathan@tootallnate.net&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[http-proxy-agent]: https://github.com/TooTallNate/node-http-proxy-agent
+[https-proxy-agent]: https://github.com/TooTallNate/node-https-proxy-agent
+[pac-proxy-agent]: https://github.com/TooTallNate/node-pac-proxy-agent
+[socks-proxy-agent]: https://github.com/TooTallNate/node-socks-proxy-agent
+[http.Agent]: https://nodejs.org/api/http.html#http_class_http_agent
 
 ==============================================================================
 ajv@6.15.0
 Declared package license: MIT
+Package attribution metadata: "Evgeny Poberezkin"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -5311,6 +5558,7 @@ SOFTWARE.
 ==============================================================================
 array-flatten@1.1.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Blake Embrey","email":"hello@blakeembrey.com","url":"http://blakeembrey.me"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -5337,6 +5585,7 @@ THE SOFTWARE.
 ==============================================================================
 async-function@1.0.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harbamd <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -5363,6 +5612,7 @@ SOFTWARE.
 ==============================================================================
 async-generator-function@1.0.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harbamd <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -5389,6 +5639,7 @@ SOFTWARE.
 ==============================================================================
 asynckit@0.4.0
 Declared package license: MIT
+Package attribution metadata: "Alex Indigo <iam@alexindigo.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -5415,6 +5666,7 @@ SOFTWARE.
 ==============================================================================
 atomic-sleep@1.0.0
 Declared package license: MIT
+Package attribution metadata: "David Mark Clements (@davidmarkclem)"
 --- LICENSE ---
 The MIT License (MIT)
 Copyright (c) 2020 David Mark Clements
@@ -5441,6 +5693,7 @@ OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 axios@1.19.0
 Declared package license: MIT
+Package attribution metadata: "Matt Zabriskie"
 --- LICENSE ---
 # Copyright (c) 2014-present Matt Zabriskie & Collaborators
 
@@ -5453,6 +5706,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 balanced-match@1.0.2
 Declared package license: MIT
+Package attribution metadata: {"name":"Julian Gruber","email":"mail@juliangruber.com","url":"http://juliangruber.com"}
 --- LICENSE.md ---
 (MIT)
 
@@ -5479,6 +5733,7 @@ SOFTWARE.
 ==============================================================================
 bluebird@3.7.2
 Declared package license: MIT
+Package attribution metadata: {"name":"Petka Antonov","email":"petka_antonov@hotmail.com","url":"http://github.com/petkaantonov/"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -5505,6 +5760,7 @@ THE SOFTWARE.
 ==============================================================================
 body-parser@1.20.6
 Declared package license: MIT
+Package attribution metadata: "expressjs/body-parser"
 --- LICENSE ---
 (The MIT License)
 
@@ -5533,10 +5789,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 boolbase@1.0.0
 Declared package license: ISC
---- shared ISC text from @isaacs/fs-minipass@4.0.1/LICENSE ---
-The ISC License
-
-Copyright (c) Isaac Z. Schlueter and Contributors
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
+Exact fallback source: https://github.com/fb55/boolbase/blob/be0bcd8a4e917a0a5895e95b523fbbed05a64871/LICENSE
+--- docs/security/license-evidence/npm-fallbacks/boolbase-1.0.0-LICENSE ---
+Copyright (c) 2014-2015, Felix Boehm <me@feedic.com>
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -5547,12 +5803,13 @@ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
 MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
 ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
-IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ==============================================================================
 bowser@2.14.1
 Declared package license: MIT
+Package attribution metadata: "Dustin Diaz <dustin@dustindiaz.com> (http://dustindiaz.com)"
 --- LICENSE ---
 Copyright 2015, Dustin Diaz (the "Original Author")
 All rights reserved.
@@ -5597,6 +5854,7 @@ Original Author, when distributed with the Software.
 ==============================================================================
 brace-expansion@1.1.18
 Declared package license: MIT
+Package attribution metadata: {"name":"Julian Gruber","email":"mail@juliangruber.com","url":"http://juliangruber.com"}
 --- LICENSE ---
 MIT License
 
@@ -5623,6 +5881,7 @@ SOFTWARE.
 ==============================================================================
 braces@3.0.3
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -5649,6 +5908,7 @@ THE SOFTWARE.
 ==============================================================================
 bytes@3.1.2
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca> (http://tjholowaychuk.com)"
 --- LICENSE ---
 (The MIT License)
 
@@ -5677,6 +5937,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 call-bind-apply-helpers@1.0.2
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -5703,6 +5964,7 @@ SOFTWARE.
 ==============================================================================
 call-bound@1.0.4
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -5729,6 +5991,7 @@ SOFTWARE.
 ==============================================================================
 charenc@0.0.2
 Declared package license: BSD-3-Clause
+Package attribution metadata: "Paul Vorbach <paul@vorb.de> (http://vorb.de)"
 --- LICENSE.mkd ---
 Copyright © 2011, Paul Vorbach. All rights reserved.
 Copyright © 2009, Jeff Mott. All rights reserved.
@@ -5761,6 +6024,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 cheerio-select@2.1.0
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -5777,6 +6041,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 cheerio@1.2.0
 Declared package license: MIT
+Package attribution metadata: "Matt Mueller <mattmuelle@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -5803,6 +6068,7 @@ SOFTWARE.
 ==============================================================================
 chownr@3.0.0
 Declared package license: BlueOak-1.0.0
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE.md ---
 All packages under `src/` are licensed according to the terms in
 their respective `LICENSE` or `LICENSE.md` files.
@@ -5871,6 +6137,7 @@ software or this license, under any kind of legal claim.***
 ==============================================================================
 colorette@2.0.19
 Declared package license: MIT
+Package attribution metadata: "Jorge Bucaran"
 --- LICENSE.md ---
 Copyright © Jorge Bucaran <<https://jorgebucaran.com>>
 
@@ -5883,6 +6150,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 combined-stream@1.0.8
 Declared package license: MIT
+Package attribution metadata: "Felix Geisendörfer <felix@debuggable.com> (http://debuggable.com/)"
 --- License ---
 Copyright (c) 2011 Debuggable Limited <felix@debuggable.com>
 
@@ -5907,6 +6175,7 @@ THE SOFTWARE.
 ==============================================================================
 commander@10.0.1
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca>"
 --- LICENSE ---
 (The MIT License)
 
@@ -5934,6 +6203,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 concat-map@0.0.1
 Declared package license: MIT
+Package attribution metadata: {"name":"James Halliday","email":"mail@substack.net","url":"http://substack.net"}
 --- LICENSE ---
 This software is released under the MIT license:
 
@@ -5957,6 +6227,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 content-disposition@0.5.4
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -5984,6 +6255,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 content-security-policy-builder@2.3.0
 Declared package license: MIT
+Package attribution metadata: "Evan Hahn <me@evanhahn.com> (https://evanhahn.com)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -6010,6 +6282,7 @@ SOFTWARE.
 ==============================================================================
 content-security-policy-parser@0.6.0
 Declared package license: MIT
+Package attribution metadata: "Evan Hahn <me@evanhahn.com> (https://evanhahn.com)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -6036,6 +6309,7 @@ SOFTWARE.
 ==============================================================================
 content-type@1.0.4
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6063,6 +6337,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 content-type@1.0.5
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6090,6 +6365,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 convexpress@2.3.0
 Declared package license: MIT
+Package attribution metadata: "Paolo Scanferla <paolo.scanferla@gmail.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -6116,32 +6392,55 @@ THE SOFTWARE.
 ==============================================================================
 cookie-signature@1.0.7
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: "TJ Holowaychuk <tj@learnboost.com>"
+--- Readme.md ---
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+# cookie-signature
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+  Sign and unsign cookies.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+## Example
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+```js
+var cookie = require('cookie-signature');
+
+var val = cookie.sign('hello', 'tobiiscool');
+val.should.equal('hello.DGDUkGlIkCzPz+C0B064FNgHdEjox7ch8tOBGslZ5QI');
+
+var val = cookie.sign('hello', 'tobiiscool');
+cookie.unsign(val, 'tobiiscool').should.equal('hello');
+cookie.unsign(val, 'luna').should.be.false;
+```
+
+## License 
+
+(The MIT License)
+
+Copyright (c) 2012 LearnBoost &lt;tj@learnboost.com&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
 cookie@0.7.2
 Declared package license: MIT
+Package attribution metadata: "Roman Shtylman <shtylman@gmail.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6170,6 +6469,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 crypt@0.0.2
 Declared package license: BSD-3-Clause
+Package attribution metadata: "Paul Vorbach <paul@vorb.de> (http://vorb.de)"
 --- LICENSE.mkd ---
 Copyright © 2011, Paul Vorbach. All rights reserved.
 Copyright © 2009, Jeff Mott. All rights reserved.
@@ -6202,6 +6502,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 css-select@5.2.2
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6218,6 +6519,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 css-what@6.2.2
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Böhm <me@feedic.com> (http://feedic.com)"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6234,6 +6536,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 debug@2.6.9
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6257,6 +6560,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 debug@4.3.3
 Declared package license: MIT
+Package attribution metadata: "Josh Junon <josh.junon@protonmail.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6281,6 +6585,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 debug@4.3.4
 Declared package license: MIT
+Package attribution metadata: "Josh Junon <josh.junon@protonmail.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6305,6 +6610,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 delayed-stream@1.0.0
 Declared package license: MIT
+Package attribution metadata: "Felix Geisendörfer <felix@debuggable.com> (http://debuggable.com/)"
 --- License ---
 Copyright (c) 2011 Debuggable Limited <felix@debuggable.com>
 
@@ -6329,6 +6635,7 @@ THE SOFTWARE.
 ==============================================================================
 depd@2.0.0
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6356,6 +6663,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 destroy@1.2.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Jonathan Ong","email":"me@jongleberry.com","url":"http://jongleberry.com","twitter":"https://twitter.com/jongleberry"}
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -6384,6 +6692,7 @@ THE SOFTWARE.
 ==============================================================================
 dom-serializer@2.0.0
 Declared package license: MIT
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 License
 
@@ -6400,6 +6709,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 domelementtype@2.3.0
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6416,6 +6726,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 domhandler@5.0.3
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6432,6 +6743,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 domutils@3.2.2
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6448,6 +6760,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 dunder-proto@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -6474,6 +6787,7 @@ SOFTWARE.
 ==============================================================================
 ee-first@1.1.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Jonathan Ong","email":"me@jongleberry.com","url":"http://jongleberry.com","twitter":"https://twitter.com/jongleberry"}
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -6501,6 +6815,7 @@ THE SOFTWARE.
 ==============================================================================
 encodeurl@2.0.0
 Declared package license: MIT
+Package attribution metadata: "pillarjs/encodeurl"
 --- LICENSE ---
 (The MIT License)
 
@@ -6528,6 +6843,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 encoding-sniffer@0.2.1
 Declared package license: MIT
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) 2022 Felix Boehm <me@feedic.com>
 
@@ -6551,6 +6867,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 entities@4.5.0
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6567,6 +6884,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 entities@6.0.1
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6583,6 +6901,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 entities@7.0.1
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -6599,6 +6918,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 es-define-property@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -6625,6 +6945,7 @@ SOFTWARE.
 ==============================================================================
 es-errors@1.3.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -6651,6 +6972,7 @@ SOFTWARE.
 ==============================================================================
 es-object-atoms@1.1.2
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -6677,6 +6999,7 @@ SOFTWARE.
 ==============================================================================
 es-set-tostringtag@2.1.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -6703,6 +7026,7 @@ SOFTWARE.
 ==============================================================================
 escalade@3.1.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Luke Edwards","email":"luke.edwards05@gmail.com","url":"https://lukeed.com"}
 --- license ---
 MIT License
 
@@ -6717,6 +7041,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 escape-html@1.0.3
 Declared package license: MIT
+Package attribution metadata: "component/escape-html"
 --- LICENSE ---
 (The MIT License)
 
@@ -6746,6 +7071,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 escape-string-regexp@4.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Sindre Sorhus","email":"sindresorhus@gmail.com","url":"https://sindresorhus.com"}
 --- license ---
 MIT License
 
@@ -6760,6 +7086,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 esm@3.2.25
 Declared package license: MIT
+Package attribution metadata: "John-David Dalton <john.david.dalton@gmail.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -6788,6 +7115,7 @@ SOFTWARE.
 ==============================================================================
 etag@1.8.1
 Declared package license: MIT
+Package attribution metadata: "jshttp/etag"
 --- LICENSE ---
 (The MIT License)
 
@@ -6815,6 +7143,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 express@4.22.2
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6844,6 +7173,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 fast-deep-equal@3.1.3
 Declared package license: MIT
+Package attribution metadata: "Evgeny Poberezkin"
 --- LICENSE ---
 MIT License
 
@@ -6870,6 +7200,7 @@ SOFTWARE.
 ==============================================================================
 fast-json-stable-stringify@2.1.0
 Declared package license: MIT
+Package attribution metadata: {"name":"James Halliday","email":"mail@substack.net","url":"http://substack.net"}
 --- LICENSE ---
 This software is released under the MIT license:
 
@@ -6896,6 +7227,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 fill-range@7.1.1
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -6922,6 +7254,7 @@ THE SOFTWARE.
 ==============================================================================
 finalhandler@1.3.2
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -6949,6 +7282,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 follow-redirects@1.16.0
 Declared package license: MIT
+Package attribution metadata: "Ruben Verborgh <ruben@verborgh.org> (https://ruben.verborgh.org/)"
 --- LICENSE ---
 Copyright 2014–present Olivier Lalonde <olalonde@gmail.com>, James Talmage <james@talmage.io>, Ruben Verborgh
 
@@ -6972,6 +7306,7 @@ IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 form-data@4.0.6
 Declared package license: MIT
+Package attribution metadata: "Felix Geisendörfer <felix@debuggable.com> (http://debuggable.com/)"
 --- License ---
 Copyright (c) 2012 Felix Geisendörfer (felix@debuggable.com) and contributors
 
@@ -6996,6 +7331,7 @@ Copyright (c) 2012 Felix Geisendörfer (felix@debuggable.com) and contributors
 ==============================================================================
 forwarded@0.2.0
 Declared package license: MIT
+Package attribution metadata: "jshttp/forwarded"
 --- LICENSE ---
 (The MIT License)
 
@@ -7023,6 +7359,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 fresh@0.5.2
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca> (http://tjholowaychuk.com)"
 --- LICENSE ---
 (The MIT License)
 
@@ -7051,6 +7388,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 fs-extra@11.4.0
 Declared package license: MIT
+Package attribution metadata: "JP Richardson <jprichardson@gmail.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -7071,6 +7409,7 @@ OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHE
 ==============================================================================
 fs.realpath@1.0.0
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 The ISC License
 
@@ -7119,6 +7458,7 @@ the licensed code:
 ==============================================================================
 function-bind@1.1.1
 Declared package license: MIT
+Package attribution metadata: "Raynos <raynos2@gmail.com>"
 --- LICENSE ---
 Copyright (c) 2013 Raynos.
 
@@ -7143,6 +7483,7 @@ THE SOFTWARE.
 ==============================================================================
 function-bind@1.1.2
 Declared package license: MIT
+Package attribution metadata: "Raynos <raynos2@gmail.com>"
 --- LICENSE ---
 Copyright (c) 2013 Raynos.
 
@@ -7167,6 +7508,7 @@ THE SOFTWARE.
 ==============================================================================
 generator-function@2.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harbamd <ljharb@gmail.com>"
 --- LICENSE.md ---
 Copyright (c) 2015 Tiancheng “Timothy” Gu
 
@@ -7179,6 +7521,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 get-caller-file@2.0.5
 Declared package license: ISC
+Package attribution metadata: "Stefan Penner"
 --- LICENSE.md ---
 ISC License (ISC)
 Copyright 2018 Stefan Penner
@@ -7190,6 +7533,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 ==============================================================================
 get-intrinsic@1.3.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -7216,6 +7560,7 @@ SOFTWARE.
 ==============================================================================
 get-package-type@0.1.0
 Declared package license: MIT
+Package attribution metadata: "Corey Farrell"
 --- LICENSE ---
 MIT License
 
@@ -7242,6 +7587,7 @@ SOFTWARE.
 ==============================================================================
 get-proto@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -7268,6 +7614,7 @@ SOFTWARE.
 ==============================================================================
 getopts@2.3.0
 Declared package license: MIT
+Package attribution metadata: "Jorge Bucaran"
 --- LICENSE.md ---
 Copyright © Jorge Bucaran <<https://jorgebucaran.com>>
 
@@ -7280,6 +7627,7 @@ THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 glob@7.2.0
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 The ISC License
 
@@ -7306,6 +7654,7 @@ https://creativecommons.org/licenses/by-sa/4.0/
 ==============================================================================
 gopd@1.2.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -7332,6 +7681,7 @@ SOFTWARE.
 ==============================================================================
 graceful-fs@4.2.8
 Declared package license: ISC
+Package attribution metadata: {"type":"git","url":"https://github.com/isaacs/node-graceful-fs"}
 --- LICENSE ---
 The ISC License
 
@@ -7352,6 +7702,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 has-symbols@1.1.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Jordan Harband","email":"ljharb@gmail.com","url":"http://ljharb.codes"}
 --- LICENSE ---
 MIT License
 
@@ -7378,6 +7729,7 @@ SOFTWARE.
 ==============================================================================
 has-tostringtag@1.0.2
 Declared package license: MIT
+Package attribution metadata: {"name":"Jordan Harband","email":"ljharb@gmail.com","url":"http://ljharb.codes"}
 --- LICENSE ---
 MIT License
 
@@ -7404,32 +7756,35 @@ SOFTWARE.
 ==============================================================================
 has@1.0.3
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: {"name":"Thiago de Arruda","email":"tpadilha84@gmail.com"}
+--- LICENSE-MIT ---
+Copyright (c) 2013 Thiago de Arruda
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
 hasown@2.0.4
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -7456,6 +7811,7 @@ SOFTWARE.
 ==============================================================================
 htmlparser2@10.1.0
 Declared package license: MIT
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright 2010, 2011, Chris Winberry <chris@winberry.net>. All rights reserved.
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -7479,6 +7835,7 @@ IN THE SOFTWARE.
 ==============================================================================
 http-errors@2.0.1
 Declared package license: MIT
+Package attribution metadata: "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)"
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -7507,32 +7864,150 @@ THE SOFTWARE.
 ==============================================================================
 https-proxy-agent@5.0.1
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: "Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)"
+--- README.md ---
+https-proxy-agent
+================
+### An HTTP(s) proxy `http.Agent` implementation for HTTPS
+[![Build Status](https://github.com/TooTallNate/node-https-proxy-agent/workflows/Node%20CI/badge.svg)](https://github.com/TooTallNate/node-https-proxy-agent/actions?workflow=Node+CI)
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+This module provides an `http.Agent` implementation that connects to a specified
+HTTP or HTTPS proxy server, and can be used with the built-in `https` module.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Specifically, this `Agent` implementation connects to an intermediary "proxy"
+server and issues the [CONNECT HTTP method][CONNECT], which tells the proxy to
+open a direct TCP connection to the destination server.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+Since this agent implements the CONNECT HTTP method, it also works with other
+protocols that use this method when connecting over proxies (i.e. WebSockets).
+See the "Examples" section below for more.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+
+Installation
+------------
+
+Install with `npm`:
+
+``` bash
+$ npm install https-proxy-agent
+```
+
+
+Examples
+--------
+
+#### `https` module example
+
+``` js
+var url = require('url');
+var https = require('https');
+var HttpsProxyAgent = require('https-proxy-agent');
+
+// HTTP/HTTPS proxy to connect to
+var proxy = process.env.http_proxy || 'http://168.63.76.32:3128';
+console.log('using proxy server %j', proxy);
+
+// HTTPS endpoint for the proxy to connect to
+var endpoint = process.argv[2] || 'https://graph.facebook.com/tootallnate';
+console.log('attempting to GET %j', endpoint);
+var options = url.parse(endpoint);
+
+// create an instance of the `HttpsProxyAgent` class with the proxy server information
+var agent = new HttpsProxyAgent(proxy);
+options.agent = agent;
+
+https.get(options, function (res) {
+  console.log('"response" event!', res.headers);
+  res.pipe(process.stdout);
+});
+```
+
+#### `ws` WebSocket connection example
+
+``` js
+var url = require('url');
+var WebSocket = require('ws');
+var HttpsProxyAgent = require('https-proxy-agent');
+
+// HTTP/HTTPS proxy to connect to
+var proxy = process.env.http_proxy || 'http://168.63.76.32:3128';
+console.log('using proxy server %j', proxy);
+
+// WebSocket endpoint for the proxy to connect to
+var endpoint = process.argv[2] || 'ws://echo.websocket.org';
+var parsed = url.parse(endpoint);
+console.log('attempting to connect to WebSocket %j', endpoint);
+
+// create an instance of the `HttpsProxyAgent` class with the proxy server information
+var options = url.parse(proxy);
+
+var agent = new HttpsProxyAgent(options);
+
+// finally, initiate the WebSocket connection
+var socket = new WebSocket(endpoint, { agent: agent });
+
+socket.on('open', function () {
+  console.log('"open" event!');
+  socket.send('hello world');
+});
+
+socket.on('message', function (data, flags) {
+  console.log('"message" event! %j %j', data, flags);
+  socket.close();
+});
+```
+
+API
+---
+
+### new HttpsProxyAgent(Object options)
+
+The `HttpsProxyAgent` class implements an `http.Agent` subclass that connects
+to the specified "HTTP(s) proxy server" in order to proxy HTTPS and/or WebSocket
+requests. This is achieved by using the [HTTP `CONNECT` method][CONNECT].
+
+The `options` argument may either be a string URI of the proxy server to use, or an
+"options" object with more specific properties:
+
+  * `host` - String - Proxy host to connect to (may use `hostname` as well). Required.
+  * `port` - Number - Proxy port to connect to. Required.
+  * `protocol` - String - If `https:`, then use TLS to connect to the proxy.
+  * `headers` - Object - Additional HTTP headers to be sent on the HTTP CONNECT method.
+  * Any other options given are passed to the `net.connect()`/`tls.connect()` functions.
+
+
+License
+-------
+
+(The MIT License)
+
+Copyright (c) 2013 Nathan Rajlich &lt;nathan@tootallnate.net&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+[CONNECT]: http://en.wikipedia.org/wiki/HTTP_tunnel#HTTP_CONNECT_Tunneling
 
 ==============================================================================
 iconv-lite@0.4.24
 Declared package license: MIT
+Package attribution metadata: "Alexander Shtuchkin <ashtuchkin@gmail.com>"
 --- LICENSE ---
 Copyright (c) 2011 Alexander Shtuchkin
 
@@ -7558,6 +8033,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 iconv-lite@0.6.3
 Declared package license: MIT
+Package attribution metadata: "Alexander Shtuchkin <ashtuchkin@gmail.com>"
 --- LICENSE ---
 Copyright (c) 2011 Alexander Shtuchkin
 
@@ -7583,6 +8059,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 inflight@1.0.6
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 The ISC License
 
@@ -7603,6 +8080,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 inherits@2.0.4
 Declared package license: ISC
+Package attribution metadata: "git://github.com/isaacs/inherits"
 --- LICENSE ---
 The ISC License
 
@@ -7623,6 +8101,7 @@ PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 interpret@2.2.0
 Declared package license: MIT
+Package attribution metadata: "Gulp Team <team@gulpjs.com> (http://gulpjs.com/)"
 --- LICENSE ---
 Copyright (c) 2014-2018 Tyler Kellen <tyler@sleekcode.net>, Blaine Bublitz <blaine.bublitz@gmail.com>, and Eric Schoffstall <yo@contra.io>
 
@@ -7650,6 +8129,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 ipaddr.js@1.9.1
 Declared package license: MIT
+Package attribution metadata: "whitequark <whitequark@whitequark.org>"
 --- LICENSE ---
 Copyright (C) 2011-2017 whitequark <whitequark@whitequark.org>
 
@@ -7674,6 +8154,7 @@ THE SOFTWARE.
 ==============================================================================
 is-buffer@1.1.6
 Declared package license: MIT
+Package attribution metadata: {"name":"Feross Aboukhadijeh","email":"feross@feross.org","url":"http://feross.org/"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -7700,6 +8181,7 @@ THE SOFTWARE.
 ==============================================================================
 is-core-module@2.8.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -7725,6 +8207,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 is-number@7.0.0
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -7751,6 +8234,7 @@ THE SOFTWARE.
 ==============================================================================
 jose@5.10.0
 Declared package license: MIT
+Package attribution metadata: "Filip Skokan <panva.ip@gmail.com>"
 --- LICENSE.md ---
 The MIT License (MIT)
 
@@ -7777,6 +8261,7 @@ SOFTWARE.
 ==============================================================================
 json-schema-traverse@0.4.1
 Declared package license: MIT
+Package attribution metadata: "Evgeny Poberezkin"
 --- LICENSE ---
 MIT License
 
@@ -7803,6 +8288,7 @@ SOFTWARE.
 ==============================================================================
 jsonfile@6.1.0
 Declared package license: MIT
+Package attribution metadata: "JP Richardson <jprichardson@gmail.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -7823,6 +8309,7 @@ OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHE
 ==============================================================================
 knex@3.1.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Tim Griesser","web":"https://github.com/tgriesser"}
 --- LICENSE ---
 Copyright (c) 2013-present Tim Griesser
 
@@ -7850,6 +8337,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 lodash@4.18.1
 Declared package license: MIT
+Package attribution metadata: "John-David Dalton <john.david.dalton@gmail.com>"
 --- LICENSE ---
 Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
 
@@ -7902,6 +8390,7 @@ terms above.
 ==============================================================================
 math-intrinsics@1.1.0
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -7928,6 +8417,7 @@ SOFTWARE.
 ==============================================================================
 md5@2.3.0
 Declared package license: BSD-3-Clause
+Package attribution metadata: "Paul Vorbach <paul@vorba.ch> (http://paul.vorba.ch)"
 --- LICENSE ---
 Copyright © 2011-2012, Paul Vorbach.
 Copyright © 2009, Jeff Mott.
@@ -7960,6 +8450,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 media-typer@0.3.0
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -7987,6 +8478,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 merge-descriptors@1.0.3
 Declared package license: MIT
+Package attribution metadata: {"name":"Jonathan Ong","email":"me@jongleberry.com","url":"http://jongleberry.com","twitter":"https://twitter.com/jongleberry"}
 --- LICENSE ---
 (The MIT License)
 
@@ -8015,6 +8507,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 methods@1.1.2
 Declared package license: MIT
+Package attribution metadata: "jshttp/methods"
 --- LICENSE ---
 (The MIT License)
 
@@ -8043,6 +8536,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 micromatch@4.0.8
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8069,6 +8563,7 @@ THE SOFTWARE.
 ==============================================================================
 mime-db@1.51.0
 Declared package license: MIT
+Package attribution metadata: "jshttp/mime-db"
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -8096,6 +8591,7 @@ THE SOFTWARE.
 ==============================================================================
 mime-db@1.52.0
 Declared package license: MIT
+Package attribution metadata: "jshttp/mime-db"
 --- LICENSE ---
 (The MIT License)
 
@@ -8124,6 +8620,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 mime-types@2.1.34
 Declared package license: MIT
+Package attribution metadata: "jshttp/mime-types"
 --- LICENSE ---
 (The MIT License)
 
@@ -8152,6 +8649,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 mime-types@2.1.35
 Declared package license: MIT
+Package attribution metadata: "jshttp/mime-types"
 --- LICENSE ---
 (The MIT License)
 
@@ -8180,6 +8678,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 mime@1.6.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Robert Kieffer","url":"http://github.com/broofa","email":"robert@broofa.com"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8206,6 +8705,7 @@ THE SOFTWARE.
 ==============================================================================
 mime@3.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Robert Kieffer","url":"http://github.com/broofa","email":"robert@broofa.com"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8232,6 +8732,7 @@ THE SOFTWARE.
 ==============================================================================
 minimatch@3.1.5
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)"
 --- LICENSE ---
 The ISC License
 
@@ -8252,6 +8753,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 minipass@7.1.3
 Declared package license: BlueOak-1.0.0
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE.md ---
 # Blue Oak Model License
 
@@ -8312,6 +8814,7 @@ software or this license, under any kind of legal claim.***
 ==============================================================================
 minizlib@3.1.0
 Declared package license: MIT
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 Minizlib was created by Isaac Z. Schlueter.
 It is a derivative work of the Node.js project.
@@ -8343,6 +8846,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 ms@2.0.0
 Declared package license: MIT
+Package attribution metadata: "zeit/ms"
 --- license.md ---
 The MIT License (MIT)
 
@@ -8369,6 +8873,7 @@ SOFTWARE.
 ==============================================================================
 ms@2.1.2
 Declared package license: MIT
+Package attribution metadata: "zeit/ms"
 --- license.md ---
 The MIT License (MIT)
 
@@ -8395,6 +8900,7 @@ SOFTWARE.
 ==============================================================================
 ms@2.1.3
 Declared package license: MIT
+Package attribution metadata: "vercel/ms"
 --- license.md ---
 The MIT License (MIT)
 
@@ -8421,6 +8927,7 @@ SOFTWARE.
 ==============================================================================
 negotiator@0.6.3
 Declared package license: MIT
+Package attribution metadata: "jshttp/negotiator"
 --- LICENSE ---
 (The MIT License)
 
@@ -8450,6 +8957,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 nth-check@2.1.1
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Felix Boehm <me@feedic.com>"
 --- LICENSE ---
 Copyright (c) Felix Böhm
 All rights reserved.
@@ -8466,6 +8974,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 object-inspect@1.13.4
 Declared package license: MIT
+Package attribution metadata: {"name":"James Halliday","email":"mail@substack.net","url":"http://substack.net"}
 --- LICENSE ---
 MIT License
 
@@ -8492,6 +9001,7 @@ SOFTWARE.
 ==============================================================================
 on-exit-leak-free@2.1.2
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 MIT License
 
@@ -8518,6 +9028,7 @@ SOFTWARE.
 ==============================================================================
 on-finished@2.4.1
 Declared package license: MIT
+Package attribution metadata: "jshttp/on-finished"
 --- LICENSE ---
 (The MIT License)
 
@@ -8546,6 +9057,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 once@1.4.0
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 The ISC License
 
@@ -8566,6 +9078,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 parse5-htmlparser2-tree-adapter@7.1.0
 Declared package license: MIT
+Package attribution metadata: "Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)"
 --- LICENSE ---
 Copyright (c) 2013-2019 Ivan Nikulin (ifaaan@gmail.com, https://github.com/inikulin)
 
@@ -8590,6 +9103,7 @@ THE SOFTWARE.
 ==============================================================================
 parse5-parser-stream@7.1.2
 Declared package license: MIT
+Package attribution metadata: "Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)"
 --- LICENSE ---
 Copyright (c) 2013-2019 Ivan Nikulin (ifaaan@gmail.com, https://github.com/inikulin)
 
@@ -8614,6 +9128,7 @@ THE SOFTWARE.
 ==============================================================================
 parse5@7.3.0
 Declared package license: MIT
+Package attribution metadata: "Ivan Nikulin <ifaaan@gmail.com> (https://github.com/inikulin)"
 --- LICENSE ---
 Copyright (c) 2013-2019 Ivan Nikulin (ifaaan@gmail.com, https://github.com/inikulin)
 
@@ -8638,6 +9153,7 @@ THE SOFTWARE.
 ==============================================================================
 parseurl@1.3.3
 Declared package license: MIT
+Package attribution metadata: "pillarjs/parseurl"
 --- LICENSE ---
 
 (The MIT License)
@@ -8667,6 +9183,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 path-is-absolute@1.0.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Sindre Sorhus","email":"sindresorhus@gmail.com","url":"sindresorhus.com"}
 --- license ---
 The MIT License (MIT)
 
@@ -8693,6 +9210,7 @@ THE SOFTWARE.
 ==============================================================================
 path-parse@1.0.7
 Declared package license: MIT
+Package attribution metadata: "Javier Blanco <http://jbgutierrez.info>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8719,6 +9237,7 @@ SOFTWARE.
 ==============================================================================
 path-to-regexp@0.1.13
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"https://github.com/pillarjs/path-to-regexp.git"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8745,6 +9264,7 @@ THE SOFTWARE.
 ==============================================================================
 pg-cloudflare@1.4.0
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"git://github.com/brianc/node-postgres.git","directory":"packages/pg-cloudflare"}
 --- LICENSE ---
 MIT License
 
@@ -8771,6 +9291,7 @@ SOFTWARE.
 ==============================================================================
 pg-connection-string@2.14.0
 Declared package license: MIT
+Package attribution metadata: "Blaine Bublitz <blaine@iceddev.com> (http://iceddev.com/)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8797,6 +9318,7 @@ SOFTWARE.
 ==============================================================================
 pg-connection-string@2.6.2
 Declared package license: MIT
+Package attribution metadata: "Blaine Bublitz <blaine@iceddev.com> (http://iceddev.com/)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8823,6 +9345,7 @@ SOFTWARE.
 ==============================================================================
 pg-int8@1.0.1
 Declared package license: ISC
+Package attribution metadata: {"type":"git","url":"https://github.com/charmander/pg-int8"}
 --- LICENSE ---
 Copyright © 2017, Charmander <~@charmander.me>
 
@@ -8841,6 +9364,7 @@ PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 pg-pool@3.14.0
 Declared package license: MIT
+Package attribution metadata: "Brian M. Carlson"
 --- LICENSE ---
 MIT License
 
@@ -8867,6 +9391,7 @@ SOFTWARE.
 ==============================================================================
 pg-protocol@1.16.0
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"git://github.com/brianc/node-postgres.git","directory":"packages/pg-protocol"}
 --- LICENSE ---
 MIT License
 
@@ -8893,10 +9418,65 @@ SOFTWARE.
 ==============================================================================
 pg-types@2.2.0
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
+Package attribution metadata: "Brian M. Carlson"
+--- README.md ---
+# pg-types
+
+This is the code that turns all the raw text from postgres into JavaScript types for [node-postgres](https://github.com/brianc/node-postgres.git)
+
+## use
+
+This module is consumed and exported from the root `pg` object of node-postgres.  To access it, do the following:
+
+```js
+var types = require('pg').types
+```
+
+Generally what you'll want to do is override how a specific data-type is parsed and turned into a JavaScript type.  By default the PostgreSQL backend server returns everything as strings.  Every data type corresponds to a unique `OID` within the server, and these `OIDs` are sent back with the query response.  So, you need to match a particluar `OID` to a function you'd like to use to take the raw text input and produce a valid JavaScript object as a result. `null` values are never parsed.
+
+Let's do something I commonly like to do on projects: return 64-bit integers `(int8)` as JavaScript integers.  Because JavaScript doesn't have support for 64-bit integers node-postgres cannot confidently parse `int8` data type results as numbers because if you have a _huge_ number it will overflow and the result you'd get back from node-postgres would not be the result in the datbase.  That would be a __very bad thing__ so node-postgres just returns `int8` results as strings and leaves the parsing up to you.  Let's say that you know you don't and wont ever have numbers greater than `int4` in your database, but you're tired of recieving results from the `COUNT(*)` function as strings (because that function returns `int8`).  You would do this:
+
+```js
+var types = require('pg').types
+types.setTypeParser(20, function(val) {
+  return parseInt(val)
+})
+```
+
+__boom__: now you get numbers instead of strings.
+
+Just as another example -- not saying this is a good idea -- let's say you want to return all dates from your database as [moment](http://momentjs.com/docs/) objects.  Okay, do this:
+
+```js
+var types = require('pg').types
+var moment = require('moment')
+var parseFn = function(val) {
+   return val === null ? null : moment(val)
+}
+types.setTypeParser(types.builtins.TIMESTAMPTZ, parseFn)
+types.setTypeParser(types.builtins.TIMESTAMP, parseFn)
+```
+_note: I've never done that with my dates, and I'm not 100% sure moment can parse all the date strings returned from postgres.  It's just an example!_
+
+If you're thinking "gee, this seems pretty handy, but how can I get a list of all the OIDs in the database and what they correspond to?!?!?!" worry not:
+
+```bash
+$ psql -c "select typname, oid, typarray from pg_type order by oid"
+```
+
+If you want to find out the OID of a specific type:
+
+```bash
+$ psql -c "select typname, oid, typarray from pg_type where typname = 'daterange' order by oid"
+```
+
+:smile:
+
+## license
+
 The MIT License (MIT)
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+Copyright (c) 2014 Brian M. Carlson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -8919,6 +9499,7 @@ THE SOFTWARE.
 ==============================================================================
 pg@8.16.3
 Declared package license: MIT
+Package attribution metadata: "Brian Carlson <brian.m.carlson@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -8945,32 +9526,87 @@ SOFTWARE.
 ==============================================================================
 pgpass@1.0.5
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: "Hannes Hörl <hannes.hoerl+pgpass@snowreporter.com>"
+--- README.md ---
+# pgpass
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+[![Build Status](https://github.com/hoegaarden/pgpass/workflows/CI/badge.svg?branch=master)](https://github.com/hoegaarden/pgpass/actions?query=workflow%3ACI+branch%3Amaster)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## Install
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+```sh
+npm install pgpass
+```
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+## Usage
+```js
+var pgPass = require('pgpass');
+
+var connInfo = {
+  'host' : 'pgserver' ,
+  'user' : 'the_user_name' ,
+};
+
+pgPass(connInfo, function(pass){
+  conn_info.password = pass;
+  // connect to postgresql server
+});
+```
+
+## Description
+
+This module tries to read the `~/.pgpass` file (or the equivalent for windows systems). If the environment variable `PGPASSFILE` is set, this file is used instead. If everything goes right, the password from said file is passed to the callback; if the password cannot be read `undefined` is passed to the callback.
+
+Cases where `undefined` is returned:
+
+- the environment variable `PGPASSWORD` is set
+- the file cannot be read (wrong permissions, no such file, ...)
+- for non windows systems: the file is write-/readable by the group or by other users
+- there is no matching line for the given connection info
+
+There should be no need to use this module directly; it is already included in `node-postgres`.
+
+## Configuration
+
+The module reads the environment variable `PGPASS_NO_DEESCAPE` to decide if the the read tokens from the password file should be de-escaped or not. Default is to do de-escaping. For further information on this see [this commit](https://github.com/postgres/postgres/commit/8d15e3ec4fcb735875a8a70a09ec0c62153c3329).
+
+
+## Tests
+
+There are tests in `./test/`; including linting and coverage testing. Running `npm test` runs:
+
+- `jshint`
+- `mocha` tests
+- `jscoverage` and `mocha -R html-cov`
+
+You can see the coverage report in `coverage.html`.
+
+
+## Development, Patches, Bugs, ...
+
+If you find Bugs or have improvements, please feel free to open a issue on GitHub. If you provide a pull request, I'm more than happy to merge them, just make sure to add tests for your changes.
+
+## Links
+
+- https://github.com/hoegaarden/node-pgpass
+- http://www.postgresql.org/docs/current/static/libpq-pgpass.html
+- https://wiki.postgresql.org/wiki/Pgpass
+- https://github.com/postgres/postgres/blob/master/src/interfaces/libpq/fe-connect.c
+
+## License
+
+Copyright (c) 2013-2016 Hannes Hörl
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
 picomatch@2.3.2
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -8997,6 +9633,7 @@ THE SOFTWARE.
 ==============================================================================
 pino-abstract-transport@3.0.0
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 MIT License
 
@@ -9023,6 +9660,7 @@ SOFTWARE.
 ==============================================================================
 pino-http@11.0.0
 Declared package license: MIT
+Package attribution metadata: "David Mark Clements"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9051,6 +9689,7 @@ SOFTWARE.
 ==============================================================================
 pino-std-serializers@7.1.0
 Declared package license: MIT
+Package attribution metadata: "James Sumners <james.sumners@gmail.com>"
 --- LICENSE ---
 Copyright Mateo Collina, David Mark Clements, James Sumners
 
@@ -9063,6 +9702,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 pino@10.3.1
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9089,6 +9729,7 @@ SOFTWARE.
 ==============================================================================
 postgres-array@2.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Ben Drucker","email":"bvdrucker@gmail.com","url":"bendrucker.me"}
 --- license ---
 The MIT License (MIT)
 
@@ -9115,6 +9756,7 @@ THE SOFTWARE.
 ==============================================================================
 postgres-bytea@1.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Ben Drucker","email":"bvdrucker@gmail.com","url":"bendrucker.me"}
 --- license ---
 The MIT License (MIT)
 
@@ -9141,6 +9783,7 @@ THE SOFTWARE.
 ==============================================================================
 postgres-date@1.0.7
 Declared package license: MIT
+Package attribution metadata: {"name":"Ben Drucker","email":"bvdrucker@gmail.com","url":"bendrucker.me"}
 --- license ---
 The MIT License (MIT)
 
@@ -9167,6 +9810,7 @@ THE SOFTWARE.
 ==============================================================================
 postgres-interval@1.2.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Ben Drucker","email":"bvdrucker@gmail.com","url":"bendrucker.me"}
 --- license ---
 The MIT License (MIT)
 
@@ -9193,6 +9837,7 @@ THE SOFTWARE.
 ==============================================================================
 process-warning@5.1.0
 Declared package license: MIT
+Package attribution metadata: "Tomas Della Vedova"
 --- LICENSE ---
 MIT License
 
@@ -9219,6 +9864,7 @@ SOFTWARE.
 ==============================================================================
 proxy-addr@2.0.7
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -9246,6 +9892,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 proxy-from-env@2.1.0
 Declared package license: MIT
+Package attribution metadata: "Rob Wu <rob@robwu.nl> (https://robwu.nl/)"
 --- LICENSE ---
 The MIT License
 
@@ -9271,32 +9918,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 punycode@2.1.1
 Declared package license: MIT
---- shared MIT text from @mondora/env@1.3.0/LICENSE ---
-The MIT License (MIT)
+Package attribution metadata: {"name":"Mathias Bynens","url":"https://mathiasbynens.be/"}
+--- LICENSE-MIT.txt ---
+Copyright Mathias Bynens <https://mathiasbynens.be/>
 
-Copyright (c) 2017-2018 mondora <open@mondora.com>
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ==============================================================================
 qs@6.15.3
 Declared package license: BSD-3-Clause
+Package attribution metadata: {"type":"git","url":"https://github.com/ljharb/qs.git"}
 --- LICENSE.md ---
 BSD 3-Clause License
 
@@ -9331,6 +9979,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 quick-format-unescaped@4.0.4
 Declared package license: MIT
+Package attribution metadata: "David Mark Clements"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9357,6 +10006,7 @@ SOFTWARE.
 ==============================================================================
 ramda@0.26.1
 Declared package license: MIT
+Package attribution metadata: "Scott Sauyet <scott@sauyet.com> (scott.sauyet.com)"
 --- LICENSE.txt ---
 The MIT License (MIT)
 
@@ -9383,6 +10033,7 @@ THE SOFTWARE.
 ==============================================================================
 range-parser@1.2.1
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca> (http://tjholowaychuk.com)"
 --- LICENSE ---
 (The MIT License)
 
@@ -9411,6 +10062,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 raw-body@2.5.3
 Declared package license: MIT
+Package attribution metadata: "Jonathan Ong <me@jongleberry.com> (http://jongleberry.com)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9438,6 +10090,7 @@ THE SOFTWARE.
 ==============================================================================
 real-require@0.2.0
 Declared package license: MIT
+Package attribution metadata: "Paolo Insogna <shogun@cowtech.it>"
 --- LICENSE.md ---
 The MIT License (MIT)
 
@@ -9464,6 +10117,7 @@ SOFTWARE.
 ==============================================================================
 real-require@1.0.0
 Declared package license: MIT
+Package attribution metadata: "Paolo Insogna <shogun@cowtech.it>"
 --- LICENSE.md ---
 The MIT License (MIT)
 
@@ -9490,6 +10144,7 @@ SOFTWARE.
 ==============================================================================
 rechoir@0.8.0
 Declared package license: MIT
+Package attribution metadata: "Gulp Team <team@gulpjs.com> (http://gulpjs.com/)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9516,6 +10171,7 @@ SOFTWARE.
 ==============================================================================
 recursive-readdir@2.2.3
 Declared package license: MIT
+Package attribution metadata: "Jamison Dance <jergason@gmail.com> (http://jamison.dance.com/)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9542,6 +10198,7 @@ THE SOFTWARE.
 ==============================================================================
 resolve-from@5.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Sindre Sorhus","email":"sindresorhus@gmail.com","url":"sindresorhus.com"}
 --- license ---
 MIT License
 
@@ -9556,6 +10213,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 resolve@1.20.0
 Declared package license: MIT
+Package attribution metadata: {"name":"James Halliday","email":"mail@substack.net","url":"http://substack.net"}
 --- LICENSE ---
 MIT License
 
@@ -9582,6 +10240,7 @@ SOFTWARE.
 ==============================================================================
 safe-buffer@5.2.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Feross Aboukhadijeh","email":"feross@feross.org","url":"https://feross.org"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9608,6 +10267,7 @@ THE SOFTWARE.
 ==============================================================================
 safe-stable-stringify@2.5.0
 Declared package license: MIT
+Package attribution metadata: "Ruben Bridgewater"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -9634,6 +10294,7 @@ SOFTWARE.
 ==============================================================================
 safer-buffer@2.1.2
 Declared package license: MIT
+Package attribution metadata: {"name":"Nikita Skovoroda","email":"chalkerx@gmail.com","url":"https://github.com/ChALkeR"}
 --- LICENSE ---
 MIT License
 
@@ -9660,6 +10321,7 @@ SOFTWARE.
 ==============================================================================
 send@0.19.2
 Declared package license: MIT
+Package attribution metadata: "TJ Holowaychuk <tj@vision-media.ca>"
 --- LICENSE ---
 (The MIT License)
 
@@ -9688,6 +10350,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 serve-static@1.16.3
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -9718,6 +10381,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 setprototypeof@1.2.0
 Declared package license: ISC
+Package attribution metadata: "Wes Todd"
 --- LICENSE ---
 Copyright (c) 2015, Wes Todd
 
@@ -9736,6 +10400,7 @@ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 side-channel-list@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -9762,6 +10427,7 @@ SOFTWARE.
 ==============================================================================
 side-channel-map@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -9788,6 +10454,7 @@ SOFTWARE.
 ==============================================================================
 side-channel-weakmap@1.0.2
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -9814,6 +10481,7 @@ SOFTWARE.
 ==============================================================================
 side-channel@1.1.1
 Declared package license: MIT
+Package attribution metadata: "Jordan Harband <ljharb@gmail.com>"
 --- LICENSE ---
 MIT License
 
@@ -9840,6 +10508,7 @@ SOFTWARE.
 ==============================================================================
 sonic-boom@4.2.1
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 MIT License
 
@@ -9866,6 +10535,7 @@ SOFTWARE.
 ==============================================================================
 split2@4.2.0
 Declared package license: ISC
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 Copyright (c) 2014-2018, Matteo Collina <hello@matteocollina.com>
 
@@ -9884,6 +10554,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 statuses@2.0.2
 Declared package license: MIT
+Package attribution metadata: "jshttp/statuses"
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -9912,6 +10583,7 @@ THE SOFTWARE.
 ==============================================================================
 swagger-ui-dist@4.1.3
 Declared package license: Apache-2.0
+Package attribution metadata: "git@github.com:swagger-api/swagger-ui.git"
 --- LICENSE ---
 
                                  Apache License
@@ -10122,6 +10794,7 @@ Copyright 2020-2021 SmartBear Software Inc.
 ==============================================================================
 swagger-ui-express@4.2.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Stephen Scott","email":"scottie1984@gmail.com"}
 --- LICENSE ---
 
 The MIT License (MIT)
@@ -10149,6 +10822,7 @@ THE SOFTWARE.
 ==============================================================================
 tar@7.5.22
 Declared package license: BlueOak-1.0.0
+Package attribution metadata: "Isaac Z. Schlueter"
 --- LICENSE.md ---
 # Blue Oak Model License
 
@@ -10209,6 +10883,7 @@ software or this license, under any kind of legal claim.***
 ==============================================================================
 tarn@3.1.2
 Declared package license: MIT
+Package attribution metadata: {"name":"Sami Koskimäki","email":"koskomi@gmail.com","url":"https://github.com/koskimas"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -10237,6 +10912,7 @@ SOFTWARE.
 ==============================================================================
 thread-stream@4.2.0
 Declared package license: MIT
+Package attribution metadata: "Matteo Collina <hello@matteocollina.com>"
 --- LICENSE ---
 MIT License
 
@@ -10263,6 +10939,7 @@ SOFTWARE.
 ==============================================================================
 tildify@2.0.0
 Declared package license: MIT
+Package attribution metadata: {"name":"Sindre Sorhus","email":"sindresorhus@gmail.com","url":"sindresorhus.com"}
 --- license ---
 MIT License
 
@@ -10277,6 +10954,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 to-regex-range@5.0.1
 Declared package license: MIT
+Package attribution metadata: "Jon Schlinkert (https://github.com/jonschlinkert)"
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -10303,6 +10981,7 @@ THE SOFTWARE.
 ==============================================================================
 toidentifier@1.0.1
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 MIT License
 
@@ -10329,6 +11008,7 @@ SOFTWARE.
 ==============================================================================
 tslib@2.8.1
 Declared package license: 0BSD
+Package attribution metadata: "Microsoft Corp."
 --- LICENSE.txt ---
 Copyright (c) Microsoft Corporation.
 
@@ -10346,6 +11026,7 @@ PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 type-is@1.6.18
 Declared package license: MIT
+Package attribution metadata: "jshttp/type-is"
 --- LICENSE ---
 (The MIT License)
 
@@ -10374,6 +11055,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 undici@7.29.0
 Declared package license: MIT
+Package attribution metadata: {"type":"git","url":"git+https://github.com/nodejs/undici.git"}
 --- LICENSE ---
 MIT License
 
@@ -10400,6 +11082,7 @@ SOFTWARE.
 ==============================================================================
 universalify@2.0.0
 Declared package license: MIT
+Package attribution metadata: "Ryan Zimmerman <opensrc@ryanzim.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -10425,6 +11108,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 unpipe@1.0.0
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -10452,6 +11136,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 uri-js@4.4.1
 Declared package license: BSD-2-Clause
+Package attribution metadata: "Gary Court <gary.court@gmail.com>"
 --- LICENSE ---
 Copyright 2011 Gary Court. All rights reserved.
 
@@ -10468,6 +11153,7 @@ The views and conclusions contained in the software and documentation are those 
 ==============================================================================
 utils-merge@1.0.1
 Declared package license: MIT
+Package attribution metadata: {"name":"Jared Hanson","email":"jaredhanson@gmail.com","url":"http://www.jaredhanson.net/"}
 --- LICENSE ---
 The MIT License (MIT)
 
@@ -10493,6 +11179,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 validator@13.15.35
 Declared package license: MIT
+Package attribution metadata: "Chris O'Hara <cohara87@gmail.com>"
 --- LICENSE ---
 Copyright (c) 2018 Chris O'Hara <cohara87@gmail.com>
 
@@ -10518,6 +11205,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 vary@1.1.2
 Declared package license: MIT
+Package attribution metadata: "Douglas Christopher Wilson <doug@somethingdoug.com>"
 --- LICENSE ---
 (The MIT License)
 
@@ -10545,6 +11233,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 vhost@3.0.2
 Declared package license: MIT
+Package attribution metadata: "expressjs/vhost"
 --- LICENSE ---
 (The MIT License)
 
@@ -10573,6 +11262,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================
 whatwg-encoding@3.1.1
 Declared package license: MIT
+Package attribution metadata: "Domenic Denicola <d@domenic.me> (https://domenic.me/)"
 --- LICENSE.txt ---
 Copyright © Domenic Denicola <d@domenic.me>
 
@@ -10585,6 +11275,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 whatwg-mimetype@4.0.0
 Declared package license: MIT
+Package attribution metadata: "Domenic Denicola <d@domenic.me> (https://domenic.me/)"
 --- LICENSE.txt ---
 Copyright © Domenic Denicola <d@domenic.me>
 
@@ -10597,6 +11288,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==============================================================================
 wrappy@1.0.2
 Declared package license: ISC
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE ---
 The ISC License
 
@@ -10617,6 +11309,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ==============================================================================
 xtend@4.0.2
 Declared package license: MIT
+Package attribution metadata: "Raynos <raynos2@gmail.com>"
 --- LICENSE ---
 The MIT License (MIT)
 Copyright (c) 2012-2014 Raynos.
@@ -10642,6 +11335,7 @@ THE SOFTWARE.
 ==============================================================================
 yallist@5.0.0
 Declared package license: BlueOak-1.0.0
+Package attribution metadata: "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)"
 --- LICENSE.md ---
 All packages under `src/` are licensed according to the terms in
 their respective `LICENSE` or `LICENSE.md` files.

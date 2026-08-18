@@ -33,7 +33,7 @@ expressions account for 1,295 records. The remaining review set is:
 ## Exact runtime image inventory
 
 Image configuration digest
-`sha256:c7b7192b1ca002f87079926c93d7450502cfa44ce90ef75539c5600fea068508` is
+`sha256:19e9d3e8eec1a3ca09f53b8283c99b4140fd47f3f0dfe50013288624df53c49f` is
 package-manager-free and runs exact Node `24.19.0`; its vulnerability posture
 must be confirmed by a fresh exact-digest Grype scan. Its non-initial license
 review set is:
@@ -50,14 +50,14 @@ The project MIT license and upstream Node license are copied into the runtime at
 `/licenses/staticdeploy/LICENSE` and `/licenses/node/LICENSE`. The deterministic
 runtime notice candidate is retained at
 `docs/security/license-evidence/m2-runtime-third-party-notices.txt` with digest
-`sha256:38e8127b5564aa37f190a3e31dc1fe064d1ad18b32fb99bbcbc1052889a8c485`. The
+`sha256:37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3`. The
 image build regenerates and byte-compares it before shipping it at
 `/licenses/THIRD_PARTY_NOTICES.txt`. It contains the exact production npm
-closure's retained texts, Node/application texts, standard base-runtime texts,
-and the GCC Runtime Library Exception 3.1 text pinned from SPDX
-license-list-data commit `5bf6d9610255540bfbee6890765a616042bf1e11`. It remains
-unapproved until a named owner reviews it; `config/license-policy.json`
-therefore stays fail closed.
+closure's retained texts or package/version/manifest-digest-bound fallback
+evidence, Node/application texts, standard base-runtime texts, and the GCC
+Runtime Library Exception 3.1 text pinned from SPDX license-list-data commit
+`5bf6d9610255540bfbee6890765a616042bf1e11`. It remains unapproved until a named
+owner reviews it; `config/license-policy.json` therefore stays fail closed.
 
 ## Approval needed
 

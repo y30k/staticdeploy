@@ -4,10 +4,11 @@ FROM node:24.19.0-bookworm-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba
 WORKDIR /opt/staticdeploy
 
 COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json LICENSE ./
-COPY config/install-scripts.json config/dependency-resolutions.json ./config/
+COPY config/install-scripts.json config/dependency-resolutions.json config/runtime-license-fallbacks.json ./config/
 COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs scripts/generate-runtime-notices.mjs ./scripts/
 COPY docs/security/license-evidence/m2-runtime-third-party-notices.txt /reviewed-runtime-third-party-notices.txt
 COPY docs/security/license-evidence/base-runtime-license-texts ./docs/security/license-evidence/base-runtime-license-texts/
+COPY docs/security/license-evidence/npm-fallbacks ./docs/security/license-evidence/npm-fallbacks/
 COPY management-console/package.json management-console/tsconfig.json management-console/index.html management-console/vite.config.mts ./management-console/
 COPY management-console/scripts ./management-console/scripts/
 COPY cli/package.json ./cli/

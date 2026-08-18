@@ -67,6 +67,29 @@ try {
     assert.equal(has("licenses/node/LICENSE"), true);
     assert.equal(has("licenses/staticdeploy/LICENSE"), true);
     assert.equal(has("licenses/THIRD_PARTY_NOTICES.txt"), true);
+    const trackedEvidence = new Map([
+        [
+            "licenses/THIRD_PARTY_NOTICES.txt",
+            "docs/security/license-evidence/m2-runtime-third-party-notices.txt",
+        ],
+        ...[
+            "ca-certificates-bundle-20260413-r1",
+            "glibc-2.43-r13",
+            "glibc-locale-posix-2.43-r13",
+            "ld-linux-2.43-r13",
+            "libgcc-16.1.0-r4",
+            "libstdc++-16.1.0-r4",
+        ].map((name) => [
+            `var/lib/db/sbom/${name}.spdx.json`,
+            `docs/security/license-evidence/chainguard-base-sboms/${name}.spdx.json`,
+        ]),
+    ]);
+    for (const [imagePath, evidencePath] of trackedEvidence)
+        assert.deepEqual(
+            execFileSync("tar", ["-xOf", archive, imagePath]),
+            fs.readFileSync(evidencePath),
+            `${imagePath} must match retained exact evidence bytes`
+        );
     const verboseEntries = execFileSync(
         "tar",
         ["--numeric-owner", "-tvf", archive],
