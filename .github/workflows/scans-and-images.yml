@@ -19,11 +19,35 @@ jobs:
             - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24.19.0
-            - name: Scan tracked content for verified secrets
-              uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318 # v3.97.0
-              with:
-                  path: ./
-                  extra_args: --json
+            - name: Scan tracked content for verified or unknown secrets
+              env:
+                  BASE_SHA: ${{ github.event.pull_request.base.sha }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+              run: |
+                  mkdir -p reports
+                  node scripts/test-sanitize-trufflehog.mjs
+                  raw_report=$(mktemp)
+                  trap 'rm -f "$raw_report"' EXIT
+                  set +e
+                  docker run --rm --volume "$PWD:/repo:ro" \
+                    trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33 \
+                    git file:///repo --since-commit "$BASE_SHA" --branch "$HEAD_SHA" \
+                    --json --results=verified,unknown --fail --fail-on-scan-errors \
+                    > "$raw_report"
+                  scan_exit=$?
+                  set -e
+                  node scripts/sanitize-trufflehog.mjs \
+                    "$raw_report" reports/trufflehog.json
+                  rm -f "$raw_report"
+                  trap - EXIT
+                  if [ "$scan_exit" -eq 183 ]; then
+                    echo "Verified or unknown secret candidate found" >&2
+                    exit 1
+                  fi
+                  if [ "$scan_exit" -ne 0 ]; then
+                    echo "TruffleHog failed with exit $scan_exit" >&2
+                    exit "$scan_exit"
+                  fi
             - name: Enable pinned Yarn
               run: |
                   corepack enable
