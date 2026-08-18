@@ -57,6 +57,7 @@
     "check:install-policy": "node scripts/check-install-policy.mjs",
     "test:install-policy": "node scripts/test-install-policy.mjs",
     "test:security-policy": "node scripts/test-security-policy.mjs",
+    "test:image": "node scripts/test-image-conformance.mjs",
     "check:install-scripts": "node scripts/check-install-scripts.mjs",
     "lerna": "lerna"
   },
