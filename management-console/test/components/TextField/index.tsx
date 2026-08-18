@@ -1,56 +1,59 @@
-import Form from "antd/lib/form";
-import Input from "antd/lib/input";
+import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
+import sinon from "sinon";
 
 import { WrappedTextField } from "../../../src/components/TextField";
 
+function props(meta: { error: string; touched: boolean }, inlineError = false) {
+    return {
+        meta,
+        input: {
+            name: "field",
+            value: "",
+            onChange: sinon.spy(),
+            onBlur: sinon.spy(),
+            onFocus: sinon.spy(),
+        },
+        inlineError,
+    } as any;
+}
+
 describe("TextField", () => {
-    describe("when the field has an error", () => {
-        it("if it hasn't been touched, displays no error", () => {
-            const props: any = {
-                meta: { error: "error", touched: false },
-                input: {},
-            };
-            const textField = shallow(<WrappedTextField {...props} />);
-            expect(textField.find(Form.Item).prop("validateStatus")).to.equal(
-                undefined
-            );
-            expect(textField.find(Form.Item).prop("help")).to.equal(undefined);
-        });
+    it("does not display an untouched error", () => {
+        const { container } = render(
+            <WrappedTextField {...props({ error: "error", touched: false })} />
+        );
+        expect(screen.queryByText("error")).to.equal(null);
+        expect(container.querySelector(".ant-form-item-has-error")).to.equal(
+            null
+        );
+    });
 
-        it("if it has been touched and prop inlineError is not true, displays a help and no suffix on the Input component", () => {
-            const props: any = {
-                meta: { error: "error", touched: true },
-                input: {},
-            };
-            const textField = shallow(<WrappedTextField {...props} />);
-            expect(textField.find(Form.Item).prop("validateStatus")).to.equal(
-                "error"
-            );
-            expect(textField.find(Form.Item).prop("help")).to.equal("error");
-            expect(textField.find(Input).prop("suffix")).to.have.property(
-                "type",
-                "span"
-            );
-        });
+    it("displays a touched non-inline error as help text", () => {
+        const { container } = render(
+            <WrappedTextField {...props({ error: "error", touched: true })} />
+        );
+        expect(screen.getByText("error")).to.not.equal(null);
+        expect(
+            container.querySelector(".ant-form-item-has-error")
+        ).to.not.equal(null);
+        expect(container.querySelector(".anticon-question-circle")).to.equal(
+            null
+        );
+    });
 
-        it("if it has been touched and prop inlineError is true, displays no help but a suffix on the Input component", () => {
-            const props: any = {
-                meta: { error: "error", touched: true },
-                input: {},
-                inlineError: true,
-            };
-            const textField = shallow(<WrappedTextField {...props} />);
-            expect(textField.find(Form.Item).prop("validateStatus")).to.equal(
-                "error"
-            );
-            expect(textField.find(Form.Item).prop("help")).to.equal(undefined);
-            expect(textField.find(Input).prop("suffix")).not.to.have.property(
-                "type",
-                "span"
-            );
-        });
+    it("displays a touched inline error as an input suffix", () => {
+        const { container } = render(
+            <WrappedTextField
+                {...props({ error: "error", touched: true }, true)}
+            />
+        );
+        expect(
+            container.querySelector(".ant-form-item-has-error")
+        ).to.not.equal(null);
+        expect(
+            container.querySelector(".anticon-question-circle")
+        ).to.not.equal(null);
+        expect(screen.queryByText("error")).to.equal(null);
     });
 });

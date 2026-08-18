@@ -1,17 +1,28 @@
 import { IAuthenticationStrategy } from "@staticdeploy/core";
 import JwtAuthenticationStrategy from "@staticdeploy/jwt-authentication-strategy";
 import OidcAuthenticationStrategy from "@staticdeploy/oidc-authentication-strategy";
-import Logger from "bunyan";
 
 import IConfig from "../common/IConfig";
+import ILogger from "../common/ILogger";
 
-export default (config: IConfig, logger: Logger): IAuthenticationStrategy[] => {
+export default (
+    config: IConfig,
+    logger: ILogger
+): IAuthenticationStrategy[] => {
     const authenticationStrategies: IAuthenticationStrategy[] = [];
 
     if (config.jwtSecretOrPublicKey) {
+        if (!config.jwtAlgorithm) {
+            throw new Error(
+                "JWT_ALGORITHM is required when JWT_SECRET_OR_PUBLIC_KEY is configured"
+            );
+        }
         logger.info("Using JwtAuthenticationStrategy authentication strategy");
         authenticationStrategies.push(
-            new JwtAuthenticationStrategy(config.jwtSecretOrPublicKey)
+            new JwtAuthenticationStrategy(
+                config.jwtSecretOrPublicKey,
+                config.jwtAlgorithm
+            )
         );
     }
 

@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 
 import MemoryStorages from "@staticdeploy/memory-storages";
 import PgS3Storages from "@staticdeploy/pg-s3-storages";
-import Logger from "bunyan";
 
 import IConfig from "../../src/common/IConfig";
+import ILogger from "../../src/common/ILogger";
 import getStoragesModule from "../../src/components/storagesModule";
 
 const baseConfig: IConfig = {
@@ -27,9 +27,12 @@ const baseConfig: IConfig = {
 };
 
 const logMessages: unknown[][] = [];
-const logger = {
-    info: (...args: unknown[]) => logMessages.push(args),
-} as unknown as Logger;
+const logger: ILogger = {
+    info: (...args: unknown[]) => {
+        logMessages.push(args);
+    },
+    error: () => undefined,
+};
 
 describe("storagesModule configuration", () => {
     const modulesToClose: PgS3Storages[] = [];

@@ -1,14 +1,13 @@
 import StaticdeployClient from "@staticdeploy/sdk";
 import ConfigProvider from "antd/lib/config-provider";
-import enUS from "antd/lib/locale-provider/en_US";
+import enUS from "antd/locale/en_US";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import compact from "lodash/compact";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 
-import "./antdStyles";
 import AuthService from "./common/AuthService";
 import JwtAuthStrategy from "./common/AuthService/JwtAuthStrategy";
 import OidcAuthStrategy from "./common/AuthService/OidcAuthStrategy";
@@ -42,10 +41,13 @@ async function start() {
         staticdeployClient
     );
 
-    const root = document.getElementById("root");
+    const rootElement = document.getElementById("root");
+    if (!rootElement)
+        throw new Error("Missing management console root element");
+    const root = createRoot(rootElement);
 
     // Render a spinner while the authService is initializing
-    ReactDOM.render(<InitSpinner />, root);
+    root.render(<InitSpinner />);
 
     await authService.init();
 
@@ -57,7 +59,7 @@ async function start() {
     }
 
     // Render the app once the authService is initialized
-    ReactDOM.render(
+    root.render(
         <StaticdeployClientContext.Provider value={staticdeployClient}>
             <ConfigProvider locale={enUS}>
                 <BrowserRouter>
@@ -66,8 +68,7 @@ async function start() {
                     </Provider>
                 </BrowserRouter>
             </ConfigProvider>
-        </StaticdeployClientContext.Provider>,
-        root
+        </StaticdeployClientContext.Provider>
     );
 }
 start();

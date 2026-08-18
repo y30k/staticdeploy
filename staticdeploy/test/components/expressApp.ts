@@ -1,4 +1,5 @@
 import tarArchiver from "@staticdeploy/tar-archiver";
+import { expect } from "chai";
 import request from "supertest";
 
 import usecases from "../../src/common/usecases";
@@ -6,7 +7,9 @@ import getExpressApp from "../../src/components/expressApp";
 import getLogger from "../../src/components/logger";
 import getManagementRouter from "../../src/components/managementRouter";
 import getStoragesModule from "../../src/components/storagesModule";
-import config from "../../src/config";
+import { getConfig } from "../../src/config";
+
+const config = getConfig();
 
 describe("staticdeploy expressApp", () => {
     describe("when config.enableManagementEndpoints === true", () => {
@@ -25,6 +28,36 @@ describe("staticdeploy expressApp", () => {
                 .set("host", config.managementHostname)
                 .expect(200)
                 .expect(/StaticDeploy Management Console/);
+        });
+
+        it("serves deep routes, runtime configuration, and root-relative built assets", async () => {
+            const logger = getLogger(config);
+            const expressApp = getExpressApp({
+                config: config,
+                authenticationStrategies: [],
+                storagesModule: getStoragesModule(config, logger),
+                managementRouter: await getManagementRouter(config),
+                usecases: usecases,
+                logger: logger,
+            });
+            const page = await request(expressApp)
+                .get("/apps/example/deployments")
+                .set("host", config.managementHostname)
+                .expect(200)
+                .expect(/StaticDeploy Management Console/);
+            expect(page.text).to.include("window.APP_CONFIG=");
+            expect(page.text).to.include("API_URL");
+            expect(page.text).to.include("AUTH_ENFORCED");
+            const paths = [
+                ...page.text.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)"/g),
+            ].map((match) => match[1]);
+            expect(paths.some((path) => path.endsWith(".js"))).to.equal(true);
+            expect(paths.some((path) => path.endsWith(".css"))).to.equal(true);
+            for (const path of paths)
+                await request(expressApp)
+                    .get(path)
+                    .set("host", config.managementHostname)
+                    .expect(200);
         });
 
         it("serves the management API at $MANAGEMENT_HOSTNAME/api/", async () => {

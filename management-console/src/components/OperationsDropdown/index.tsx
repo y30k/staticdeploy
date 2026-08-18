@@ -10,12 +10,10 @@ interface IProps {
     actions: React.ReactNode[];
 }
 
-interface IKeyed {
-    key?: string | number;
-}
-
-function hasKey(node: React.ReactNode): node is IKeyed {
-    return !!(node && (node as any).key);
+function getKey(node: React.ReactNode, fallback: number) {
+    return React.isValidElement(node) && node.key !== null
+        ? node.key
+        : fallback;
 }
 
 export default class OperationsDropdown extends React.Component<IProps> {
@@ -24,9 +22,7 @@ export default class OperationsDropdown extends React.Component<IProps> {
         return (
             <Menu className="c-OperationsDropdown-menu">
                 {this.props.actions.map((action, index) => (
-                    <Menu.Item key={hasKey(action) ? action.key : index}>
-                        {action}
-                    </Menu.Item>
+                    <Menu.Item key={getKey(action, index)}>{action}</Menu.Item>
                 ))}
             </Menu>
         );

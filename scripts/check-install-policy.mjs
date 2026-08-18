@@ -8,11 +8,17 @@ const manifestPath = path.resolve(process.argv[4] || "package.json");
 const inventoryPath = path.resolve(
     process.argv[5] || "config/install-scripts.json"
 );
+const resolutionsInventoryPath = path.resolve(
+    process.argv[6] || "config/dependency-resolutions.json"
+);
 
 const config = fs.readFileSync(configPath, "utf8");
 const lock = fs.readFileSync(lockPath, "utf8");
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
+const resolutionsInventory = JSON.parse(
+    fs.readFileSync(resolutionsInventoryPath, "utf8")
+);
 
 const canonicalConfig =
     "enableImmutableInstalls: true\n\n" +
@@ -42,6 +48,43 @@ for (const match of lock.matchAll(/^\s*resolution:\s*"([^"]+)"\s*$/gm)) {
     }
 }
 
+if (resolutionsInventory.defaultPolicy !== "blocked")
+    throw new Error("Dependency-resolution inventory must default to blocked");
+const reviewedResolutions = new Map();
+for (const entry of resolutionsInventory.resolutions) {
+    if (
+        typeof entry.selector !== "string" ||
+        !entry.selector.includes("@npm:") ||
+        /[*?]/.test(entry.selector)
+    )
+        throw new Error(`Invalid exact resolution selector: ${entry.selector}`);
+    if (
+        typeof entry.resolution !== "string" ||
+        !/^npm:\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/.test(entry.resolution)
+    )
+        throw new Error(
+            `Invalid exact registry resolution: ${entry.resolution}`
+        );
+    for (const field of ["owner", "rationale", "removalCondition"]) {
+        if (typeof entry[field] !== "string" || entry[field].trim() === "")
+            throw new Error(
+                `Resolution ${entry.selector} requires a non-empty ${field}`
+            );
+    }
+    if (reviewedResolutions.has(entry.selector))
+        throw new Error(`Duplicate resolution decision: ${entry.selector}`);
+    reviewedResolutions.set(entry.selector, entry.resolution);
+}
+const configuredResolutions = manifest.resolutions || {};
+for (const [selector, resolution] of Object.entries(configuredResolutions)) {
+    if (reviewedResolutions.get(selector) !== resolution)
+        throw new Error(`Unreviewed dependency resolution: ${selector}`);
+}
+for (const [selector, resolution] of reviewedResolutions) {
+    if (configuredResolutions[selector] !== resolution)
+        throw new Error(`Missing exact dependency resolution: ${selector}`);
+}
+
 if (inventory.defaultPolicy !== "blocked")
     throw new Error("Install-script inventory must default to blocked");
 const reviewed = new Map(
@@ -67,5 +110,5 @@ for (const [locator, allowed] of reviewed) {
 }
 
 console.log(
-    "Pre-install policy is fail-closed: immutable, scripts disabled, no Git sources, and exact lifecycle decisions."
+    "Pre-install policy is fail-closed: immutable, scripts disabled, no Git sources, and exact lifecycle and registry-resolution decisions."
 );

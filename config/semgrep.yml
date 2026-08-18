@@ -1,0 +1,24 @@
+rules:
+    - id: staticdeploy.javascript.dynamic-eval
+      message: Dynamic eval requires security review.
+      severity: ERROR
+      languages: [javascript, typescript]
+      pattern: eval(...)
+    - id: staticdeploy.javascript.function-constructor
+      message: Dynamic Function construction requires security review.
+      severity: ERROR
+      languages: [javascript, typescript]
+      pattern: new Function(...)
+    - id: staticdeploy.node.child-process-exec
+      message:
+          Shell command execution requires security review; prefer argv-based
+          execFile/spawn.
+      severity: WARNING
+      languages: [javascript, typescript]
+      patterns:
+          - pattern-either:
+                - pattern: exec(...)
+                - pattern: execSync(...)
+          - pattern-inside: |
+                import { ..., $EXEC, ... } from "node:child_process";
+                ...

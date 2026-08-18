@@ -3,7 +3,6 @@
     "include": ["src/**/*.ts", "typings/**/*.ts"],
     "compilerOptions": {
         "types": [
-            "@types/bunyan",
             "@types/express",
             "@types/lodash",
             "@types/mocha",

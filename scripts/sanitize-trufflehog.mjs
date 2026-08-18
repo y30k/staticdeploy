@@ -25,18 +25,24 @@ for (const [index, line] of fs
         throw new Error(`Unexpected TruffleHog record on line ${index + 1}`);
     }
     const git = finding.SourceMetadata?.Data?.Git;
+    const filesystem = finding.SourceMetadata?.Data?.Filesystem;
+    const commit = git?.commit || process.env.TRUFFLEHOG_SUBJECT_COMMIT;
+    const file = git?.file || filesystem?.file;
+    const sourceLine = git?.line ?? filesystem?.line ?? 0;
     if (
-        !git ||
-        typeof git.file !== "string" ||
-        !Number.isInteger(git.line) ||
-        typeof git.commit !== "string"
+        typeof file !== "string" ||
+        !Number.isInteger(sourceLine) ||
+        typeof commit !== "string" ||
+        !/^[a-f0-9]{40}$/.test(commit)
     ) {
-        throw new Error(`Missing TruffleHog Git location on line ${index + 1}`);
+        throw new Error(
+            `Missing exact TruffleHog source location on line ${index + 1}`
+        );
     }
     findings.push({
         detector: finding.DetectorName,
         status: finding.Verified ? "verified" : "unknown",
-        source: { commit: git.commit, file: git.file, line: git.line },
+        source: { commit, file, line: sourceLine },
     });
 }
 

@@ -1,0 +1,26 @@
+{
+    "defaultPolicy": "blocked",
+    "resolutions": [
+        {
+            "selector": "brace-expansion@npm:5.0.8",
+            "resolution": "npm:5.0.9",
+            "owner": "StaticDeploy maintainers",
+            "rationale": "Nx 23.1.1 pins the vulnerable 5.0.8 patch; 5.0.9 is the registry-published security patch on the same API line.",
+            "removalCondition": "Remove when the pinned Nx/Lerna release accepts brace-expansion 5.0.9 or newer."
+        },
+        {
+            "selector": "js-yaml@npm:4.3.0",
+            "resolution": "npm:4.3.1",
+            "owner": "StaticDeploy maintainers",
+            "rationale": "Lerna 10.0.0 pins vulnerable js-yaml 4.3.0; 4.3.1 is the registry-published security patch on the same API line.",
+            "removalCondition": "Remove when the pinned Lerna release accepts js-yaml 4.3.1 or newer."
+        },
+        {
+            "selector": "serialize-javascript@npm:^6.0.2",
+            "resolution": "npm:7.1.0",
+            "owner": "StaticDeploy maintainers",
+            "rationale": "Current Mocha 11 pins a vulnerable serializer range. The fixed registry major is exercised through Mocha's parallel worker serializer plus the complete backend test suite.",
+            "removalCondition": "Remove when a supported Mocha release accepts serialize-javascript 7.1.0 or newer, or when Mocha is replaced."
+        }
+    ]
+}

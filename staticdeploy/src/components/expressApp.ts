@@ -4,14 +4,14 @@ import {
     staticServerAdapter,
 } from "@staticdeploy/http-adapters";
 import tarArchiver from "@staticdeploy/tar-archiver";
-import Logger from "bunyan";
-import bunyanMiddleware from "bunyan-middleware";
 import express from "express";
+import { Logger } from "pino";
 import vhost from "vhost";
 
 import IConfig from "../common/IConfig";
 import extractAuthToken from "../middleware/extractAuthToken";
 import injectMakeUsecase from "../middleware/injectMakeUsecase";
+import getRequestLogger from "./requestLogger";
 
 export default function getExpressApp(options: {
     authenticationStrategies: IAuthenticationStrategy[];
@@ -33,10 +33,7 @@ export default function getExpressApp(options: {
     return express()
         .disable("x-powered-by")
         .use([
-            bunyanMiddleware({
-                logger: logger,
-                obscureHeaders: ["Authorization"],
-            }),
+            getRequestLogger(logger),
             extractAuthToken(),
             injectMakeUsecase(usecases, {
                 archiver: tarArchiver,

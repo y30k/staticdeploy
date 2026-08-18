@@ -1,6 +1,6 @@
 import StaticdeployClient from "@staticdeploy/sdk";
 import { expect } from "chai";
-import { createTree, destroyTree } from "create-fs-tree";
+import { createTree, destroyTree } from "@staticdeploy/storages-test-suite";
 import { emptyDirSync } from "fs-extra";
 import { tmpdir } from "os";
 import { join } from "path";

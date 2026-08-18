@@ -1,4 +1,4 @@
-import { UserManager, WebStorageStateStore } from "oidc-client";
+import { UserManager, WebStorageStateStore } from "oidc-client-ts";
 
 import IAuthStrategy from "../IAuthStrategy";
 import getLoginHint from "./getLoginHint";
@@ -19,12 +19,25 @@ export default class OidcAuthStrategy implements IAuthStrategy {
         baseRedirectUrl: string,
         providerName: string
     ) {
+        const metadataUrl = new URL(
+            openidConfigurationUrl,
+            window.location.href
+        );
+        const discoverySuffix = "/.well-known/openid-configuration";
+        const issuerPath = metadataUrl.pathname.endsWith(discoverySuffix)
+            ? metadataUrl.pathname.slice(0, -discoverySuffix.length)
+            : "";
+        const authority = `${metadataUrl.origin}${issuerPath}`;
         this.userManager = new UserManager({
-            authority: openidConfigurationUrl,
+            authority,
+            metadataUrl: metadataUrl.href,
             client_id: clientId,
             redirect_uri: urlUtils.getRedirectUrl(baseRedirectUrl),
             silent_redirect_uri: urlUtils.getSilentRedirectUrl(baseRedirectUrl),
+            response_type: "code",
+            response_mode: "query",
             scope: "openid profile",
+            loadUserInfo: false,
             userStore: new WebStorageStateStore({ store: window.localStorage }),
         });
         this.displayName = providerName;
@@ -40,7 +53,7 @@ export default class OidcAuthStrategy implements IAuthStrategy {
     }
 
     async login(): Promise<void> {
-        await this.userManager.signinRedirect();
+        await this.userManager.signinRedirect({ nonce: crypto.randomUUID() });
         // Keep "logging in" while the user is redirected to the idp
         await new Promise(() => null);
     }
@@ -72,11 +85,17 @@ export default class OidcAuthStrategy implements IAuthStrategy {
             return null;
         }
 
-        // We can't use user.expires_at because oidc-client fails to populate it
+        // Preserve the legacy token contract while failing closed if the
+        // provider returns an incomplete user record.
+        if (!user.id_token) {
+            await this.logout();
+            return null;
+        }
         if (isAuthTokenExpired(user.id_token)) {
             try {
                 user = await this.userManager.signinSilent({
                     login_hint: getLoginHint(user),
+                    nonce: crypto.randomUUID(),
                 });
             } catch {
                 await this.logout();
@@ -84,6 +103,10 @@ export default class OidcAuthStrategy implements IAuthStrategy {
             }
         }
 
+        if (!user?.id_token) {
+            await this.logout();
+            return null;
+        }
         return user.id_token;
     }
 }

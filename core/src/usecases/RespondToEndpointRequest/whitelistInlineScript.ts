@@ -21,18 +21,20 @@ export default function whitelistInlineScript(
     }
 
     const cspHeaderValue = headers[cspHeaderKey];
-    const cspDirectives = cspHeaderValue ? parseCsp(cspHeaderValue) : {};
+    const cspDirectives = cspHeaderValue
+        ? parseCsp(cspHeaderValue)
+        : new Map<string, string[]>();
+    const directives = new Map(cspDirectives);
+    directives.set(
+        SCRIPT_SRC_DIRECTIVE,
+        compact([
+            ...castArray(cspDirectives.get(SCRIPT_SRC_DIRECTIVE)),
+            `'sha256-${inlineScriptSha256}'`,
+        ])
+    );
 
     return {
         ...headers,
-        [cspHeaderKey]: buildCsp({
-            directives: {
-                ...cspDirectives,
-                [SCRIPT_SRC_DIRECTIVE]: compact([
-                    ...castArray(cspDirectives[SCRIPT_SRC_DIRECTIVE]),
-                    `'sha256-${inlineScriptSha256}'`,
-                ]),
-            },
-        }),
+        [cspHeaderKey]: buildCsp({ directives }),
     };
 }

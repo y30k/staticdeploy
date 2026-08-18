@@ -1,0 +1,31 @@
+{
+    "matches": [
+        {
+            "vulnerability": {
+                "id": "GHSA-redacted",
+                "severity": "High"
+            },
+            "relatedVulnerabilities": [{ "id": "CVE-2026-0001" }],
+            "artifact": {
+                "name": "fixture-package",
+                "version": "1.0.0",
+                "locations": [{ "path": "pkg:npm/fixture-package@1.0.0" }]
+            },
+            "matchDetails": [
+                {
+                    "type": "exact-direct-match",
+                    "searchedBy": { "namespace": "npm" }
+                }
+            ]
+        }
+    ],
+    "source": {
+        "type": "sbom-file",
+        "target": "/reports/source-sbom.raw.json"
+    },
+    "distro": {},
+    "descriptor": {
+        "name": "grype",
+        "version": "0.117.0"
+    }
+}

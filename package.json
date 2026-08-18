@@ -7,6 +7,11 @@
   "engines": {
     "node": "24.19.0"
   },
+  "resolutions": {
+    "brace-expansion@npm:5.0.8": "npm:5.0.9",
+    "js-yaml@npm:4.3.0": "npm:4.3.1",
+    "serialize-javascript@npm:^6.0.2": "npm:7.1.0"
+  },
   "workspaces": [
     "management-console",
     "cli",
@@ -20,8 +25,7 @@
     "serve-static",
     "staticdeploy",
     "storages-test-suite",
-    "tar-archiver",
-    "website"
+    "tar-archiver"
   ],
   "author": "Paolo Scanferla <paolo.scanferla@gmail.com>",
   "license": "MIT",
@@ -33,34 +37,10 @@
     "url": "https://github.com/staticdeploy/staticdeploy/issues"
   },
   "dependenciesMeta": {
-    "core-js@2.6.12": {
-      "built": false
-    },
-    "core-js@3.19.3": {
-      "built": false
-    },
-    "core-js-pure@3.19.3": {
-      "built": false
-    },
-    "dtrace-provider@0.8.8": {
-      "built": false
-    },
-    "ejs@2.7.4": {
-      "built": false
-    },
-    "gifsicle@4.0.1": {
-      "built": false
-    },
-    "highlight.js@9.18.5": {
-      "built": false
-    },
-    "jpegtran-bin@4.0.0": {
+    "esbuild@0.28.2": {
       "built": false
     },
     "nx@23.1.1": {
-      "built": false
-    },
-    "optipng-bin@5.1.0": {
       "built": false
     }
   },
@@ -70,13 +50,16 @@
     "format:check": "prettier --check \"eslint.config.mjs\" \"prettier.config.js\" \"scripts/**/*.mjs\" \"cli/bin/**/*.js\" \"{cli,core,http-adapters,jwt-authentication-strategy,management-console,memory-storages,oidc-authentication-strategy,pg-s3-storages,sdk,serve-static,staticdeploy,storages-test-suite,tar-archiver}/{src,test,typings,mock-server}/**/*.{ts,tsx,css}\" \"website/**/*.js\" \"website/docs/**/*.md\"",
     "lint": "eslint \"eslint.config.mjs\" \"prettier.config.js\" \"scripts/**/*.mjs\" \"cli/bin/**/*.js\" \"{cli,core,http-adapters,jwt-authentication-strategy,management-console,memory-storages,oidc-authentication-strategy,pg-s3-storages,sdk,serve-static,staticdeploy,storages-test-suite,tar-archiver}/{src,test,typings,mock-server}/**/*.{ts,tsx}\" \"website/**/*.js\"",
     "typecheck": "node scripts/typecheck-workspaces.mjs",
-    "unit": "node scripts/test-workspace-checks.mjs && lerna run test --stream --concurrency 1",
+    "unit": "node scripts/test-workspace-checks.mjs && yarn test:runtime-notices && yarn test:tooling-compatibility && lerna run test --stream --concurrency 1",
+    "test:tooling-compatibility": "yarn workspace @staticdeploy/core exec mocha --parallel --jobs 2 'test-fixtures/mocha-parallel-*.cjs'",
     "test": "yarn unit",
-    "coverage": "nyc --all yarn unit",
+    "coverage": "nyc --all yarn unit && yarn workspace @staticdeploy/management-console test:coverage",
     "check:install-policy": "node scripts/check-install-policy.mjs",
     "test:install-policy": "node scripts/test-install-policy.mjs",
+    "test:security-policy": "node scripts/test-security-policy.mjs",
+    "test:runtime-notices": "node scripts/test-runtime-notices.mjs",
+    "test:image": "node scripts/test-image-conformance.mjs",
     "check:install-scripts": "node scripts/check-install-scripts.mjs",
-    "provision:optipng": "node scripts/provision-optipng.mjs",
     "lerna": "lerna"
   },
   "devDependencies": {
@@ -87,8 +70,9 @@
     "globals": "^17.11.0",
     "lerna": "10.0.0",
     "minipass": "3.1.6",
-    "nyc": "^15.1.0",
+    "nyc": "18.0.0",
     "prettier": "3.6.2",
+    "spdx-expression-parse": "5.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0"
   }

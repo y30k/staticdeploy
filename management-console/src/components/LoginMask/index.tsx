@@ -16,6 +16,7 @@ import UserCreationInstructions from "./UserCreationInstructions";
 
 interface IProps {
     authService: AuthService;
+    children?: React.ReactNode;
 }
 
 export default class LoginMask extends React.Component<IProps> {

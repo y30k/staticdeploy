@@ -17,11 +17,24 @@ const validConfig =
 const validLock = 'package@npm:1.0.0:\n  resolution: "package@npm:1.0.0"\n';
 const validManifest = {
     dependenciesMeta: { "package@1.0.0": { built: false } },
+    resolutions: { "child@npm:1.0.0": "npm:1.0.1" },
 };
 const validInventory = {
     defaultPolicy: "blocked",
     packages: [
         { package: "package", version: "1.0.0", allowed: false, scripts: {} },
+    ],
+};
+const validResolutionsInventory = {
+    defaultPolicy: "blocked",
+    resolutions: [
+        {
+            selector: "child@npm:1.0.0",
+            resolution: "npm:1.0.1",
+            owner: "test owner",
+            rationale: "test security correction",
+            removalCondition: "remove after parent upgrade",
+        },
     ],
 };
 
@@ -33,6 +46,10 @@ function run(name, overrides = {}) {
         lock: path.join(directory, "yarn.lock"),
         manifest: path.join(directory, "package.json"),
         inventory: path.join(directory, "inventory.json"),
+        resolutionsInventory: path.join(
+            directory,
+            "resolutions-inventory.json"
+        ),
     };
     fs.writeFileSync(paths.config, overrides.config || validConfig);
     fs.writeFileSync(paths.lock, overrides.lock || validLock);
@@ -44,9 +61,22 @@ function run(name, overrides = {}) {
         paths.inventory,
         JSON.stringify(overrides.inventory || validInventory)
     );
+    fs.writeFileSync(
+        paths.resolutionsInventory,
+        JSON.stringify(
+            overrides.resolutionsInventory || validResolutionsInventory
+        )
+    );
     return spawnSync(
         process.execPath,
-        [checker, paths.config, paths.lock, paths.manifest, paths.inventory],
+        [
+            checker,
+            paths.config,
+            paths.lock,
+            paths.manifest,
+            paths.inventory,
+            paths.resolutionsInventory,
+        ],
         { encoding: "utf8" }
     );
 }
@@ -106,7 +136,57 @@ try {
     assert.notEqual(
         run("changed-decision", {
             manifest: {
+                ...validManifest,
                 dependenciesMeta: { "package@1.0.0": { built: true } },
+            },
+        }).status,
+        0
+    );
+    assert.notEqual(
+        run("unreviewed-resolution", {
+            manifest: {
+                ...validManifest,
+                resolutions: {
+                    ...validManifest.resolutions,
+                    "other@npm:2.0.0": "npm:2.0.1",
+                },
+            },
+        }).status,
+        0
+    );
+    assert.notEqual(
+        run("changed-resolution", {
+            manifest: {
+                ...validManifest,
+                resolutions: { "child@npm:1.0.0": "npm:1.0.2" },
+            },
+        }).status,
+        0
+    );
+    assert.notEqual(
+        run("wildcard-resolution", {
+            resolutionsInventory: {
+                defaultPolicy: "blocked",
+                resolutions: [
+                    {
+                        ...validResolutionsInventory.resolutions[0],
+                        selector: "child@npm:*",
+                    },
+                ],
+            },
+        }).status,
+        0
+    );
+    assert.notEqual(
+        run("ownerless-resolution", {
+            resolutionsInventory: {
+                defaultPolicy: "blocked",
+                resolutions: [
+                    {
+                        ...validResolutionsInventory.resolutions[0],
+                        owner: "",
+                    },
+                ],
             },
         }).status,
         0

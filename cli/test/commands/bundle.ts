@@ -1,7 +1,7 @@
 import BundlesClient from "@staticdeploy/sdk/lib/BundlesClient";
 import tarArchiver from "@staticdeploy/tar-archiver";
 import { expect } from "chai";
-import { createTree, destroyTree } from "create-fs-tree";
+import { createTree, destroyTree } from "@staticdeploy/storages-test-suite";
 import { emptyDirSync, removeSync } from "fs-extra";
 import { tmpdir } from "os";
 import { join } from "path";

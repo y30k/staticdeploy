@@ -1,117 +1,91 @@
-import Spin from "antd/lib/spin";
+import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
+import type { ReactNode } from "react";
+import { Provider } from "react-redux";
 import sinon from "sinon";
 
-import ErrorAlert from "../../../src/components/ErrorAlert";
 import LoginMask from "../../../src/components/LoginMask";
-import JwtLogin from "../../../src/components/LoginMask/JwtLogin";
-import OidcLogin from "../../../src/components/LoginMask/OidcLogin";
+import reduxStore from "../../../src/reduxStore";
 
-describe("LoginMask", () => {
-    const getMockAuthService = () => ({
+const status = {
+    authToken: null,
+    isLoggingIn: false,
+    isLoggedIn: false,
+    loginError: null,
+    requiresUserCreation: false,
+    requiresUserCreationError: null,
+};
+
+function getAuthService(overrides: Record<string, unknown> = {}) {
+    return {
         onStatusChange: sinon.stub(),
         offStatusChange: sinon.stub(),
-        getStatus: sinon.stub(),
+        getStatus: sinon.stub().returns(status),
         authEnforced: true,
-        hasAuthStrategy: sinon.stub(),
-        getStrategyDisplayName: sinon.stub(),
+        hasAuthStrategy: sinon.stub().returns(false),
+        getStrategyDisplayName: sinon.stub().returns("provider"),
+        ...overrides,
+    } as any;
+}
+
+function renderMask(authService: any, children?: ReactNode) {
+    return render(
+        <Provider store={reduxStore}>
+            <LoginMask authService={authService}>{children}</LoginMask>
+        </Provider>
+    );
+}
+
+describe("LoginMask", () => {
+    it("renders the configured OIDC login", () => {
+        const authService = getAuthService();
+        authService.hasAuthStrategy.withArgs("oidc").returns(true);
+        renderMask(authService);
+        expect(
+            screen.getByRole("button", { name: "Login with provider" })
+        ).to.not.equal(null);
     });
 
-    describe("when the user is not logged in", () => {
-        it("when the oidc auth strategy is used, renders an OidcLogin", () => {
-            const mockAuthService = getMockAuthService();
-            mockAuthService.hasAuthStrategy.withArgs("oidc").returns(true);
-            mockAuthService.getStatus.returns({
-                authToken: null,
-                isLoggingIn: false,
-                isLoggedIn: false,
-                loginError: null,
-            });
-            const loginMask = shallow(
-                <LoginMask authService={mockAuthService as any} />
-            );
-            expect(loginMask.find(OidcLogin)).to.have.length(1);
-        });
-
-        it("when the jwt auth strategy is used, renders an JwtLogin", () => {
-            const mockAuthService = getMockAuthService();
-            mockAuthService.hasAuthStrategy.withArgs("jwt").returns(true);
-            mockAuthService.getStatus.returns({
-                authToken: null,
-                isLoggingIn: false,
-                isLoggedIn: false,
-                loginError: null,
-            });
-            const loginMask = shallow(
-                <LoginMask authService={mockAuthService as any} />
-            );
-            expect(loginMask.find(JwtLogin)).to.have.length(1);
-        });
+    it("renders the configured JWT login", () => {
+        const authService = getAuthService();
+        authService.hasAuthStrategy.withArgs("jwt").returns(true);
+        renderMask(authService);
+        expect(
+            screen.getByRole("button", { name: "Login with provider" })
+        ).to.not.equal(null);
     });
 
-    it("when the user is logging in, renders a spinner", () => {
-        const mockAuthService = getMockAuthService();
-        mockAuthService.getStatus.returns({
-            authToken: null,
-            isLoggingIn: true,
-            isLoggedIn: false,
-            loginError: null,
+    it("shows progress while logging in", () => {
+        const authService = getAuthService({
+            getStatus: sinon.stub().returns({ ...status, isLoggingIn: true }),
         });
-        const loginMask = shallow(
-            <LoginMask authService={mockAuthService as any} />
-        );
-        expect(loginMask.find(Spin)).to.have.length(1);
-        expect(loginMask.find(Spin).prop("spinning")).to.equal(true);
-    });
-
-    it("when an error occurred logging in, renders an error message", () => {
-        const mockAuthService = getMockAuthService();
-        mockAuthService.getStatus.returns({
-            authToken: null,
-            isLoggingIn: false,
-            isLoggedIn: false,
-            loginError: new Error("Error logging in"),
-        });
-        const loginMask = shallow(
-            <LoginMask authService={mockAuthService as any} />
-        );
-        expect(loginMask.find(ErrorAlert).prop("message")).to.equal(
-            "Error logging in"
+        const { container } = renderMask(authService);
+        expect(container.querySelector(".ant-spin-spinning")).to.not.equal(
+            null
         );
     });
 
-    it("when auth is not enforced, renders its children", () => {
-        const mockAuthService = getMockAuthService();
-        mockAuthService.getStatus.returns({
-            authToken: null,
-            isLoggingIn: false,
-            isLoggedIn: true,
-            loginError: null,
+    it("renders login errors", () => {
+        const authService = getAuthService({
+            getStatus: sinon.stub().returns({
+                ...status,
+                loginError: new Error("Error logging in"),
+            }),
         });
-        mockAuthService.authEnforced = false;
-        const loginMask = shallow(
-            <LoginMask authService={mockAuthService as any}>
-                <div id="child" />
-            </LoginMask>
-        );
-        expect(loginMask.find("div#child")).to.have.length(1);
+        renderMask(authService);
+        expect(screen.getByText("Error logging in")).to.not.equal(null);
     });
 
-    it("when the user is logged in, renders its children", () => {
-        const mockAuthService = getMockAuthService();
-        mockAuthService.getStatus.returns({
-            authToken: "authToken",
-            isLoggingIn: false,
-            isLoggedIn: true,
-            loginError: null,
+    it("renders children when auth is not enforced", () => {
+        renderMask(getAuthService({ authEnforced: false }), <div>child</div>);
+        expect(screen.getByText("child")).to.not.equal(null);
+    });
+
+    it("renders children when the user is logged in", () => {
+        const authService = getAuthService({
+            getStatus: sinon.stub().returns({ ...status, isLoggedIn: true }),
         });
-        const loginMask = shallow(
-            <LoginMask authService={mockAuthService as any}>
-                <div id="child" />
-            </LoginMask>
-        );
-        expect(loginMask.find("div#child")).to.have.length(1);
+        renderMask(authService, <div>child</div>);
+        expect(screen.getByText("child")).to.not.equal(null);
     });
 });

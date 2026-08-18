@@ -1,16 +1,35 @@
 import env from "@mondora/env";
-import { LogLevelString } from "bunyan";
 
-import IConfig from "./common/IConfig";
+import IConfig, { LogLevel } from "./common/IConfig";
 
 const pkg = require("../package.json");
 
-const config: IConfig = {
+export const APP_NAME: string = pkg.name;
+export const APP_VERSION: string = pkg.version;
+
+const LOG_LEVELS: LogLevel[] = [
+    "trace",
+    "debug",
+    "info",
+    "warn",
+    "error",
+    "fatal",
+];
+
+export const parseLogLevel = (value: string): LogLevel => {
+    const level = LOG_LEVELS.find((candidate) => candidate === value);
+    if (level === undefined) {
+        throw new Error(`LOG_LEVEL must be one of ${LOG_LEVELS.join(", ")}`);
+    }
+    return level;
+};
+
+export const getConfig = (): IConfig => ({
     // General service configurations
-    appName: pkg.name,
-    appVersion: pkg.version,
+    appName: APP_NAME,
+    appVersion: APP_VERSION,
     nodeEnv: env("NODE_ENV", { default: "development" }),
-    logLevel: env("LOG_LEVEL", { default: "info" }) as LogLevelString,
+    logLevel: parseLogLevel(env("LOG_LEVEL", { default: "info" })),
     port: env("PORT", { default: "3000" }),
     managementHostname: env("MANAGEMENT_HOSTNAME", {
         required: true,
@@ -37,6 +56,14 @@ const config: IConfig = {
     jwtSecretOrPublicKey: env("JWT_SECRET_OR_PUBLIC_KEY", {
         parse: (value) => Buffer.from(value, "base64"),
     }),
+    jwtAlgorithm: env("JWT_ALGORITHM", {
+        parse: (value) => {
+            if (value !== "HS256" && value !== "RS256") {
+                throw new Error("JWT_ALGORITHM must be HS256 or RS256");
+            }
+            return value;
+        },
+    }),
     oidcConfigurationUrl: env("OIDC_CONFIGURATION_URL"),
     oidcClientId: env("OIDC_CLIENT_ID"),
     oidcProviderName: env("OIDC_PROVIDER_NAME"),
@@ -56,5 +83,4 @@ const config: IConfig = {
         default: "false",
         parse: (value) => value === "true",
     }),
-};
-export default config;
+});

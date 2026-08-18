@@ -3,67 +3,11 @@
     "defaultPolicy": "blocked",
     "packages": [
         {
-            "package": "core-js-pure",
-            "version": "3.19.3",
+            "package": "esbuild",
+            "version": "0.28.2",
             "allowed": false,
             "scripts": {
-                "postinstall": "node -e \"try{require('./postinstall')}catch(e){}\""
-            }
-        },
-        {
-            "package": "core-js",
-            "version": "2.6.12",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node -e \"try{require('./postinstall')}catch(e){}\""
-            }
-        },
-        {
-            "package": "core-js",
-            "version": "3.19.3",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node -e \"try{require('./postinstall')}catch(e){}\""
-            }
-        },
-        {
-            "package": "dtrace-provider",
-            "version": "0.8.8",
-            "allowed": false,
-            "scripts": {
-                "install": "node-gyp rebuild || node suppress-error.js"
-            }
-        },
-        {
-            "package": "ejs",
-            "version": "2.7.4",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node ./postinstall.js"
-            }
-        },
-        {
-            "package": "gifsicle",
-            "version": "4.0.1",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node lib/install.js"
-            }
-        },
-        {
-            "package": "highlight.js",
-            "version": "9.18.5",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node deprecated.js"
-            }
-        },
-        {
-            "package": "jpegtran-bin",
-            "version": "4.0.0",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node lib/install.js"
+                "postinstall": "node install.js"
             }
         },
         {
@@ -72,14 +16,6 @@
             "allowed": false,
             "scripts": {
                 "postinstall": "node -e \"try{require('./dist/bin/post-install')}catch(e){}\""
-            }
-        },
-        {
-            "package": "optipng-bin",
-            "version": "5.1.0",
-            "allowed": false,
-            "scripts": {
-                "postinstall": "node lib/install.js"
             }
         }
     ]

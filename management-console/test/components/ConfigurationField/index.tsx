@@ -1,54 +1,55 @@
+import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
+import { vi } from "vitest";
+
+vi.mock("../../../src/components/TextField", () => ({
+    default: ({ name }: { name: string }) => (
+        <input data-testid="configuration-input" data-field-name={name} />
+    ),
+}));
 
 import { WrappedConfigurationField } from "../../../src/components/ConfigurationField";
-import TextField from "../../../src/components/TextField";
+
+function fields() {
+    return {
+        map: (renderField: any) => renderField("fieldName", 0, fields()),
+        push: vi.fn(),
+        remove: vi.fn(),
+    } as any;
+}
 
 describe("ConfigurationField", () => {
-    describe("label prop", () => {
-        it("when a label is specified, renders it inside a div.ant-form-item-label", () => {
-            const configurationField = shallow(
-                <WrappedConfigurationField
-                    name="name"
-                    fields={{ map: () => null } as any}
-                    meta={{} as any}
-                    label="label"
-                />
-            );
-            expect(
-                configurationField.find("div.ant-form-item-label")
-            ).to.have.length(1);
-        });
-        it("when a label is not specified, doesn't render any div.ant-form-item-label", () => {
-            const configurationField = shallow(
-                <WrappedConfigurationField
-                    name="name"
-                    fields={{ map: () => null } as any}
-                    meta={{} as any}
-                />
-            );
-            expect(
-                configurationField.find("div.ant-form-item-label")
-            ).to.have.length(0);
-        });
-    });
-
-    it("for each kvPair field passed by redux-form, renders a TextField for the key and one for the value", () => {
-        const configurationField = shallow(
+    it("renders an optional label", () => {
+        const { rerender } = render(
             <WrappedConfigurationField
                 name="name"
-                fields={{ map: (fn: any) => fn("fieldName", 0) } as any}
+                fields={fields()}
+                meta={{} as any}
+                label="label"
+            />
+        );
+        expect(screen.getByText("label")).to.not.equal(null);
+        rerender(
+            <WrappedConfigurationField
+                name="name"
+                fields={fields()}
                 meta={{} as any}
             />
         );
-        const textFields = configurationField.find(TextField);
-        expect(textFields).to.have.length(2);
-        const fieldNames = textFields.map((textField) =>
-            textField.prop("name")
+        expect(screen.queryByText("label")).to.equal(null);
+    });
+
+    it("renders key and value fields for every configuration pair", () => {
+        render(
+            <WrappedConfigurationField
+                name="name"
+                fields={fields()}
+                meta={{} as any}
+            />
         );
-        expect(fieldNames.sort()).to.deep.equal(
-            ["fieldName.key", "fieldName.value"].sort()
-        );
+        const names = screen
+            .getAllByTestId("configuration-input")
+            .map((input) => input.getAttribute("data-field-name"));
+        expect(names).to.deep.equal(["fieldName.key", "fieldName.value"]);
     });
 });

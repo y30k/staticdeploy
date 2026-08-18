@@ -1,4 +1,4 @@
-import { IConfiguration } from "@staticdeploy/core";
+import { IConfiguration } from "@staticdeploy/core/browser";
 import set from "lodash/set";
 
 export interface IKVPair {

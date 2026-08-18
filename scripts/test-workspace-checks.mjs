@@ -18,7 +18,6 @@ const expectedWorkspaces = [
     "staticdeploy",
     "storages-test-suite",
     "tar-archiver",
-    "website",
 ];
 assert.deepEqual(rootManifest.workspaces, expectedWorkspaces);
 
@@ -147,8 +146,44 @@ const consoleManifest = JSON.parse(
 );
 assert.equal(
     consoleManifest.scripts.compile,
-    "PUBLIC_URL=. SKIP_PREFLIGHT_CHECK=true DISABLE_ESLINT_PLUGIN=true NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
-    "CRA compatibility bridges must remain scoped to the console compile command"
+    "vite build && node scripts/check-build.mjs",
+    "The console compile command must use Vite and enforce built-artifact checks"
 );
-assert.equal(rootManifest.workspaces.length, 14);
-console.log("Central check contract covers all 14 retained workspaces.");
+for (const retiredDependency of [
+    "react-scripts",
+    "enzyme",
+    "oidc-client",
+    "npm-run-all",
+]) {
+    assert.equal(
+        consoleManifest.dependencies?.[retiredDependency] ??
+            consoleManifest.devDependencies?.[retiredDependency],
+        undefined,
+        `The console must not retain ${retiredDependency}`
+    );
+}
+assert.equal(rootManifest.workspaces.length, 13);
+assert.equal(
+    rootManifest.workspaces.includes("website"),
+    false,
+    "The retired website must remain outside the installable workspace graph"
+);
+const consoleIndex = fs.readFileSync("management-console/index.html", "utf8");
+assert.match(
+    consoleIndex,
+    /<script\s+id="app-config"\s+src="\/app-config\.js"\s*><\/script>/,
+    "The server-injected runtime configuration marker must remain intact"
+);
+assert.match(
+    consoleIndex,
+    /<script type="module" src="\/src\/index\.tsx"><\/script>/,
+    "The Vite module entry must remain explicit"
+);
+const devConfig = fs.readFileSync(
+    "management-console/public/app-config.js",
+    "utf8"
+);
+assert.match(devConfig, /http:\/\/127\.0\.0\.1:3456/);
+assert.match(devConfig, /http:\/\/127\.0\.0\.1:5173/);
+assert.doesNotMatch(devConfig, /localhost/);
+console.log("Central check contract covers all 13 retained workspaces.");

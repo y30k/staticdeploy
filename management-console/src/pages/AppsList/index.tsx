@@ -1,5 +1,5 @@
 import PlusOutlined from "@ant-design/icons/PlusOutlined";
-import { IApp } from "@staticdeploy/core";
+import { IApp } from "@staticdeploy/core/browser";
 import isNil from "lodash/isNil";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";

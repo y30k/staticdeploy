@@ -1,7 +1,7 @@
 import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import EditOutlined from "@ant-design/icons/EditOutlined";
 import PlusOutlined from "@ant-design/icons/PlusOutlined";
-import { IApp, IEntrypoint } from "@staticdeploy/core";
+import { IApp, IEntrypoint } from "@staticdeploy/core/browser";
 import isNil from "lodash/isNil";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";

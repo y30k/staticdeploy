@@ -1,4 +1,4 @@
-import { IGroup } from "@staticdeploy/core";
+import { IGroup } from "@staticdeploy/core/browser";
 import Form from "antd/lib/form";
 import Select from "antd/lib/select";
 import React from "react";

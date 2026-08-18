@@ -1,0 +1,151 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "apk-libgcc-16.1.0-r4",
+  "documentNamespace": "https://spdx.org/spdxdocs/chainguard/melange/3a23ae726beac4e3961f68ec09f224f7",
+  "creationInfo": {
+    "licenseListVersion": "3.22",
+    "creators": [
+      "Tool: melange (v0.54.0)",
+      "Organization: Chainguard, Inc"
+    ],
+    "created": "2026-06-25T13:05:52Z"
+  },
+  "packages": [
+    {
+      "name": "wolfi",
+      "SPDXID": "SPDXRef-OperatingSystem",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "description": "Operating System",
+      "primaryPackagePurpose": "OPERATING-SYSTEM"
+    },
+    {
+      "name": "libgcc",
+      "SPDXID": "SPDXRef-Package-apk-libgcc-16.1.0-r4",
+      "versionInfo": "16.1.0-r4",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later WITH GCC-exception-3.1",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/wolfi/libgcc@16.1.0-r4?arch=x86_64\u0026distro=wolfi"
+        }
+      ],
+      "primaryPackagePurpose": "APPLICATION"
+    },
+    {
+      "name": "gcc.yaml",
+      "SPDXID": "SPDXRef-Package-Melange-gcc.yaml-ee52ebd3c186a06b70547dbfa69282385da38f2b",
+      "versionInfo": "ee52ebd3c186a06b70547dbfa69282385da38f2b",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/chainguard-dev/stereo@ee52ebd3c186a06b70547dbfa69282385da38f2b#gcc.yaml"
+        }
+      ],
+      "primaryPackagePurpose": "INSTALL"
+    },
+    {
+      "name": "gnutools/gcc",
+      "SPDXID": "SPDXRef-Package-Source-gitlab.com-gnutools-gcc.git-releases-gcc-16.1.0-6afcc4f6da931eb93f3ab001a0dd9650ea71d1ea-0",
+      "versionInfo": "releases/gcc-16.1.0",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "https://tarballs.cgr.dev/g/dc3e72361e36d33e861a0662815d63a4f1b8578521cc6935343a4aa87327bdec-6afcc4f6da931eb93f3ab001a0dd9650ea71d1ea.tar.gz",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "GPL-3.0-or-later WITH GCC-exception-3.1",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:generic/gnutools%2Fgcc@releases%2Fgcc-16.1.0?vcs_url=git%2Bhttps:%2F%2Fgitlab.com%2Fgnutools%2Fgcc.git%406afcc4f6da931eb93f3ab001a0dd9650ea71d1ea"
+        }
+      ],
+      "primaryPackagePurpose": "SOURCE"
+    },
+    {
+      "name": "libgcc",
+      "SPDXID": "SPDXRef-Package-apk-libgcc-88896f69d5e17f62",
+      "versionInfo": "16.1.0-r4",
+      "supplier": "Organization: chainguard",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: /.PKGINFO",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "(GPL-3.0-or-later WITH GCC-exception-3.1)",
+      "copyrightText": "NOASSERTION",
+      "description": "GCC runtime library",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:gnu:gcc:16.1.0:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/wolfi/libgcc@16.1.0-r4?arch=x86_64\u0026origin=gcc"
+        }
+      ]
+    },
+    {
+      "name": "libgcc",
+      "SPDXID": "SPDXRef-DocumentRoot-Directory-libgcc",
+      "versionInfo": "16.1.0-r4",
+      "supplier": "Organization: chainguard",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "FILE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Package-apk-libgcc-16.1.0-r4",
+      "relatedSpdxElement": "SPDXRef-Package-Melange-gcc.yaml-ee52ebd3c186a06b70547dbfa69282385da38f2b",
+      "relationshipType": "DESCRIBED_BY"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-apk-libgcc-16.1.0-r4",
+      "relatedSpdxElement": "SPDXRef-Package-Source-gitlab.com-gnutools-gcc.git-releases-gcc-16.1.0-6afcc4f6da931eb93f3ab001a0dd9650ea71d1ea-0",
+      "relationshipType": "GENERATED_FROM"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-apk-libgcc-16.1.0-r4",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-libgcc",
+      "relatedSpdxElement": "SPDXRef-Package-apk-libgcc-88896f69d5e17f62",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-apk-libgcc-16.1.0-r4",
+      "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-libgcc",
+      "relationshipType": "CONTAINS"
+    }
+  ]
+}

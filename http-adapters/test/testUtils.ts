@@ -12,7 +12,8 @@ interface IExecMocks {
 }
 
 export function getManagementApiAdapter(
-    execMocks: IExecMocks
+    execMocks: IExecMocks,
+    options: { maxRequestBodySize?: string } = {}
 ): express.Express {
     return getServer(
         execMocks,
@@ -21,7 +22,7 @@ export function getManagementApiAdapter(
             serviceVersion: "serviceVersion",
             serviceHost: "serviceHost",
             serviceBasePath: "/",
-            maxRequestBodySize: "100mb",
+            maxRequestBodySize: options.maxRequestBodySize || "100mb",
         }),
         "/"
     );

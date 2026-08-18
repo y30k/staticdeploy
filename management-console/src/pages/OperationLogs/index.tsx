@@ -1,4 +1,4 @@
-import { IOperationLog } from "@staticdeploy/core";
+import { IOperationLog } from "@staticdeploy/core/browser";
 import Col from "antd/lib/col";
 import Row from "antd/lib/row";
 import React from "react";

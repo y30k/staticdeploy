@@ -1,4 +1,4 @@
-import { IBundle } from "@staticdeploy/core";
+import { IBundle } from "@staticdeploy/core/browser";
 import Cascader from "antd/lib/cascader";
 import Form, { FormItemProps } from "antd/lib/form";
 import classnames from "classnames";

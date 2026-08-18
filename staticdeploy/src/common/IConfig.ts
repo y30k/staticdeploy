@@ -1,11 +1,11 @@
-import { LogLevelString } from "bunyan";
+export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 
 export default interface IConfig {
     // General service configurations
     appName: string;
     appVersion: string;
     nodeEnv: string;
-    logLevel: LogLevelString;
+    logLevel: LogLevel;
     port: string;
     managementHostname: string;
     enableManagementEndpoints: boolean;
@@ -18,6 +18,7 @@ export default interface IConfig {
     enforceAuth: boolean;
     createRootUser: boolean;
     jwtSecretOrPublicKey?: Buffer;
+    jwtAlgorithm?: "HS256" | "RS256";
     oidcConfigurationUrl?: string;
     oidcClientId?: string;
     oidcProviderName?: string;

@@ -1,12 +1,11 @@
+import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
 
 import Logo from "../../../src/components/Logo";
 
 describe("Logo", () => {
-    it("renders an img", () => {
-        const logo = shallow(<Logo withShadow={false} />);
-        expect(logo.find("img")).to.have.length(1);
+    it("renders an image", () => {
+        render(<Logo withShadow={false} />);
+        expect(screen.getByRole("img", { name: "logo" })).to.not.equal(null);
     });
 });

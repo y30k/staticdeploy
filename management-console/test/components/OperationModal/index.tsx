@@ -1,64 +1,46 @@
-import Modal from "antd/lib/modal";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
 import sinon from "sinon";
 
-import OperationModal, {
-    OperationStatus,
-} from "../../../src/components/OperationModal";
+import OperationModal from "../../../src/components/OperationModal";
+
+function openModal(operation: sinon.SinonStub) {
+    render(
+        <OperationModal
+            title="title"
+            operation={operation}
+            trigger={<button>Open operation</button>}
+        >
+            <div>Operation content</div>
+        </OperationModal>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Open operation" }));
+}
 
 describe("OperationModal", () => {
-    const props = {
-        title: "title",
-        operation: sinon.stub(),
-    };
-
-    it("when clicked, renders an open Modal", () => {
-        const operationModal = shallow(<OperationModal {...props} />);
-        operationModal.simulate("click");
-        expect(operationModal.find(Modal)).to.have.length(1);
+    it("opens and renders its children from the trigger", () => {
+        openModal(sinon.stub().resolves("result"));
+        expect(screen.getByRole("dialog")).to.not.equal(null);
+        expect(screen.getByText("Operation content")).to.not.equal(null);
     });
 
-    describe("renders its children", () => {
-        const operationModal = shallow(
-            <OperationModal {...props}>
-                <div id="child" />
-            </OperationModal>
+    it("replaces its children with success content after completion", async () => {
+        openModal(sinon.stub().resolves("result"));
+        fireEvent.click(
+            screen.getByRole("button", { name: "Start operation" })
         );
-        it("when state.status === OperationStatus.NotStarted", () => {
-            operationModal.setState({
-                modalOpen: true,
-                status: OperationStatus.NotStarted,
-            });
-            expect(operationModal.find("div#child")).to.have.length(1);
-        });
-        it("when state.status === OperationStatus.Started", () => {
-            operationModal.setState({
-                modalOpen: true,
-                status: OperationStatus.Started,
-            });
-            expect(operationModal.find("div#child")).to.have.length(1);
-        });
-        it("when state.status === OperationStatus.Failed", () => {
-            operationModal.setState({
-                modalOpen: true,
-                status: OperationStatus.Failed,
-            });
-            expect(operationModal.find("div#child")).to.have.length(1);
-        });
+        await screen.findByText("Operation succeeded");
+        expect(screen.queryByText("Operation content")).to.equal(null);
     });
 
-    it("doesn't render its children when state.status === OperationStatus.Succeeded", () => {
-        const operationModal = shallow(
-            <OperationModal {...props}>
-                <div id="child" />
-            </OperationModal>
+    it("retains its children and shows the error after failure", async () => {
+        openModal(sinon.stub().rejects(new Error("operation failed")));
+        fireEvent.click(
+            screen.getByRole("button", { name: "Start operation" })
         );
-        operationModal.setState({
-            modalOpen: true,
-            status: OperationStatus.Succeeded,
-        });
-        expect(operationModal.find("div#child")).to.have.length(0);
+        await waitFor(
+            () => expect(screen.getByText("operation failed")).to.exist
+        );
+        expect(screen.getByText("Operation content")).to.not.equal(null);
     });
 });

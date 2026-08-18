@@ -4,6 +4,26 @@ import { extractAppConfig, test } from "./testUtils";
 
 const htmlWithConfig = '<head><script id="app-config"></script></head>';
 
+describe("extractAppConfig", () => {
+    it("structurally parses trusted, locally generated configuration scripts", () => {
+        const body = htmlWithConfig.replace(
+            "</script>",
+            'window.APP_CONFIG={"KEY":"VALUE"};</script>'
+        );
+
+        expect(extractAppConfig(body)).to.deep.equal({ KEY: "VALUE" });
+    });
+
+    it("rejects additional JavaScript instead of executing it", () => {
+        const body = htmlWithConfig.replace(
+            "</script>",
+            'window.APP_CONFIG={"KEY":"VALUE"};window.other=true;</script>'
+        );
+
+        expect(() => extractAppConfig(body)).to.throw(SyntaxError);
+    });
+});
+
 describe("usecase RespondToEndpointRequest (configuration)", () => {
     test("doesn't inject anything in non-html files", {
         entrypoints: [

@@ -1,17 +1,13 @@
+import { fireEvent, render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import sinon, { SinonFakeTimers } from "sinon";
+import sinon from "sinon";
 
 import { WrappedBundleIdField } from "../../../src/components/BundleIdField";
 
 describe("BundleIdField", () => {
     describe("getOptions method", () => {
-        let clock: SinonFakeTimers;
-        after(() => {
-            clock.restore();
-        });
-
         it("creates the Cascader's options structure from a list of bundles", () => {
-            clock = sinon.useFakeTimers(new Date("1980"));
+            const clock = sinon.useFakeTimers(new Date("1980"));
             const getOptions = WrappedBundleIdField.prototype.getOptions;
             const options = getOptions.call({
                 props: {
@@ -105,6 +101,41 @@ describe("BundleIdField", () => {
                     ],
                 },
             ]);
+            clock.restore();
         });
+    });
+
+    it("selects a bundle through the rendered Cascader", async () => {
+        const onChange = sinon.spy();
+        render(
+            <WrappedBundleIdField
+                name="bundleId"
+                bundles={[
+                    {
+                        id: "bundle-id",
+                        name: "bundle-name",
+                        tag: "bundle-tag",
+                        createdAt: new Date("2020-01-01"),
+                    } as any,
+                ]}
+                input={{
+                    name: "bundleId",
+                    onBlur: sinon.spy(),
+                    onChange,
+                    onDragStart: sinon.spy(),
+                    onDrop: sinon.spy(),
+                    onFocus: sinon.spy(),
+                    value: null,
+                }}
+                meta={{ touched: false } as any}
+                placeholder="Select bundle"
+            />
+        );
+
+        fireEvent.mouseDown(screen.getByRole("combobox"));
+        fireEvent.click(await screen.findByText("bundle-name"));
+        fireEvent.click(await screen.findByText("bundle-tag"));
+        fireEvent.click(await screen.findByText(/bundle-id/));
+        expect(onChange).to.have.been.calledWith("bundle-id");
     });
 });

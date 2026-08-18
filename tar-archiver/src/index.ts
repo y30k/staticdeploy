@@ -4,12 +4,11 @@ import {
     IArchiver,
     IFile,
 } from "@staticdeploy/core";
-import { map } from "bluebird";
 import { mkdirp, outputFile, readFile, remove } from "fs-extra";
 import { tmpdir } from "os";
 import { join } from "path";
 import recursiveReaddir from "recursive-readdir";
-import tar from "tar";
+import { create as createTar, extract as extractTar, ReadEntry } from "tar";
 
 import getRandomString from "./getRandomString";
 import removePrefix from "./removePrefix";
@@ -27,18 +26,38 @@ const tarArchiver: ITarArchiver = {
             await mkdirp(workingDirectoryPath);
             await outputFile(tarArchivePath, archive);
             await mkdirp(stagingDirectoryPath);
-            await tar.extract({
+            let archiveContainsLinks = false;
+            await extractTar({
                 cwd: stagingDirectoryPath,
                 file: tarArchivePath,
+                filter: (_path, entry) => {
+                    if (
+                        entry instanceof ReadEntry &&
+                        (entry.type === "Link" || entry.type === "SymbolicLink")
+                    ) {
+                        archiveContainsLinks = true;
+                        return false;
+                    }
+                    return true;
+                },
+                preservePaths: false,
+                strict: true,
             });
+            if (archiveContainsLinks) {
+                throw new Error("Archive links are not supported");
+            }
             const localPaths = await recursiveReaddir(stagingDirectoryPath);
-            return map(localPaths, async (localPath) => {
-                const path = removePrefix(localPath, stagingDirectoryPath);
-                return {
-                    path: path,
-                    content: await readFile(join(stagingDirectoryPath, path)),
-                };
-            });
+            return await Promise.all(
+                localPaths.map(async (localPath) => {
+                    const path = removePrefix(localPath, stagingDirectoryPath);
+                    return {
+                        path: path,
+                        content: await readFile(
+                            join(stagingDirectoryPath, path)
+                        ),
+                    };
+                })
+            );
         } catch (err) {
             throw new ArchiveExtractionError();
         } finally {
@@ -52,10 +71,15 @@ const tarArchiver: ITarArchiver = {
         const tarArchivePath = join(workingDirectoryPath, "archive.tar.gz");
         try {
             await mkdirp(workingDirectoryPath);
-            await map(files, (file) =>
-                outputFile(join(stagingDirectoryPath, file.path), file.content)
+            await Promise.all(
+                files.map((file) =>
+                    outputFile(
+                        join(stagingDirectoryPath, file.path),
+                        file.content
+                    )
+                )
             );
-            await tar.create(
+            await createTar(
                 {
                     cwd: stagingDirectoryPath,
                     file: tarArchivePath,
@@ -64,7 +88,7 @@ const tarArchiver: ITarArchiver = {
                 },
                 ["."]
             );
-            return readFile(tarArchivePath);
+            return await readFile(tarArchivePath);
         } catch (err) {
             throw new ArchiveCreationError();
         } finally {
@@ -77,7 +101,7 @@ const tarArchiver: ITarArchiver = {
         const tarArchivePath = join(workingDirectoryPath, "archive.tar.gz");
         try {
             await mkdirp(workingDirectoryPath);
-            await tar.create(
+            await createTar(
                 {
                     cwd: path,
                     file: tarArchivePath,
@@ -86,7 +110,7 @@ const tarArchiver: ITarArchiver = {
                 },
                 ["."]
             );
-            return readFile(tarArchivePath);
+            return await readFile(tarArchivePath);
         } catch (err) {
             throw new ArchiveCreationError();
         } finally {

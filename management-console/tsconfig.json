@@ -1,7 +1,7 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "target": "es5",
+        "target": "ES2020",
         "module": "esnext",
         "moduleResolution": "node",
         "lib": [
@@ -10,22 +10,18 @@
             "esnext"
         ],
         "types": [
+            "vite/client",
             "@types/chai",
-            "@types/enzyme",
-            "@types/enzyme-adapter-react-16",
             "@types/express",
             "@types/faker",
-            "@types/jsdom-global",
             "@types/lodash",
-            "@types/mocha",
             "@types/node",
-            "@types/prop-types",
             "@types/react",
             "@types/react-dom",
             "@types/react-router-dom",
             "@types/sinon",
             "@types/sinon-chai",
-            "@types/validator"
+            "vitest/globals"
         ],
         "jsx": "react-jsx",
         "allowSyntheticDefaultImports": true,

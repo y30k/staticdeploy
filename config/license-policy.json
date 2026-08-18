@@ -1,0 +1,256 @@
+{
+    "schemaVersion": 1,
+    "allowedSpdx": [
+        "0BSD",
+        "Apache-2.0",
+        "BlueOak-1.0.0",
+        "BSD-2-Clause",
+        "BSD-3-Clause",
+        "CC-BY-3.0",
+        "CC-BY-4.0",
+        "CC0-1.0",
+        "GPL-3.0-or-later",
+        "ISC",
+        "LGPL-2.1-or-later",
+        "MIT",
+        "MIT-0",
+        "MPL-2.0",
+        "Python-2.0",
+        "WTFPL"
+    ],
+    "obligationEvidence": {
+        "0BSD": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "Apache-2.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "BlueOak-1.0.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "BSD-2-Clause": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "BSD-3-Clause": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "CC-BY-3.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "CC-BY-4.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "CC0-1.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "GPL-3.0-or-later": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
+        },
+        "ISC": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "LGPL-2.1-or-later": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
+        },
+        "MIT": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "MIT-0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "MPL-2.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
+        },
+        "Python-2.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "WTFPL": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        }
+    },
+    "reviewedExpressions": [
+        {
+            "expression": "(MIT OR CC0-1.0)",
+            "selected": "MIT",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        },
+        {
+            "expression": "(BSD-2-Clause OR WTFPL)",
+            "selected": "BSD-2-Clause",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        },
+        {
+            "expression": "(GPL-3.0-or-later WITH GCC-exception-3.1)",
+            "selected": "GPL-3.0-or-later WITH GCC-exception-3.1",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+                "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+                "missingReason": null
+            }
+        }
+    ],
+    "componentAssertions": [
+        {
+            "scope": "image",
+            "component": "node",
+            "version": "24.19.0",
+            "observed": "NOASSERTION",
+            "asserted": "MIT",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        }
+    ],
+    "evidenceArtifacts": [
+        {
+            "path": "docs/security/license-evidence/m2-license-review-decision.md",
+            "digest": "sha256:58abc076cf177966a7230ec36d947a111c5831999a7004f7dd06b18aaf16f348"
+        },
+        {
+            "path": "docs/security/license-evidence/m2-runtime-third-party-notices.txt",
+            "digest": "sha256:37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "digest": "sha256:6ae13823b79c81639b9420350bac816ef6bd1360b2c35e4d8d6576ff92743607"
+        },
+        {
+            "path": "docs/security/license-evidence/base-runtime-license-texts/GCC-exception-3.1.txt",
+            "digest": "sha256:7103d4f7f7e2f8ce10d282a05e0689637f8d6d9ef7b399d808d1da313e69b960"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/ca-certificates-bundle-20260413-r1.spdx.json",
+            "digest": "sha256:048e54383819dc88c3e7015bed9f671b51ba3c649fff590b9ca1b8124c4fb0dd"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/glibc-2.43-r13.spdx.json",
+            "digest": "sha256:1f4233fd035591b1dd4f23537a6ff7c09ddd928482908067baba07dc8e19610e"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/glibc-locale-posix-2.43-r13.spdx.json",
+            "digest": "sha256:68fa41c5f5c8b02e3a91c983dd8efa4a0316db7d4b3f711eadfdb4a7cef76220"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/ld-linux-2.43-r13.spdx.json",
+            "digest": "sha256:3af9e0b1cf6cd659bb027d4b7aedf8673eee96f39a102377958095b3f697d685"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/libgcc-16.1.0-r4.spdx.json",
+            "digest": "sha256:d9ca803e39b73744a8f9cb348d41bf7b3ed537da634d7c8166f5d0e15cde4bf2"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/libstdc++-16.1.0-r4.spdx.json",
+            "digest": "sha256:9c09f88a89cb340798aeb14dd8008307b5652ba4fd9e91b597d3d7dec843969b"
+        },
+        {
+            "path": "docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE",
+            "digest": "sha256:edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d"
+        },
+        {
+            "path": "docs/security/license-evidence/npm-fallbacks/boolbase-1.0.0-LICENSE",
+            "digest": "sha256:cdf4d87ae0a6c160227263bf4e39a0a10e30e89ae7256e0f7ac7bde0836552c6"
+        },
+        {
+            "path": "docs/security/license-evidence/m2-approved-license-components.json",
+            "digest": "sha256:2fb3563a09534a3e70683e10126fd1e85e5905336d32b29f515f9cfe7092c1ce"
+        }
+    ],
+    "approvedInventory": {
+        "path": "docs/security/license-evidence/m2-approved-license-components.json",
+        "digest": "sha256:2fb3563a09534a3e70683e10126fd1e85e5905336d32b29f515f9cfe7092c1ce"
+    }
+}

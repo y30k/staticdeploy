@@ -1,7 +1,5 @@
-import { isAbsolute, normalize } from "path";
-import isFQDN from "validator/lib/isFQDN";
-
 import { EntrypointUrlMatcherNotValidError } from "../common/errors";
+import isEntrypointUrlMatcherValid from "../common/entrypointUrlMatcher";
 import { IConfiguration } from "./Configuration";
 
 export interface IEntrypoint {
@@ -31,21 +29,7 @@ export interface IEntrypoint {
  *  - domain.com
  *  - domain.com/path
  */
-export function isEntrypointUrlMatcherValid(urlMatcher: string): boolean {
-    const indexOfFirstSlash = urlMatcher.indexOf("/");
-    // Must contain at least a / to be valid
-    if (indexOfFirstSlash === -1) {
-        return false;
-    }
-    const domain = urlMatcher.slice(0, indexOfFirstSlash);
-    const path = urlMatcher.slice(indexOfFirstSlash);
-    return (
-        isFQDN(domain, { allow_trailing_dot: false }) &&
-        isAbsolute(path) &&
-        normalize(path) === path &&
-        /\/$/.test(path)
-    );
-}
+export { isEntrypointUrlMatcherValid };
 export function validateEntrypointUrlMatcher(urlMatcher: string): void {
     if (!isEntrypointUrlMatcherValid(urlMatcher)) {
         throw new EntrypointUrlMatcherNotValidError(urlMatcher);

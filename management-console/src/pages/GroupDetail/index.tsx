@@ -1,6 +1,6 @@
 import DeleteOutlined from "@ant-design/icons/DeleteOutlined";
 import EditOutlined from "@ant-design/icons/EditOutlined";
-import { IGroup } from "@staticdeploy/core";
+import { IGroup } from "@staticdeploy/core/browser";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 

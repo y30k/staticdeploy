@@ -10,6 +10,7 @@ const directory = fs.mkdtempSync(
 const input = path.join(directory, "raw.jsonl");
 const output = path.join(directory, "sanitized.json");
 const rawMarker = "fake-secret-value-that-must-not-survive";
+const commit = "a".repeat(40);
 
 try {
     fs.writeFileSync(
@@ -21,7 +22,7 @@ try {
             RawV2: rawMarker,
             SourceMetadata: {
                 Data: {
-                    Git: { commit: "abc123", file: "example.txt", line: 7 },
+                    Git: { commit, file: "example.txt", line: 7 },
                 },
             },
         }) + "\n"
@@ -40,9 +41,30 @@ try {
         {
             detector: "SyntheticDetector",
             status: "verified",
-            source: { commit: "abc123", file: "example.txt", line: 7 },
+            source: { commit, file: "example.txt", line: 7 },
         },
     ]);
+
+    fs.rmSync(output);
+    const actualFilesystemFixture = fs.readFileSync(
+        path.resolve(
+            "scripts/test-fixtures/security/trufflehog-filesystem.jsonl"
+        ),
+        "utf8"
+    );
+    fs.writeFileSync(input, actualFilesystemFixture);
+    const filesystemResult = spawnSync(
+        process.execPath,
+        [path.resolve("scripts/sanitize-trufflehog.mjs"), input, output],
+        {
+            encoding: "utf8",
+            env: { ...process.env, TRUFFLEHOG_SUBJECT_COMMIT: commit },
+        }
+    );
+    assert.equal(filesystemResult.status, 0, filesystemResult.stderr);
+    const filesystemOutput = fs.readFileSync(output, "utf8");
+    assert.ok(!filesystemOutput.includes("REDACTED-DO-NOT-RETAIN"));
+    assert.equal(JSON.parse(filesystemOutput).findings[0].status, "unknown");
 
     fs.rmSync(output);
     fs.writeFileSync(input, "not-json\n");

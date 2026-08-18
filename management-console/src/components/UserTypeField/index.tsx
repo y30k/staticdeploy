@@ -1,6 +1,6 @@
 import RobotOutlined from "@ant-design/icons/RobotOutlined";
 import UserOutlined from "@ant-design/icons/UserOutlined";
-import { UserType } from "@staticdeploy/core";
+import { UserType } from "@staticdeploy/core/browser";
 import Form from "antd/lib/form";
 import Select from "antd/lib/select";
 import upperFirst from "lodash/upperFirst";
