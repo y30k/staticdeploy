@@ -1,10 +1,8 @@
-# Note: this Dockerfile is executed with the root of the staticdeploy monorepo
-# as context. M2-07 owns the later image-hardening/multi-stage conversion.
-FROM node:24.19.0-alpine
+# This Dockerfile is executed with the monorepo root as its build context.
+FROM node:24.19.0-alpine AS builder
 
 WORKDIR /opt/staticdeploy
 
-# Use the repository-pinned Yarn release and immutable node-modules install.
 COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY config/install-scripts.json config/dependency-resolutions.json ./config/
 COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs ./scripts/
@@ -44,8 +42,10 @@ RUN corepack enable && \
     yarn install --immutable && \
     yarn check:install-scripts && \
     yarn lerna run compile --scope=@staticdeploy/staticdeploy --include-dependencies --stream --concurrency 1 && \
+    rm -rf node_modules */node_modules && \
     yarn workspaces focus @staticdeploy/staticdeploy --production && \
-    rm yarn.lock tsconfig.json && \
+    rm -f yarn.lock tsconfig.json lerna.json .yarnrc.yml && \
+    rm -rf .yarn config scripts && \
     rm -rf management-console/tsconfig.json management-console/vite.config.mts management-console/index.html management-console/public management-console/scripts management-console/src && \
     rm -rf core/tsconfig.json core/tsconfig.browser.json core/src && \
     rm -rf http-adapters/tsconfig.json http-adapters/src && \
@@ -58,15 +58,22 @@ RUN corepack enable && \
     rm -rf storages-test-suite && \
     rm -rf tar-archiver/tsconfig.json tar-archiver/src && \
     rm -rf staticdeploy/tsconfig.json staticdeploy/src staticdeploy/typings && \
-    rm -rf config scripts && \
-    apk add --no-cache curl
+    find node_modules -type d \( -name test -o -name tests -o -name __tests__ \) -prune -exec rm -rf '{}' +
+
+FROM node:24.19.0-alpine AS runtime
+
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack && \
+    rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg
+
+WORKDIR /opt/staticdeploy/staticdeploy
+COPY --from=builder --chown=node:node /opt/staticdeploy /opt/staticdeploy
 
 ENV NODE_ENV=production
-ENV YARN_VERSION=4.18.0
 ENV PORT=80
 EXPOSE 80
 
-HEALTHCHECK CMD curl -f -H "Host: $MANAGEMENT_HOSTNAME" http://localhost:$PORT/api/health || exit 1
+USER node
 
-WORKDIR /opt/staticdeploy/staticdeploy
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["node", "-e", "const http=require('http');const request=http.get({host:'127.0.0.1',port:process.env.PORT,path:'/api/health',headers:{host:process.env.MANAGEMENT_HOSTNAME}},response=>{response.resume();process.exit(response.statusCode===200?0:1)});request.setTimeout(4000,()=>request.destroy());request.on('error',()=>process.exit(1));"]
+
 CMD ["node", "build/server.js"]

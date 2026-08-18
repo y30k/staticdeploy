@@ -211,6 +211,28 @@ StaticDeploy backend maintainers own it, and the M4 API route modernization
 milestone must remove convexpress and reassess the Express major version while
 implementing the modern API routes.
 
+## Hardened baseline service image
+
+`staticdeploy/Dockerfile` uses an exact Node `24.19.0` Alpine builder and a
+separate runtime stage. The builder performs the immutable full install and
+compilation, deletes every installed dependency, and recreates a clean
+production-only StaticDeploy focus before copying the result. The runtime
+removes npm, Corepack, and Yarn, contains no TypeScript source or dependency
+test fixtures, and runs as the existing unprivileged `node` user. Its health
+check uses Node itself, so no package manager or extra HTTP client is installed.
+
+`scripts/test-image-conformance.mjs` verifies the runtime user, command,
+healthcheck, layer history, absence of build tooling/source/tests, and a live
+loopback-only smoke with a read-only root filesystem, all Linux capabilities
+dropped, `no-new-privileges`, and a bounded no-exec temporary filesystem. These
+are image-build and runtime checks; workload profiles must still express the
+same restrictions in Compose and Helm.
+
+The management console is a compiled static artifact, not executable Node
+package code. Its browser dependencies are therefore development/build
+requirements and are absent from the production-focused service image while its
+built files remain available to the management router.
+
 ## Distribution
 
 These commands install, check, compile, test, report, and build locally only.
