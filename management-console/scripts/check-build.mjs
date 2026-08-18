@@ -28,16 +28,15 @@ for (const assetUrl of [script[1], stylesheet[1]]) {
     assert.ok(fs.statSync(asset).size > 0, `Missing built asset ${assetUrl}`);
 }
 
-const assetsDirectory = new URL("assets/", build);
 const javascriptAssets = fs
-    .readdirSync(assetsDirectory, { recursive: true })
+    .readdirSync(build, { recursive: true })
     .filter(
         (asset) => typeof asset === "string" && /\.(?:js|mjs)$/.test(asset)
     );
 assert.ok(javascriptAssets.length > 0, "Build must emit JavaScript assets");
 for (const asset of javascriptAssets) {
     const javascript = fs.readFileSync(
-        new URL(asset.replaceAll(path.sep, "/"), assetsDirectory),
+        new URL(asset.replaceAll(path.sep, "/"), build),
         "utf8"
     );
     assert.doesNotMatch(

@@ -335,17 +335,50 @@ describe("OidcAuthenticationStrategy", () => {
 
     it("requires HTTPS except for explicit loopback URLs", async () => {
         const authToken = await makeToken();
-        for (const unsafeUrl of [
-            "file:///tmp/openid-configuration",
-            "http://idp.example/.well-known/openid-configuration",
-            "https://user:password@idp.example/.well-known/openid-configuration",
-        ]) {
-            expect(
-                await createStrategy(unsafeUrl).getIdpUserFromAuthToken(
-                    authToken
-                )
-            ).to.equal(null);
+        const originalGet = axios.get;
+        let unsafeRequests = 0;
+        axios.get = (async () => {
+            unsafeRequests += 1;
+            throw new Error("Unsafe URL reached the HTTP client");
+        }) as unknown as typeof axios.get;
+        try {
+            for (const unsafeUrl of [
+                "file:///tmp/openid-configuration",
+                "http://idp.example/.well-known/openid-configuration",
+                "https://user:password@idp.example/.well-known/openid-configuration",
+            ]) {
+                expect(
+                    await createStrategy(unsafeUrl).getIdpUserFromAuthToken(
+                        authToken
+                    )
+                ).to.equal(null);
+            }
+            expect(unsafeRequests).to.equal(0);
+        } finally {
+            axios.get = originalGet;
         }
+
+        const loopbackIssuer = "http://127.0.0.1:4455";
+        const loopbackDiscovery = nock(loopbackIssuer)
+            .get("/.well-known/openid-configuration")
+            .reply(200, {
+                issuer: loopbackIssuer,
+                jwks_uri: `${loopbackIssuer}/keys`,
+            });
+        const loopbackJwks = nock(loopbackIssuer).get("/keys").reply(200, jwks);
+        expect(
+            await createStrategy(
+                `${loopbackIssuer}/.well-known/openid-configuration`
+            ).getIdpUserFromAuthToken(
+                await makeToken({
+                    sub,
+                    iss: loopbackIssuer,
+                    aud: clientId,
+                })
+            )
+        ).to.deep.equal({ id: sub, idp: loopbackIssuer });
+        loopbackDiscovery.done();
+        loopbackJwks.done();
 
         const discovery = nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
