@@ -129,9 +129,10 @@ current supported parent releases pin newly disclosed vulnerable children:
 All corrected packages remain registry-backed. The first two corrections are
 security patch releases on the same API line. The serializer correction crosses
 a major boundary because no secure 6.x exists; Mocha uses it only for reporter
-metadata serialization, and the complete backend test suite is the compatibility
-contract. These are not wildcard suppressions or vulnerability exceptions: raw
-audit output sees the corrected resolved graph, and no finding is hidden.
+metadata serialization. A focused two-worker parallel-mode check exercises that
+path, and the complete backend test suite is the broader compatibility contract.
+These are not wildcard suppressions or vulnerability exceptions: raw audit
+output sees the corrected resolved graph, and no finding is hidden.
 
 `config/dependency-resolutions.json` records each exact selector, result, owner,
 rationale, and removal condition. The install-policy checker rejects unreviewed,

@@ -21,7 +21,7 @@
     "dev:mock-server": "tsx watch mock-server/index.ts",
     "dev:server": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
-    "compile": "vite build",
+    "compile": "vite build && node scripts/check-build.mjs",
     "test:build": "node scripts/check-build.mjs"
   },
   "dependencies": {

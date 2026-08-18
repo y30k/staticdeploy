@@ -28,18 +28,27 @@ const HTTP_REQUEST_OPTIONS: AxiosRequestConfig = {
     transitional: { silentJSONParsing: false },
 };
 
-const assertHttpUrl = (value: unknown, field: string): string => {
+const assertTrustedUrl = (value: unknown, field: string): string => {
     if (typeof value !== "string") {
-        throw new TypeError(`${field} must be an HTTP(S) URL`);
+        throw new TypeError(`${field} must be an HTTPS or loopback URL`);
     }
     let url: URL;
     try {
         url = new URL(value);
     } catch {
-        throw new TypeError(`${field} must be an HTTP(S) URL`);
+        throw new TypeError(`${field} must be an HTTPS or loopback URL`);
     }
-    if (url.protocol !== "http:" && url.protocol !== "https:") {
-        throw new TypeError(`${field} must be an HTTP(S) URL`);
+    const loopback =
+        url.hostname === "127.0.0.1" ||
+        url.hostname === "[::1]" ||
+        url.hostname === "localhost";
+    if (
+        (url.protocol !== "https:" &&
+            !(url.protocol === "http:" && loopback)) ||
+        url.username !== "" ||
+        url.password !== ""
+    ) {
+        throw new TypeError(`${field} must be an HTTPS or loopback URL`);
     }
     return value;
 };
@@ -131,7 +140,7 @@ export default class OidcAuthenticationStrategy
     }
 
     private async fetchOpenidConfiguration(): Promise<IOpenidConfiguration> {
-        const url = assertHttpUrl(
+        const url = assertTrustedUrl(
             this.openidConfigurationUrl,
             "openidConfigurationUrl"
         );
@@ -140,8 +149,8 @@ export default class OidcAuthenticationStrategy
             throw new TypeError("Invalid OpenID configuration response");
         }
         return {
-            issuer: assertHttpUrl(data.issuer, "issuer"),
-            jwks_uri: assertHttpUrl(data.jwks_uri, "jwks_uri"),
+            issuer: assertTrustedUrl(data.issuer, "issuer"),
+            jwks_uri: assertTrustedUrl(data.jwks_uri, "jwks_uri"),
         };
     }
 

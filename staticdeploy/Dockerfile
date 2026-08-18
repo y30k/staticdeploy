@@ -6,9 +6,10 @@ WORKDIR /opt/staticdeploy
 
 # Use the repository-pinned Yarn release and immutable node-modules install.
 COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json ./
-COPY config/install-scripts.json ./config/install-scripts.json
+COPY config/install-scripts.json config/dependency-resolutions.json ./config/
 COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs ./scripts/
 COPY management-console/package.json management-console/tsconfig.json management-console/index.html management-console/vite.config.mts ./management-console/
+COPY management-console/scripts ./management-console/scripts/
 COPY cli/package.json ./cli/
 COPY core/package.json core/tsconfig.json core/tsconfig.browser.json ./core/
 COPY http-adapters/package.json http-adapters/tsconfig.json ./http-adapters/
@@ -45,7 +46,7 @@ RUN corepack enable && \
     yarn lerna run compile --scope=@staticdeploy/staticdeploy --include-dependencies --stream --concurrency 1 && \
     yarn workspaces focus @staticdeploy/staticdeploy --production && \
     rm yarn.lock tsconfig.json && \
-    rm -rf management-console/tsconfig.json management-console/vite.config.mts management-console/index.html management-console/public management-console/src && \
+    rm -rf management-console/tsconfig.json management-console/vite.config.mts management-console/index.html management-console/public management-console/scripts management-console/src && \
     rm -rf core/tsconfig.json core/tsconfig.browser.json core/src && \
     rm -rf http-adapters/tsconfig.json http-adapters/src && \
     rm -rf jwt-authentication-strategy/tsconfig.json jwt-authentication-strategy/src && \

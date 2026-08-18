@@ -48,7 +48,7 @@ export default class OidcAuthStrategy implements IAuthStrategy {
     }
 
     async login(): Promise<void> {
-        await this.userManager.signinRedirect();
+        await this.userManager.signinRedirect({ nonce: crypto.randomUUID() });
         // Keep "logging in" while the user is redirected to the idp
         await new Promise(() => null);
     }
@@ -90,6 +90,7 @@ export default class OidcAuthStrategy implements IAuthStrategy {
             try {
                 user = await this.userManager.signinSilent({
                     login_hint: getLoginHint(user),
+                    nonce: crypto.randomUUID(),
                 });
             } catch {
                 await this.logout();

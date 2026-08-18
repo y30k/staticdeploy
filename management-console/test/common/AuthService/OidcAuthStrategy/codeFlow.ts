@@ -1,6 +1,7 @@
 // @vitest-environment node
 
 import { expect } from "chai";
+import { createHash } from "node:crypto";
 import type { Server } from "node:http";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import {
@@ -52,7 +53,9 @@ describe("local OIDC Authorization Code + PKCE flow", () => {
                 store: new InMemoryWebStorage(),
             }),
         });
-        const request = await client.createSigninRequest({});
+        const request = await client.createSigninRequest({
+            nonce: "test-signin-nonce",
+        });
         const authorizeUrl = new URL(request.url);
         expect(authorizeUrl.searchParams.get("code_challenge_method")).to.equal(
             "S256"
@@ -92,6 +95,88 @@ describe("local OIDC Authorization Code + PKCE flow", () => {
         );
         expect(response.status).to.equal(400);
         expect(response.headers.get("location")).to.equal(null);
+    });
+
+    it("rejects missing nonce, verifier mismatch, and authorization-code replay", async () => {
+        const missingNonce = await fetch(
+            `${ISSUER}/oidc/authorize?client_id=${CLIENT_ID}` +
+                "&response_type=code&code_challenge_method=S256" +
+                `&code_challenge=${"a".repeat(43)}&state=${"s".repeat(8)}` +
+                `&redirect_uri=${encodeURIComponent(redirectUri)}`,
+            { redirect: "manual" }
+        );
+        expect(missingNonce.status).to.equal(400);
+
+        const verifier = "v".repeat(43);
+        const challenge = createHash("sha256")
+            .update(verifier)
+            .digest("base64url");
+        const authorize = new URL(`${ISSUER}/oidc/authorize`);
+        authorize.search = new URLSearchParams({
+            client_id: CLIENT_ID,
+            code_challenge: challenge,
+            code_challenge_method: "S256",
+            nonce: "test-nonce",
+            redirect_uri: redirectUri,
+            response_type: "code",
+            state: "test-state",
+        }).toString();
+        const authorization = await fetch(authorize, { redirect: "manual" });
+        const callback = new URL(authorization.headers.get("location")!);
+        const code = callback.searchParams.get("code")!;
+        const tokenRequest = (codeVerifier: string) =>
+            fetch(`${ISSUER}/oidc/token`, {
+                method: "POST",
+                headers: {
+                    "content-type": "application/x-www-form-urlencoded",
+                    origin: DEV_ORIGIN,
+                },
+                body: new URLSearchParams({
+                    client_id: CLIENT_ID,
+                    code,
+                    code_verifier: codeVerifier,
+                    grant_type: "authorization_code",
+                    redirect_uri: redirectUri,
+                }),
+            });
+        expect((await tokenRequest(`${verifier}x`)).status).to.equal(400);
+        expect((await tokenRequest(verifier)).status).to.equal(400);
+
+        const authorization2 = await fetch(authorize, { redirect: "manual" });
+        const code2 = new URL(
+            authorization2.headers.get("location")!
+        ).searchParams.get("code")!;
+        const validBody = new URLSearchParams({
+            client_id: CLIENT_ID,
+            code: code2,
+            code_verifier: verifier,
+            grant_type: "authorization_code",
+            redirect_uri: redirectUri,
+        });
+        expect(
+            (
+                await fetch(`${ISSUER}/oidc/token`, {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded",
+                        origin: DEV_ORIGIN,
+                    },
+                    body: validBody,
+                })
+            ).status
+        ).to.equal(200);
+        expect(
+            (
+                await fetch(`${ISSUER}/oidc/token`, {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/x-www-form-urlencoded",
+                        origin: DEV_ORIGIN,
+                    },
+                    body: validBody,
+                })
+            ).status
+        ).to.equal(400);
     });
 
     it("permits credentialed preflight only from the exact dev origin", async () => {

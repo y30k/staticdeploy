@@ -146,8 +146,8 @@ const consoleManifest = JSON.parse(
 );
 assert.equal(
     consoleManifest.scripts.compile,
-    "vite build",
-    "The console compile command must use the supported Vite builder"
+    "vite build && node scripts/check-build.mjs",
+    "The console compile command must use Vite and enforce built-artifact checks"
 );
 for (const retiredDependency of [
     "react-scripts",

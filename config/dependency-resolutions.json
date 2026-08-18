@@ -19,7 +19,7 @@
             "selector": "serialize-javascript@npm:^6.0.2",
             "resolution": "npm:7.1.0",
             "owner": "StaticDeploy maintainers",
-            "rationale": "Current Mocha 11 pins a vulnerable serializer range. Mocha uses this dependency only to serialize reporter metadata; the fixed registry major is covered by the complete backend test suite.",
+            "rationale": "Current Mocha 11 pins a vulnerable serializer range. The fixed registry major is exercised through Mocha's parallel worker serializer plus the complete backend test suite.",
             "removalCondition": "Remove when a supported Mocha release accepts serialize-javascript 7.1.0 or newer, or when Mocha is replaced."
         }
     ]

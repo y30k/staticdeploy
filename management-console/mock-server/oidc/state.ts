@@ -20,7 +20,7 @@ interface AuthorizationCode {
     challenge: string;
     createdAt: number;
     clientId: string;
-    nonce?: string;
+    nonce: string;
     redirectUri: string;
 }
 
@@ -63,6 +63,7 @@ export function redeemAuthorizationCode(input: {
     ) {
         return null;
     }
+    if (!/^[A-Za-z0-9._~-]{43,128}$/.test(input.verifier)) return null;
     const actual = Buffer.from(sha256Base64Url(input.verifier));
     const expected = Buffer.from(stored.challenge);
     if (
@@ -74,7 +75,7 @@ export function redeemAuthorizationCode(input: {
     return stored;
 }
 
-export async function createToken(nonce: string | undefined, clientId: string) {
+export async function createToken(nonce: string, clientId: string) {
     const { privateKey } = await keyPair;
     return new SignJWT({ nonce, preferred_username: "mock-user" })
         .setProtectedHeader({ alg: "RS256", kid: keyId })

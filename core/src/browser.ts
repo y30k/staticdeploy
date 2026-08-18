@@ -1,4 +1,4 @@
-import isFQDN from "validator/lib/isFQDN";
+import isEntrypointUrlMatcherValid from "./common/entrypointUrlMatcher";
 
 export type { IApp } from "./entities/App";
 export type { IAsset } from "./entities/Asset";
@@ -31,28 +31,4 @@ export function isRoleValid(role: string): boolean {
     );
 }
 
-function normalizePosixPath(path: string) {
-    const normalizedSegments: string[] = [];
-    for (const segment of path.split("/")) {
-        if (!segment || segment === ".") continue;
-        if (segment === "..") normalizedSegments.pop();
-        else normalizedSegments.push(segment);
-    }
-    const normalized = `/${normalizedSegments.join("/")}`;
-    return path.endsWith("/") && normalized !== "/"
-        ? `${normalized}/`
-        : normalized;
-}
-
-export function isEntrypointUrlMatcherValid(urlMatcher: string): boolean {
-    const firstSlash = urlMatcher.indexOf("/");
-    if (firstSlash === -1) return false;
-    const domain = urlMatcher.slice(0, firstSlash);
-    const path = urlMatcher.slice(firstSlash);
-    return (
-        isFQDN(domain, { allow_trailing_dot: false }) &&
-        path.startsWith("/") &&
-        path.endsWith("/") &&
-        normalizePosixPath(path) === path
-    );
-}
+export { isEntrypointUrlMatcherValid };

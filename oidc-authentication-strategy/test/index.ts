@@ -18,8 +18,8 @@ interface ITokenOptions {
 
 describe("OidcAuthenticationStrategy", () => {
     const openidConfigurationUrl =
-        "http://openid-configuration.localhost/.well-known/openid-configuration";
-    const jwksUrl = "http://jwks.localhost/keys";
+        "https://openid-configuration.example/.well-known/openid-configuration";
+    const jwksUrl = "https://jwks.example/keys";
     const clientId = "clientId";
     const logger: ILogger = { error: () => undefined };
     const { publicKey, privateKey } = generateKeyPairSync("rsa", {
@@ -62,12 +62,12 @@ describe("OidcAuthenticationStrategy", () => {
     };
 
     const mockConfiguration = () =>
-        nock("http://openid-configuration.localhost")
+        nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
             .reply(200, { issuer, jwks_uri: jwksUrl });
 
     const mockJwks = () =>
-        nock("http://jwks.localhost").get("/keys").reply(200, jwks);
+        nock("https://jwks.example").get("/keys").reply(200, jwks);
 
     const createStrategy = (
         configurationUrl = openidConfigurationUrl,
@@ -215,7 +215,7 @@ describe("OidcAuthenticationStrategy", () => {
     });
 
     it("does not cache a failed configuration and retries discovery", async () => {
-        const configurationScope = nock("http://openid-configuration.localhost")
+        const configurationScope = nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
             .reply(503)
             .get("/.well-known/openid-configuration")
@@ -238,7 +238,7 @@ describe("OidcAuthenticationStrategy", () => {
         const redirectTarget = nock("http://redirect.localhost")
             .get("/configuration")
             .reply(200, { issuer, jwks_uri: jwksUrl });
-        const discovery = nock("http://openid-configuration.localhost")
+        const discovery = nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
             .reply(302, undefined, {
                 Location: "http://redirect.localhost/configuration",
@@ -253,7 +253,7 @@ describe("OidcAuthenticationStrategy", () => {
 
     it("rejects JWKS redirects without following them", async () => {
         const discovery = mockConfiguration();
-        const jwksScope = nock("http://jwks.localhost")
+        const jwksScope = nock("https://jwks.example")
             .get("/keys")
             .reply(302, undefined, {
                 Location: "http://redirect.localhost/keys",
@@ -290,11 +290,11 @@ describe("OidcAuthenticationStrategy", () => {
         },
     ]) {
         it(`rejects ${testCase.name}`, async () => {
-            const discovery = nock("http://openid-configuration.localhost")
+            const discovery = nock("https://openid-configuration.example")
                 .get("/.well-known/openid-configuration")
                 .reply(200, testCase.discovery);
             const jwksScope = testCase.jwks
-                ? nock("http://jwks.localhost")
+                ? nock("https://jwks.example")
                       .get("/keys")
                       .reply(200, testCase.jwks)
                 : undefined;
@@ -310,7 +310,7 @@ describe("OidcAuthenticationStrategy", () => {
     }
 
     it("rejects malformed discovery JSON", async () => {
-        const discovery = nock("http://openid-configuration.localhost")
+        const discovery = nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
             .reply(200, "{", { "Content-Type": "application/json" });
 
@@ -322,7 +322,7 @@ describe("OidcAuthenticationStrategy", () => {
 
     it("rejects malformed JWKS responses", async () => {
         const discovery = mockConfiguration();
-        const jwksScope = nock("http://jwks.localhost")
+        const jwksScope = nock("https://jwks.example")
             .get("/keys")
             .reply(200, { keys: "not-an-array" });
 
@@ -333,15 +333,21 @@ describe("OidcAuthenticationStrategy", () => {
         jwksScope.done();
     });
 
-    it("rejects non-http(s) configured and discovered URLs", async () => {
+    it("requires HTTPS except for explicit loopback URLs", async () => {
         const authToken = await makeToken();
-        expect(
-            await createStrategy(
-                "file:///tmp/openid-configuration"
-            ).getIdpUserFromAuthToken(authToken)
-        ).to.equal(null);
+        for (const unsafeUrl of [
+            "file:///tmp/openid-configuration",
+            "http://idp.example/.well-known/openid-configuration",
+            "https://user:password@idp.example/.well-known/openid-configuration",
+        ]) {
+            expect(
+                await createStrategy(unsafeUrl).getIdpUserFromAuthToken(
+                    authToken
+                )
+            ).to.equal(null);
+        }
 
-        const discovery = nock("http://openid-configuration.localhost")
+        const discovery = nock("https://openid-configuration.example")
             .get("/.well-known/openid-configuration")
             .reply(200, { issuer, jwks_uri: "file:///tmp/jwks" });
         expect(

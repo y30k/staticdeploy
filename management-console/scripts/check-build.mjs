@@ -28,20 +28,29 @@ for (const assetUrl of [script[1], stylesheet[1]]) {
     assert.ok(fs.statSync(asset).size > 0, `Missing built asset ${assetUrl}`);
 }
 
-const javascript = fs.readFileSync(
-    path.join(new URL(build).pathname, script[1]),
-    "utf8"
-);
-assert.doesNotMatch(
-    javascript,
-    /\beval\s*\(/,
-    "Bundle must not require unsafe-eval"
-);
-assert.doesNotMatch(
-    javascript,
-    /new\s+Function\s*\(/,
-    "Bundle must not construct code dynamically"
-);
+const assetsDirectory = new URL("assets/", build);
+const javascriptAssets = fs
+    .readdirSync(assetsDirectory, { recursive: true })
+    .filter(
+        (asset) => typeof asset === "string" && /\.(?:js|mjs)$/.test(asset)
+    );
+assert.ok(javascriptAssets.length > 0, "Build must emit JavaScript assets");
+for (const asset of javascriptAssets) {
+    const javascript = fs.readFileSync(
+        new URL(asset.replaceAll(path.sep, "/"), assetsDirectory),
+        "utf8"
+    );
+    assert.doesNotMatch(
+        javascript,
+        /\beval\s*\(/,
+        `${asset} must not require unsafe-eval`
+    );
+    assert.doesNotMatch(
+        javascript,
+        /new\s+Function\s*\(/,
+        `${asset} must not construct code dynamically`
+    );
+}
 assert.ok(
     fs.existsSync(new URL("app-config.js", build)),
     "Vite development defaults must be included in the standalone build"

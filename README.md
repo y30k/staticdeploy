@@ -1,4 +1,3 @@
-
 <br />
 
 ![logo](./readme-logo.png)
@@ -46,8 +45,8 @@ This is the StaticDeploy monorepo, which includes several different projects:
 - [sdk](./sdk): browser and nodejs SDK for StaticDeploy's API
 - [cli](./cli): CLI tool to deploy static apps
 - [management-console](./management-console): web GUI for the API
-- [website](./website): landing page and documentation, deployed with
-  StaticDeploy on [staticdeploy.io](https://staticdeploy.io)
+- [website](./website): retired historical landing-page and documentation
+  source; it is not an installable workspace and has no publication path
 
 ## Contributing
 

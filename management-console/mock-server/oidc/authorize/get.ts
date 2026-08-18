@@ -28,8 +28,12 @@ export default ((req: Request<any, any, any, Query>, res) => {
         code_challenge_method !== "S256" ||
         typeof code_challenge !== "string" ||
         !/^[A-Za-z0-9_-]{43,128}$/.test(code_challenge) ||
-        (nonce !== undefined && typeof nonce !== "string") ||
+        typeof nonce !== "string" ||
+        nonce.length < 8 ||
+        nonce.length > 256 ||
         typeof state !== "string" ||
+        state.length < 8 ||
+        state.length > 512 ||
         typeof redirect_uri !== "string" ||
         !REDIRECT_URIS.has(redirect_uri)
     ) {
