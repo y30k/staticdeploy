@@ -571,17 +571,35 @@ try {
         ),
         "missing obligation artifacts must be reported in evaluation evidence"
     );
-    expectPass("retained-license-evidence-artifact", undefined, {
-        licenses: {
-            ...licensePolicy,
-            evidenceArtifacts: [
-                {
-                    path: obligationArtifact,
-                    digest: digest(fs.readFileSync(obligationArtifact)),
-                },
-            ],
-        },
-    });
+    const retainedEvidence = expectPass(
+        "retained-license-evidence-artifact",
+        undefined,
+        {
+            licenses: {
+                ...licensePolicy,
+                evidenceArtifacts: [
+                    {
+                        path: obligationArtifact,
+                        digest: digest(fs.readFileSync(obligationArtifact)),
+                    },
+                ],
+            },
+        }
+    );
+    assert.deepEqual(
+        JSON.parse(
+            fs.readFileSync(
+                path.join(retainedEvidence.directory, "license-evaluation.json")
+            )
+        ).evidenceArtifacts,
+        [
+            {
+                path: obligationArtifact,
+                digest: digest(fs.readFileSync(obligationArtifact)),
+            },
+        ],
+        "license evaluation must bind retained evidence paths and digests"
+    );
     expectFail("stale-license-evidence-artifact", undefined, {
         licenses: {
             ...licensePolicy,

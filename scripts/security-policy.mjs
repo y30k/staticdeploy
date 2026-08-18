@@ -1594,6 +1594,7 @@ function evaluate(directory) {
         evaluatedAt: new Date(now).toISOString(),
         passed: licensePassed,
         prohibitedCount: licenseResults.filter((item) => !item.allowed).length,
+        evidenceArtifacts: licensePolicy.evidenceArtifacts,
         components: licenseResults,
     });
     if (!vulnerabilityPassed || !licensePassed)
