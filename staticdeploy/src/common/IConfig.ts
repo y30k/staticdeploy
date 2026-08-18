@@ -26,6 +26,8 @@ export default interface IConfig {
     postgresUrl?: string;
     s3Bucket?: string;
     s3Endpoint?: string;
+    s3Region?: string;
+    s3ForcePathStyle?: boolean;
     s3AccessKeyId?: string;
     s3SecretAccessKey?: string;
     s3EnableGCSCompatibility?: boolean;

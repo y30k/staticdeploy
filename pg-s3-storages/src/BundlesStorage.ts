@@ -1,23 +1,30 @@
 import {
+    DeleteObjectCommand,
+    DeleteObjectsCommand,
+    GetObjectCommand,
+    PutObjectCommand,
+    S3Client,
+} from "@aws-sdk/client-s3";
+import {
     IAssetWithContent,
     IBaseBundle,
     IBundlesStorage,
     IBundleWithoutAssetsContent,
 } from "@staticdeploy/core";
-import { S3 } from "aws-sdk";
 import { Knex } from "knex";
 import { flatMap, map, omit } from "lodash";
 import { join } from "path";
 
 import concurrentForEach from "./common/concurrentForEach";
 import convertErrors from "./common/convertErrors";
+import { isS3NotFoundError } from "./common/s3Errors";
 import tables from "./common/tables";
 
 @convertErrors
 export default class BundlesStorage implements IBundlesStorage {
     constructor(
         private knex: Knex,
-        private s3Client: S3,
+        private s3Client: S3Client,
         private s3Bucket: string,
         private s3EnableGCSCompatibility: boolean
     ) {}
@@ -44,13 +51,21 @@ export default class BundlesStorage implements IBundlesStorage {
     ): Promise<Buffer | null> {
         const assetS3Key = this.getAssetS3Key(bundleId, assetPath);
         try {
-            const s3Object = await this.s3Client
-                .getObject({ Bucket: this.s3Bucket, Key: assetS3Key })
-                .promise();
-            return s3Object.Body as Buffer;
+            const s3Object = await this.s3Client.send(
+                new GetObjectCommand({
+                    Bucket: this.s3Bucket,
+                    Key: assetS3Key,
+                })
+            );
+            if (s3Object.Body === undefined) {
+                throw new Error(`S3 object ${assetS3Key} has no body`);
+            }
+            return Buffer.from(await s3Object.Body.transformToByteArray());
         } catch (err) {
-            // If S3 returns a 404, return null
-            if (err.statusCode === 404) {
+            // Preserve the storage contract: an S3 HTTP 404 is absence; other
+            // SDK/service/provider errors remain failures for conversion by
+            // the storage error decorator.
+            if (isS3NotFoundError(err)) {
                 return null;
             }
             throw err;
@@ -107,13 +122,13 @@ export default class BundlesStorage implements IBundlesStorage {
     }): Promise<IBundleWithoutAssetsContent> {
         // Upload files to S3
         await concurrentForEach(toBeCreatedBundle.assets, async (asset) => {
-            await this.s3Client
-                .putObject({
+            await this.s3Client.send(
+                new PutObjectCommand({
                     Bucket: this.s3Bucket,
                     Body: asset.content,
                     Key: this.getAssetS3Key(toBeCreatedBundle.id, asset.path),
                 })
-                .promise();
+            );
         });
         // Omit the assets' content before saving the bundle to sql
         const bundleWithoutAssetsContent = {
@@ -153,21 +168,38 @@ export default class BundlesStorage implements IBundlesStorage {
 
     private async deleteObjectsIndividually(s3Keys: string[]) {
         await concurrentForEach(s3Keys, async (s3Key) =>
-            this.s3Client
-                .deleteObject({ Bucket: this.s3Bucket, Key: s3Key })
-                .promise()
+            this.s3Client.send(
+                new DeleteObjectCommand({
+                    Bucket: this.s3Bucket,
+                    Key: s3Key,
+                })
+            )
         );
     }
 
     private async deleteObjectsInBulk(s3Keys: string[]) {
-        await this.s3Client
-            .deleteObjects({
-                Bucket: this.s3Bucket,
-                Delete: {
-                    Objects: map(s3Keys, (s3Key) => ({ Key: s3Key })),
-                },
-            })
-            .promise();
+        // S3 accepts at most 1,000 objects per DeleteObjects request. Process
+        // batches sequentially so a failed batch leaves SQL metadata intact and
+        // a retry can safely repeat already completed object deletions.
+        for (let index = 0; index < s3Keys.length; index += 1000) {
+            const response = await this.s3Client.send(
+                new DeleteObjectsCommand({
+                    Bucket: this.s3Bucket,
+                    Delete: {
+                        Objects: map(
+                            s3Keys.slice(index, index + 1000),
+                            (s3Key) => ({ Key: s3Key })
+                        ),
+                    },
+                })
+            );
+            const errorCount = response.Errors?.length ?? 0;
+            if (errorCount > 0) {
+                throw new Error(
+                    `S3 bulk delete failed for ${errorCount} object(s)`
+                );
+            }
+        }
     }
 
     private getAssetS3Key(bundleId: string, assetPath: string) {

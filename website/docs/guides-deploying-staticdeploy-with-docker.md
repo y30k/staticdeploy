@@ -78,16 +78,20 @@ passed in via environment variables.
 
 #### pg-s3 storages configurations
 
-When setting these config (all of them, save for `S3_ENABLE_GCS_COMPATIBILITY`,
-which is optional), the pg-s3 storages module will be enabled (the memory one is
-used otherwise):
+The pg-s3 storages module is enabled when `POSTGRES_URL`, `S3_BUCKET`, and
+`S3_ENDPOINT` are set (the memory one is used otherwise):
 
 - `POSTGRES_URL`: connection string for the
   [PostgreSQL](https://www.postgresql.org/) database
 - `S3_BUCKET`: name of the S3 bucket to use for storing static content
 - `S3_ENDPOINT`: endpoint of the S3 server
-- `S3_ACCESS_KEY_ID`: access key id for the S3 server
-- `S3_SECRET_ACCESS_KEY`: secret access key for the S3 server
+- `S3_REGION`: S3 signing region. Defaults to `us-east-1`
+- `S3_FORCE_PATH_STYLE`: `true` or `false`. Defaults to `true` to preserve the
+  existing MinIO-compatible addressing behavior
+- `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY`: optional explicit credentials.
+  Set both or neither. When both are omitted, the supported AWS SDK default Node
+  credential provider chain is used (for example environment, shared config, or
+  workload identity credentials)
 - `S3_ENABLE_GCS_COMPATIBILITY`: `true` or `false`, enables compatibility with
   Google Cloud Storage, which doesn't support some S3 APIs. Defaults to `false`
 
