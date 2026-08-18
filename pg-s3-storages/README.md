@@ -10,3 +10,45 @@ addressing enabled by default for backward-compatible MinIO behavior. Set both
 `accessKeyId` and `secretAccessKey` for explicit credentials, or omit both to
 use the AWS SDK default Node credential provider chain. `enableGCSCompatibility`
 continues to replace bulk deletes with individual object deletes for GCS.
+
+## PostgreSQL migrations and connections
+
+This package uses the directly pinned and supported Knex `3.1.0` and PostgreSQL
+client `pg` `8.16.3`. The existing `postgresUrl` remains the complete connection
+contract, including any operator-selected TLS query parameters. The service does
+not add environment knobs for pool behavior. Knex uses an explicit `pg` client
+with conservative bounded defaults: pool minimum `0`, pool maximum `10`, idle
+connections eligible for reaping after 30 seconds, connection attempts bounded
+at 5 seconds, and pool acquisition bounded at 10 seconds.
+`PgS3Storages.destroy()` closes both the PostgreSQL pool and S3 client and is
+safe to call repeatedly.
+
+Production migrations are append-only and numerically ordered. Never rename,
+edit, or reformat historical source migrations `00.ts` through `02.ts`. Knex
+records those names in TypeScript execution and the corresponding `00.js`
+through `02.js` names in compiled production execution, so both ordered stems
+are compatibility surfaces. A future production schema change must use a new
+migration and the expand-backfill-contract convention:
+
+1. **Expand** with additive nullable columns, tables, constraints, or indexes
+   that old and new application versions can both tolerate.
+2. **Backfill** separately, transactionally, and in bounded/restartable batches.
+3. **Contract** only in a later deployment after compatibility and rollback
+   windows close.
+
+New additive migrations must include and rehearse a real inverse `down`
+operation. Do not run an all-history rollback: the legacy `down` functions in
+`00.ts`-`02.ts` intentionally do nothing and therefore cannot restore an empty
+schema. Application rollback across those historical migrations requires a
+verified database backup/restore procedure. This dependency upgrade introduces
+no production schema change; its rollback is an application/package rollback
+while leaving the accepted migration history intact.
+
+Disposable PostgreSQL 13 coverage verifies the emitted production migrations
+against empty databases and checksum-pinned, captured pre/post-02 SQL fixtures,
+including data, foreign keys, and complete migration history. It also verifies
+transaction and migration atomicity, lock release/retry, connection and pool
+timeout recovery, and a reversible test-only additive migration. Production
+acceptance remains **BLOCKED-EXTERNAL on B-PG** until the production PostgreSQL
+roles, migration identity, backup destination, restore owner, and RPO/RTO are
+provisioned and the same acceptance is rehearsed there.

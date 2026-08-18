@@ -19,7 +19,7 @@
   },
   "scripts": {
     "compile": "rimraf lib && tsc",
-    "test": "NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'",
+    "test": "NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'",
     "start-test-containers:minio": "docker run --rm -p 127.0.0.1:9000:9000 -e MINIO_ACCESS_KEY=accessKeyId -e MINIO_SECRET_KEY=secretAccessKey minio/minio:RELEASE.2021-11-24T23-19-33Z server /data",
     "start-test-containers:pg": "docker run --rm -p 127.0.0.1:5432:5432 -e POSTGRES_PASSWORD=password postgres:13",
     "start-test-containers": "npm-run-all -p start-test-containers:*"
@@ -28,9 +28,9 @@
     "@aws-sdk/client-s3": "^3.1112.0",
     "@staticdeploy/core": "^0.15.5",
     "bluebird": "^3.7.2",
-    "knex": "^0.95.14",
+    "knex": "3.1.0",
     "lodash": "^4.17.21",
-    "pg": "^8.7.1"
+    "pg": "8.16.3"
   },
   "devDependencies": {
     "@staticdeploy/storages-test-suite": "^0.15.5",

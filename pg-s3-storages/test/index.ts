@@ -177,10 +177,6 @@ function execStorageTests(options: {
                         "postgres://postgres:password@localhost/postgres",
                     s3Config: invalidConfig,
                 });
-                const invalidKnex: Knex = (invalidStorages as any).knex;
-                const invalidS3Client: S3Client = (invalidStorages as any)
-                    .s3Client;
-
                 if (!options.credentials) {
                     process.env.AWS_ACCESS_KEY_ID = "invalidAccessKeyId";
                     process.env.AWS_SECRET_ACCESS_KEY =
@@ -204,11 +200,7 @@ function execStorageTests(options: {
                     );
                 } finally {
                     setEnvironment(options.environment);
-                    try {
-                        await invalidKnex.destroy();
-                    } finally {
-                        invalidS3Client.destroy();
-                    }
+                    await invalidStorages.destroy();
                 }
             });
         });
@@ -221,13 +213,9 @@ function execStorageTests(options: {
                 );
             } finally {
                 try {
-                    await knex.destroy();
+                    await pgS3Storages.destroy();
                 } finally {
-                    try {
-                        s3Client.destroy();
-                    } finally {
-                        restoreEnvironment(savedEnvironment);
-                    }
+                    restoreEnvironment(savedEnvironment);
                 }
             }
         });
