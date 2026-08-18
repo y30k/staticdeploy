@@ -9,6 +9,21 @@ const SCHEMA_VERSION = 1;
 const MAX_REPORT_AGE_MS = 2 * 60 * 60 * 1000;
 const MAX_DATABASE_AGE_MS = 24 * 60 * 60 * 1000;
 const DIGEST = /^sha256:[a-f0-9]{64}$/;
+const validDatabaseIdentity = (value) => {
+    if (typeof value !== "string") return false;
+    const separator = value.indexOf("|");
+    if (separator <= 0 || !/^v[0-9.]+$/.test(value.slice(0, separator)))
+        return false;
+    try {
+        const source = new URL(value.slice(separator + 1));
+        return (
+            source.protocol === "https:" &&
+            DIGEST.test(source.searchParams.get("checksum") || "")
+        );
+    } catch {
+        return false;
+    }
+};
 const requiredTypes = [
     "dependency-vulnerabilities",
     "sast",
@@ -37,11 +52,11 @@ const scannerContracts = {
         database: true,
     },
     "source-sbom": {
-        name: "syft",
-        version: "1.51.0",
-        identity:
-            "anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0",
+        name: "staticdeploy-lock-sbom",
+        version: "1",
+        identity: "repository:scripts/security-policy.mjs#lock-sbom-v1",
         exits: [0],
+        rules: true,
     },
     "image-sbom": {
         name: "syft",
@@ -113,9 +128,17 @@ const exactKeys = (value, keys, field) => {
         fail(`${field} has unexpected or missing fields`);
 };
 const iso = (value, field) => {
-    if (typeof value !== "string") fail(`${field} must be an ISO timestamp`);
+    if (
+        typeof value !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)
+    )
+        fail(`${field} must be a strict RFC3339 UTC timestamp`);
     const time = Date.parse(value);
-    if (!Number.isFinite(time)) fail(`${field} must be an ISO timestamp`);
+    if (
+        !Number.isFinite(time) ||
+        new Date(time).toISOString().slice(0, 19) !== value.slice(0, 19)
+    )
+        fail(`${field} must be a valid RFC3339 UTC timestamp`);
     return time;
 };
 const parseNdjson = (text, source) =>
@@ -135,7 +158,14 @@ const parseNdjson = (text, source) =>
 function validateSubject(value) {
     exactKeys(
         value,
-        ["schemaVersion", "commit", "lockDigest", "imageDigest", "workflow"],
+        [
+            "schemaVersion",
+            "commit",
+            "lockDigest",
+            "imageConfigDigest",
+            "imageManifestDigest",
+            "workflow",
+        ],
         "subject"
     );
     if (
@@ -143,8 +173,14 @@ function validateSubject(value) {
         !/^[a-f0-9]{40}$/.test(value.commit)
     )
         fail("Invalid subject schema or commit");
-    if (!DIGEST.test(value.lockDigest) || !DIGEST.test(value.imageDigest || ""))
-        fail("Subject requires exact lock and image digests");
+    if (
+        !DIGEST.test(value.lockDigest) ||
+        !DIGEST.test(value.imageConfigDigest || "") ||
+        value.imageManifestDigest !== null
+    )
+        fail(
+            "Subject requires exact lock/image config digests and an explicit null manifest digest for this non-publishing local build"
+        );
     exactKeys(
         value.workflow,
         ["repository", "runId", "runAttempt", "eventName", "ref"],
@@ -162,17 +198,18 @@ function validateSubject(value) {
     return value;
 }
 
-function subject(output, imageDigest = null) {
+function subject(output, imageConfigDigest = null) {
     const commit = process.env.SECURITY_COMMIT || git("rev-parse", "HEAD");
     if (!/^[a-f0-9]{40}$/.test(commit))
         fail("Subject commit must be a full SHA");
-    if (!DIGEST.test(imageDigest || ""))
-        fail("Image digest must be sha256:<64 lowercase hex>");
+    if (!DIGEST.test(imageConfigDigest || ""))
+        fail("Image config digest must be sha256:<64 lowercase hex>");
     writeJson(output, {
         schemaVersion: SCHEMA_VERSION,
         commit,
         lockDigest: sha256File("yarn.lock"),
-        imageDigest,
+        imageConfigDigest,
+        imageManifestDigest: null,
         workflow: {
             repository: process.env.GITHUB_REPOSITORY || "local/staticdeploy",
             runId: process.env.GITHUB_RUN_ID || "local",
@@ -194,7 +231,7 @@ function normalizeLicenseRecords(records) {
         if (typeof locator !== "string" || typeof version !== "string")
             fail(`License record ${index + 1} lacks component/version`);
         return {
-            component: locator.replace(/@(?:npm|workspace):.*$/, ""),
+            component: locator.replace(/@(?:npm|workspace|patch):.*$/, ""),
             locator,
             version,
             scope: locator.includes("@workspace:") ? "workspace" : "resolved",
@@ -204,6 +241,122 @@ function normalizeLicenseRecords(records) {
                     : "NOASSERTION",
         };
     });
+}
+
+function sanitizeSourceSbom(payload) {
+    exactKeys(
+        payload,
+        ["bomFormat", "specVersion", "version", "components"],
+        "source CycloneDX SBOM"
+    );
+    if (
+        payload.bomFormat !== "CycloneDX" ||
+        payload.specVersion !== "1.6" ||
+        payload.version !== 1
+    )
+        fail("Source SBOM has an unsupported CycloneDX schema");
+    const components = asArray(
+        payload.components,
+        "source CycloneDX components"
+    ).map((component, index) => {
+        exactKeys(
+            component,
+            ["type", "name", "version", "purl", "bom-ref", "licenses"],
+            `source CycloneDX component ${index + 1}`
+        );
+        exactKeys(
+            component.licenses?.[0],
+            ["expression"],
+            `source CycloneDX component ${index + 1} license`
+        );
+        if (
+            !["application", "library"].includes(component.type) ||
+            typeof component.name !== "string" ||
+            !component.name ||
+            typeof component.version !== "string" ||
+            !component.version ||
+            typeof component.purl !== "string" ||
+            component["bom-ref"] !== component.purl ||
+            component.licenses.length !== 1 ||
+            typeof component.licenses[0].expression !== "string" ||
+            !component.licenses[0].expression
+        )
+            fail(`Source CycloneDX component ${index + 1} is malformed`);
+        return component;
+    });
+    if (
+        !components.length ||
+        new Set(components.map((item) => item.purl)).size !== components.length
+    )
+        fail("Source CycloneDX components must be non-empty and unique");
+    return {
+        bomFormat: "CycloneDX",
+        specVersion: "1.6",
+        version: 1,
+        components,
+    };
+}
+
+function sanitizeImageSbom(payload) {
+    if (
+        !String(payload?.spdxVersion || "").startsWith("SPDX-") ||
+        !Array.isArray(payload?.packages)
+    )
+        fail("Image SBOM has an invalid SPDX schema");
+    let described = Array.isArray(payload.documentDescribes)
+        ? payload.documentDescribes
+        : [];
+    if (!described.length) {
+        const inferred = payload.packages.find((item) =>
+            String(item?.SPDXID || "").startsWith("SPDXRef-DocumentRoot-Image-")
+        );
+        if (inferred) described = [inferred.SPDXID];
+    }
+    if (described.length !== 1 || typeof described[0] !== "string")
+        fail("Image SPDX must identify one document root");
+    const packages = payload.packages.map((component, index) => {
+        const externalRefs = asArray(
+            component?.externalRefs || [],
+            `image SPDX package ${index + 1} externalRefs`
+        )
+            .filter(
+                (reference) =>
+                    reference?.referenceType === "purl" &&
+                    typeof reference.referenceLocator === "string"
+            )
+            .map((reference) => ({
+                referenceType: "purl",
+                referenceLocator: reference.referenceLocator,
+            }));
+        const value = {
+            name: component?.name,
+            SPDXID: component?.SPDXID,
+            versionInfo: component?.versionInfo || "NOASSERTION",
+            licenseConcluded: component?.licenseConcluded || "NOASSERTION",
+            licenseDeclared: component?.licenseDeclared || "NOASSERTION",
+            externalRefs,
+        };
+        if (
+            typeof value.name !== "string" ||
+            !value.name ||
+            typeof value.SPDXID !== "string" ||
+            !value.SPDXID ||
+            typeof value.versionInfo !== "string" ||
+            typeof value.licenseConcluded !== "string" ||
+            typeof value.licenseDeclared !== "string"
+        )
+            fail(`Image SPDX package ${index + 1} is malformed`);
+        return value;
+    });
+    if (!packages.some((item) => item.SPDXID === described[0]))
+        fail("Image SPDX document root is absent from packages");
+    return {
+        spdxVersion: payload.spdxVersion,
+        name: String(payload.name || ""),
+        documentNamespace: String(payload.documentNamespace || ""),
+        documentDescribes: described,
+        packages,
+    };
 }
 
 function sanitizeSemgrep(payload) {
@@ -277,10 +430,14 @@ function sanitizeGrype(payload, type) {
     if (!Array.isArray(payload?.matches) || !payload?.source?.target)
         fail("Grype output has an invalid schema");
     const target = {};
-    if (typeof payload.source.target.imageID === "string")
-        target.imageID = payload.source.target.imageID;
-    if (typeof payload.source.target.userInput === "string")
-        target.userInput = payload.source.target.userInput;
+    if (typeof payload.source.target === "string")
+        target.userInput = payload.source.target;
+    else {
+        if (typeof payload.source.target.imageID === "string")
+            target.imageID = payload.source.target.imageID;
+        if (typeof payload.source.target.userInput === "string")
+            target.userInput = payload.source.target.userInput;
+    }
     return {
         target,
         matches: payload.matches.map((match, index) => {
@@ -335,7 +492,9 @@ function record(type, rawPath, outputPath) {
             )
         )
             payload = sanitizeGrype(parsed, type);
-        else payload = parsed;
+        else if (type === "source-sbom") payload = sanitizeSourceSbom(parsed);
+        else if (type === "image-sbom") payload = sanitizeImageSbom(parsed);
+        else fail(`No sanitizer exists for ${type}`);
     }
     const startedAt = process.env.SCANNER_STARTED_AT;
     const completedAt = process.env.SCANNER_COMPLETED_AT;
@@ -367,11 +526,7 @@ function record(type, rawPath, outputPath) {
     const databaseIdentity = process.env.SCANNER_DATABASE_IDENTITY || null;
     if (contract.database) {
         iso(databaseUpdatedAt, `${type} database timestamp`);
-        if (
-            !databaseValid ||
-            typeof databaseIdentity !== "string" ||
-            !/^v[0-9.]+\|https:\/\//.test(databaseIdentity)
-        )
+        if (!databaseValid || !validDatabaseIdentity(databaseIdentity))
             fail(`${type} database identity or validity is invalid`);
     }
     const inputDigest = process.env.SCANNER_INPUT_DIGEST || null;
@@ -474,8 +629,7 @@ function validateEnvelope(report, type, subjectReport, now) {
         );
         if (
             report.scanner.databaseValid !== true ||
-            typeof report.scanner.databaseIdentity !== "string" ||
-            !/^v[0-9.]+\|https:\/\//.test(report.scanner.databaseIdentity) ||
+            !validDatabaseIdentity(report.scanner.databaseIdentity) ||
             updated > now ||
             now - updated > MAX_DATABASE_AGE_MS
         )
@@ -491,10 +645,10 @@ function validateEnvelope(report, type, subjectReport, now) {
             fail("SAST ruleset digest does not match config/semgrep.yml");
     }
     if (
-        type === "license-inventory" &&
+        ["license-inventory", "source-sbom"].includes(type) &&
         report.scanner.rulesetDigest !== sha256File("yarn.lock")
     )
-        fail("License inventory does not identify the exact lockfile");
+        fail(`${type} does not identify the exact lockfile`);
 }
 
 function validateSanitizedPayloads(reports) {
@@ -602,6 +756,8 @@ function validateSanitizedPayloads(reports) {
             if (typeof component[field] !== "string" || !component[field])
                 fail(`License component ${index + 1} lacks ${field}`);
     }
+    sanitizeSourceSbom(reports["source-sbom"].payload);
+    sanitizeImageSbom(reports["image-sbom"].payload);
 }
 
 function normalizeSeverity(value) {
@@ -671,7 +827,7 @@ function validateExceptions(policy, subjectReport, now) {
                 "scope",
                 "severity",
                 "subjectCommit",
-                "imageDigest",
+                "imageConfigDigest",
                 "owner",
                 "securityApprover",
                 "releaseOwnerApprover",
@@ -717,10 +873,12 @@ function validateExceptions(policy, subjectReport, now) {
             )
                 fail(`Exception ${item.id} has wrong severity or subject`);
             if (item.scope === "image") {
-                if (item.imageDigest !== subjectReport.imageDigest)
-                    fail(`Exception ${item.id} has wrong image digest`);
-            } else if (item.imageDigest !== null)
-                fail(`Exception ${item.id} must not carry an image digest`);
+                if (item.imageConfigDigest !== subjectReport.imageConfigDigest)
+                    fail(`Exception ${item.id} has wrong image config digest`);
+            } else if (item.imageConfigDigest !== null)
+                fail(
+                    `Exception ${item.id} must not carry an image config digest`
+                );
             if (
                 item.severity === "critical" &&
                 (typeof item.releaseOwnerApprover !== "string" ||
@@ -770,7 +928,7 @@ function exactException(finding, subjectReport, exceptions) {
             item.severity === finding.severity &&
             item.subjectCommit === subjectReport.commit &&
             (finding.scope !== "image" ||
-                item.imageDigest === subjectReport.imageDigest)
+                item.imageConfigDigest === subjectReport.imageConfigDigest)
     );
 }
 
@@ -794,6 +952,62 @@ function hasException(node) {
         (node?.left && (hasException(node.left) || hasException(node.right)))
     );
 }
+function canonicalSpdx(node) {
+    if (node?.license)
+        return `${node.license}${node.plus ? "+" : ""}${node.exception ? ` WITH ${node.exception}` : ""}`;
+    if (node?.left && node?.right && ["and", "or"].includes(node.conjunction))
+        return `(${canonicalSpdx(node.left)} ${node.conjunction.toUpperCase()} ${canonicalSpdx(node.right)})`;
+    fail("Malformed SPDX expression tree");
+}
+function offeredOrBranches(node) {
+    if (node?.conjunction === "or")
+        return [
+            ...offeredOrBranches(node.left),
+            ...offeredOrBranches(node.right),
+        ];
+    return [node];
+}
+function validateObligationEvidence(evidence, field) {
+    exactKeys(
+        evidence,
+        [
+            "obligationsComplete",
+            "evidencePath",
+            "evidenceDigest",
+            "reviewReference",
+            "missingReason",
+        ],
+        field
+    );
+    if (
+        typeof evidence.reviewReference !== "string" ||
+        !evidence.reviewReference
+    )
+        fail(`${field} lacks a review reference`);
+    if (evidence.obligationsComplete === true) {
+        if (
+            typeof evidence.evidencePath !== "string" ||
+            !evidence.evidencePath.startsWith(
+                "docs/security/license-evidence/"
+            ) ||
+            path.isAbsolute(evidence.evidencePath) ||
+            path.normalize(evidence.evidencePath) !== evidence.evidencePath ||
+            !DIGEST.test(evidence.evidenceDigest || "") ||
+            evidence.missingReason !== null ||
+            !fs.existsSync(evidence.evidencePath) ||
+            sha256File(evidence.evidencePath) !== evidence.evidenceDigest
+        )
+            fail(`${field} lacks a retained artifact with its exact digest`);
+    } else if (
+        evidence.obligationsComplete !== false ||
+        evidence.evidencePath !== null ||
+        evidence.evidenceDigest !== null ||
+        typeof evidence.missingReason !== "string" ||
+        !evidence.missingReason
+    )
+        fail(`${field} must report its missing obligation artifact`);
+    return evidence;
+}
 function validateLicensePolicy(policy) {
     exactKeys(
         policy,
@@ -816,20 +1030,19 @@ function validateLicensePolicy(policy) {
         new Set(allowed).size !== allowed.length
     )
         fail("Allowed SPDX licenses are invalid");
+    exactKeys(
+        policy.obligationEvidence,
+        allowed,
+        "base-license obligation evidence"
+    );
     for (const expression of allowed) {
         const tree = parseSpdx(expression);
         if (hasOr(tree))
             fail("Base allowed licenses cannot contain OR expressions");
-        const evidence = policy.obligationEvidence?.[expression];
-        if (
-            !evidence ||
-            evidence.obligationsComplete !== true ||
-            typeof evidence.evidence !== "string" ||
-            !evidence.evidence ||
-            typeof evidence.reviewReference !== "string" ||
-            !evidence.reviewReference
-        )
-            fail(`Allowed license ${expression} lacks obligation evidence`);
+        validateObligationEvidence(
+            policy.obligationEvidence[expression],
+            `allowed license ${expression}`
+        );
     }
     const reviewed = asArray(
         policy.reviewedExpressions,
@@ -845,7 +1058,6 @@ function validateLicensePolicy(policy) {
                 "owner",
                 "approver",
                 "reviewReference",
-                "obligationsComplete",
                 "obligationEvidence",
             ],
             "reviewed license expression"
@@ -854,62 +1066,87 @@ function validateLicensePolicy(policy) {
             fail("Duplicate reviewed license expression");
         seen.add(item.expression);
         const tree = parseSpdx(item.expression);
-        const ids = collectLicenseIds(tree);
+        let selectedTree;
+        try {
+            selectedTree = parseSpdx(item.selected);
+        } catch {
+            fail(
+                `Reviewed expression ${item.expression} has malformed selection`
+            );
+        }
+        const selectedCanonical = canonicalSpdx(selectedTree);
+        const offered = offeredOrBranches(tree).map(canonicalSpdx);
         if (
-            hasOr(tree)
-                ? !ids.has(item.selected) || !allowed.includes(item.selected)
-                : item.selected !== item.expression
+            hasOr(selectedTree) ||
+            !offered.includes(selectedCanonical) ||
+            [...collectLicenseIds(selectedTree)].some(
+                (id) => !allowed.includes(id)
+            )
         )
             fail(
-                `Reviewed expression ${item.expression} has an unavailable selection`
+                `Reviewed expression ${item.expression} has an unavailable exact branch selection`
             );
-        for (const field of [
-            "owner",
-            "approver",
-            "reviewReference",
-            "obligationEvidence",
-        ])
+        for (const field of ["owner", "approver", "reviewReference"])
             if (typeof item[field] !== "string" || !item[field])
                 fail(`Reviewed expression ${item.expression} lacks ${field}`);
-        if (item.obligationsComplete !== true)
-            fail(
-                `Reviewed expression ${item.expression} has incomplete obligations`
-            );
+        validateObligationEvidence(
+            item.obligationEvidence,
+            `reviewed expression ${item.expression}`
+        );
     }
     return policy;
 }
 function licenseAllowed(expression, policy) {
-    if (expression === "NOASSERTION")
-        return { allowed: false, selected: null, obligationEvidence: null };
+    const blocked = (selected = null, missingObligationReasons = []) => ({
+        allowed: false,
+        selected,
+        obligationEvidence: null,
+        missingObligationReasons,
+    });
+    if (expression === "NOASSERTION") return blocked();
     let tree;
     try {
         tree = parseSpdx(expression);
     } catch {
-        return { allowed: false, selected: null, obligationEvidence: null };
+        return blocked();
     }
     const ids = [...collectLicenseIds(tree)];
-    if (
+    const isBaseExpression =
         !hasOr(tree) &&
         !hasException(tree) &&
-        ids.every((id) => policy.allowedSpdx.includes(id))
-    ) {
+        ids.every((id) => policy.allowedSpdx.includes(id));
+    if (isBaseExpression) {
+        const missing = ids
+            .map((id) => policy.obligationEvidence[id])
+            .filter((evidence) => evidence.obligationsComplete !== true)
+            .map((evidence) => evidence.missingReason);
+        if (missing.length) return blocked(expression, missing);
         return {
             allowed: true,
             selected: expression,
-            obligationEvidence: ids.map(
-                (id) => policy.obligationEvidence[id].evidence
-            ),
+            obligationEvidence: ids.map((id) => ({
+                path: policy.obligationEvidence[id].evidencePath,
+                digest: policy.obligationEvidence[id].evidenceDigest,
+            })),
+            missingObligationReasons: [],
         };
     }
     const reviewed = policy.reviewedExpressions.find(
         (item) => item.expression === expression
     );
-    if (!reviewed)
-        return { allowed: false, selected: null, obligationEvidence: null };
+    if (!reviewed) return blocked();
+    if (reviewed.obligationEvidence.obligationsComplete !== true)
+        return blocked(reviewed.selected, [
+            reviewed.obligationEvidence.missingReason,
+        ]);
     return {
         allowed: true,
         selected: reviewed.selected,
-        obligationEvidence: reviewed.obligationEvidence,
+        obligationEvidence: {
+            path: reviewed.obligationEvidence.evidencePath,
+            digest: reviewed.obligationEvidence.evidenceDigest,
+        },
+        missingObligationReasons: [],
     };
 }
 
@@ -940,6 +1177,70 @@ function lockPackages() {
     return [...packages.values()];
 }
 
+function npmPackageUrl(name, version) {
+    const encodedName = name.startsWith("@")
+        ? `%40${name.slice(1).split("/").map(encodeURIComponent).join("/")}`
+        : encodeURIComponent(name);
+    return `pkg:npm/${encodedName}@${encodeURIComponent(version)}`;
+}
+
+function generateSourceSbom(licenseReportPath, outputPath) {
+    const report = readJson(licenseReportPath);
+    const subjectReport = validateSubject(report.subject);
+    validateEnvelope(report, "license-inventory", subjectReport, Date.now());
+    exactKeys(report.payload, ["components"], "license inventory payload");
+    const inventory = asArray(report.payload.components, "license components");
+    const expectedRegistry = new Set(
+        lockPackages().map((item) => `${item.name}@${item.version}`)
+    );
+    const components = new Map();
+    for (const [index, item] of inventory.entries()) {
+        exactKeys(
+            item,
+            ["component", "locator", "version", "scope", "spdxExpression"],
+            `license component ${index + 1}`
+        );
+        const key = `${item.component}@${item.version}`;
+        if (item.scope === "resolved" && !expectedRegistry.has(key))
+            fail(`License inventory has non-lockfile registry package ${key}`);
+        if (!["resolved", "workspace"].includes(item.scope))
+            fail(`License inventory component ${key} has invalid scope`);
+        const prior = components.get(`${item.scope}:${key}`);
+        if (prior && prior.licenses[0].expression !== item.spdxExpression)
+            fail(`License inventory has conflicting expressions for ${key}`);
+        const purl = npmPackageUrl(item.component, item.version);
+        components.set(`${item.scope}:${key}`, {
+            type: item.scope === "workspace" ? "application" : "library",
+            name: item.component,
+            version: item.version,
+            purl,
+            "bom-ref": purl,
+            licenses: [{ expression: item.spdxExpression }],
+        });
+    }
+    const actualRegistry = new Set(
+        [...components.keys()]
+            .filter((key) => key.startsWith("resolved:"))
+            .map((key) => key.slice("resolved:".length))
+    );
+    if (
+        actualRegistry.size !== expectedRegistry.size ||
+        [...expectedRegistry].some((key) => !actualRegistry.has(key))
+    )
+        fail(
+            "License inventory does not exactly cover every registry lock package"
+        );
+    const payload = sanitizeSourceSbom({
+        bomFormat: "CycloneDX",
+        specVersion: "1.6",
+        version: 1,
+        components: [...components.values()].sort((left, right) =>
+            left.purl.localeCompare(right.purl)
+        ),
+    });
+    writeJson(outputPath, payload);
+}
+
 function evaluate(directory) {
     const now = Date.now();
     const subjectReport = validateSubject(
@@ -965,6 +1266,16 @@ function evaluate(directory) {
         })
     );
     validateSanitizedPayloads(reports);
+    const dependencyDatabase = reports["dependency-vulnerabilities"].scanner;
+    const imageDatabase = reports["image-vulnerabilities"].scanner;
+    if (
+        dependencyDatabase.databaseUpdatedAt !==
+            imageDatabase.databaseUpdatedAt ||
+        dependencyDatabase.databaseIdentity !== imageDatabase.databaseIdentity
+    )
+        fail(
+            "Dependency and image scans did not use the exact same Grype database snapshot"
+        );
     const sourceSbom = reports["source-sbom"];
     const imageSbom = reports["image-sbom"];
     if (
@@ -984,26 +1295,35 @@ function evaluate(directory) {
         !imageSbom.payload.packages.length
     )
         fail("Image SBOM is not a non-empty SPDX document");
-    const imageHex = subjectReport.imageDigest.slice("sha256:".length);
+    const imageHex = subjectReport.imageConfigDigest.slice("sha256:".length);
+    const rootId = imageSbom.payload.documentDescribes[0];
     const imagePackage = imageSbom.payload.packages.find(
-        (component) =>
-            component?.versionInfo === imageHex &&
-            (component.externalRefs || []).some(
-                (reference) =>
-                    typeof reference?.referenceLocator === "string" &&
-                    reference.referenceLocator.includes(imageHex)
-            )
+        (component) => component.SPDXID === rootId
     );
-    if (!imagePackage)
-        fail("Image SPDX document does not identify the exact image digest");
     if (
-        reports["image-vulnerabilities"].scanner.inputDigest !==
-            subjectReport.imageDigest ||
-        reports["image-vulnerabilities"].payload?.target?.imageID !==
-            subjectReport.imageDigest
+        !imagePackage ||
+        imagePackage.versionInfo !== imageHex ||
+        !String(imagePackage.SPDXID).startsWith(
+            "SPDXRef-DocumentRoot-Image-"
+        ) ||
+        !(imagePackage.externalRefs || []).some(
+            (reference) =>
+                reference.referenceType === "purl" &&
+                reference.referenceLocator.startsWith("pkg:oci/") &&
+                reference.referenceLocator.includes(`tag=${imageHex}`)
+        )
     )
         fail(
-            "Image vulnerability scan did not identify the exact image digest"
+            "Image SPDX document root does not identify the exact local image config digest"
+        );
+    if (
+        reports["image-vulnerabilities"].scanner.inputDigest !==
+            subjectReport.imageConfigDigest ||
+        reports["image-vulnerabilities"].payload?.target?.imageID !==
+            subjectReport.imageConfigDigest
+    )
+        fail(
+            "Image vulnerability scan did not identify the exact image config digest"
         );
 
     const secrets = sanitizeSecrets({
@@ -1073,35 +1393,52 @@ function evaluate(directory) {
         reports["license-inventory"].payload?.components,
         "license components"
     );
-    const licenseKeys = new Set(
-        dependencyComponents.map((item) => `${item.component}@${item.version}`)
+    const inventoryByKey = new Map();
+    for (const item of dependencyComponents) {
+        const key = `${item.scope}:${item.component}@${item.version}`;
+        const prior = inventoryByKey.get(key);
+        if (prior && prior.spdxExpression !== item.spdxExpression)
+            fail(`License inventory conflicts for ${key}`);
+        inventoryByKey.set(key, item);
+    }
+    const expectedRegistry = new Set(
+        lockPackages().map((item) => `resolved:${item.name}@${item.version}`)
     );
-    const workspaceLicenses = new Set(
-        dependencyComponents
-            .filter((item) => item.scope === "workspace")
-            .map((item) => item.component)
-    );
-    for (const item of lockPackages())
-        if (!licenseKeys.has(`${item.name}@${item.version}`))
-            fail(
-                `License inventory omits lockfile package ${item.name}@${item.version}`
-            );
+    for (const key of expectedRegistry)
+        if (!inventoryByKey.has(key))
+            fail(`License inventory omits lockfile package ${key}`);
+    for (const key of inventoryByKey.keys())
+        if (key.startsWith("resolved:") && !expectedRegistry.has(key))
+            fail(`License inventory contains non-lockfile package ${key}`);
+    const sourceByKey = new Map();
     for (const component of sourceSbom.payload.components) {
         const parsed = npmPurl(component);
-        if (
-            parsed &&
-            !licenseKeys.has(`${parsed.name}@${parsed.version}`) &&
-            !(
-                parsed.version === "0.0.0-use.local" &&
-                workspaceLicenses.has(parsed.name)
-            )
-        )
+        if (!parsed) fail("Source SBOM contains a non-npm component");
+        const sourceScope =
+            component.type === "application" ? "workspace" : "resolved";
+        const key = `${sourceScope}:${parsed.name}@${parsed.version}`;
+        const inventory = inventoryByKey.get(key);
+        if (!inventory)
             fail(
-                `License inventory omits source SBOM package ${parsed.name}@${parsed.version}`
+                `Source SBOM contains component absent from license inventory: ${key}`
             );
+        if (component.licenses[0].expression !== inventory.spdxExpression)
+            fail(`Source SBOM license disagrees with inventory for ${key}`);
+        if (sourceByKey.has(key))
+            fail(`Source SBOM duplicates component ${key}`);
+        sourceByKey.set(key, component);
     }
-    const imageComponents = imageSbom.payload.packages.map(
-        (component, index) => ({
+    if (
+        sourceByKey.size !== inventoryByKey.size ||
+        [...inventoryByKey.keys()].some((key) => !sourceByKey.has(key))
+    )
+        fail(
+            "Source SBOM and exact lock/workspace license inventory are not bidirectionally complete"
+        );
+    const documentRootIds = new Set(imageSbom.payload.documentDescribes);
+    const imageComponents = imageSbom.payload.packages
+        .filter((component) => !documentRootIds.has(component.SPDXID))
+        .map((component, index) => ({
             component: component.name || `unknown-image-component-${index}`,
             locator: component.SPDXID || `image-component-${index}`,
             version: component.versionInfo || "NOASSERTION",
@@ -1111,8 +1448,7 @@ function evaluate(directory) {
                 component.licenseConcluded !== "NOASSERTION"
                     ? component.licenseConcluded
                     : component.licenseDeclared || "NOASSERTION",
-        })
-    );
+        }));
     const components = [...dependencyComponents, ...imageComponents];
     writeJson(path.join(directory, "normalized-license-inventory.json"), {
         schemaVersion: SCHEMA_VERSION,
@@ -1138,7 +1474,7 @@ function evaluate(directory) {
             `Security policy failed: vulnerabilities=${vulnerabilityPassed}, licenses=${licensePassed}`
         );
     console.log(
-        `Security policy passed for ${subjectReport.commit} and ${subjectReport.imageDigest}`
+        `Security policy passed for ${subjectReport.commit} and ${subjectReport.imageConfigDigest}`
     );
 }
 
@@ -1146,8 +1482,10 @@ const [command, ...args] = process.argv.slice(2);
 if (command === "subject" && args.length === 2) subject(args[0], args[1]);
 else if (command === "record" && args.length === 3)
     record(args[0], args[1], args[2]);
+else if (command === "generate-source-sbom" && args.length === 2)
+    generateSourceSbom(args[0], args[1]);
 else if (command === "evaluate" && args.length === 1) evaluate(args[0]);
 else
     fail(
-        "usage: security-policy.mjs subject OUTPUT IMAGE_DIGEST | record TYPE RAW OUTPUT | evaluate REPORT_DIRECTORY"
+        "usage: security-policy.mjs subject OUTPUT IMAGE_CONFIG_DIGEST | record TYPE RAW OUTPUT | generate-source-sbom LICENSE_REPORT OUTPUT | evaluate REPORT_DIRECTORY"
     );

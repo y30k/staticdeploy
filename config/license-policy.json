@@ -11,39 +11,53 @@
     ],
     "obligationEvidence": {
         "0BSD": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         },
         "Apache-2.0": {
-            "obligationsComplete": true,
-            "evidence": "The package license and NOTICE material are retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing exact Apache license and NOTICE material has not yet been retained."
         },
         "BSD-2-Clause": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         },
         "BSD-3-Clause": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         },
         "CC0-1.0": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         },
         "ISC": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         },
         "MIT": {
-            "obligationsComplete": true,
-            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+            "obligationsComplete": false,
+            "evidencePath": null,
+            "evidenceDigest": null,
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
+            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
         }
     },
     "reviewedExpressions": []

@@ -46,6 +46,27 @@ try {
     ]);
 
     fs.rmSync(output);
+    const actualFilesystemFixture = fs.readFileSync(
+        path.resolve(
+            "scripts/test-fixtures/security/trufflehog-filesystem.jsonl"
+        ),
+        "utf8"
+    );
+    fs.writeFileSync(input, actualFilesystemFixture);
+    const filesystemResult = spawnSync(
+        process.execPath,
+        [path.resolve("scripts/sanitize-trufflehog.mjs"), input, output],
+        {
+            encoding: "utf8",
+            env: { ...process.env, TRUFFLEHOG_SUBJECT_COMMIT: commit },
+        }
+    );
+    assert.equal(filesystemResult.status, 0, filesystemResult.stderr);
+    const filesystemOutput = fs.readFileSync(output, "utf8");
+    assert.ok(!filesystemOutput.includes("REDACTED-DO-NOT-RETAIN"));
+    assert.equal(JSON.parse(filesystemOutput).findings[0].status, "unknown");
+
+    fs.rmSync(output);
     fs.writeFileSync(input, "not-json\n");
     assert.notEqual(
         spawnSync(process.execPath, [

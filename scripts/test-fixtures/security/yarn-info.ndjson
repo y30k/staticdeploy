@@ -1,0 +1,2 @@
+{"value":"fixture-package@npm:1.0.0","children":{"Version":"1.0.0","Manifest":{"License":"MIT","Homepage":"https://example.invalid/fixture"}}}
+{"value":"@staticdeploy/fixture@workspace:fixture","children":{"Version":"1.0.0","Manifest":{"License":"MIT"}}}

@@ -1,0 +1,2 @@
+This file is retained only to exercise obligation-artifact path and digest validation in policy tests.
+It is not evidence for any distributed production component.
