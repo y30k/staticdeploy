@@ -69,10 +69,13 @@ version, and CI entry points. `yarn format:check`, `yarn lint`,
 `yarn typecheck`, `yarn compile`, and `yarn unit` are intentionally separate:
 standalone typechecking enforces 28 source/test projects across all 13
 TypeScript workspaces and always passes `--noEmit`, while compile remains the
-only quality phase that emits workspace builds. `tsconfig.test.json` supplies
-the shared no-emit test-project contract. Root tooling scripts, the CLI
-executable, and all owned website JavaScript are included in the centralized
-lint/format paths.
+only quality phase that emits workspace builds. Tests remain a separate phase
+and do not emit, but retained workspace package entrypoints resolve through
+compiled `lib/` artifacts; the supported execution order is therefore
+`yarn compile` followed by `yarn unit` or `yarn coverage`, as encoded in CI.
+`tsconfig.test.json` supplies the shared no-emit test-project contract. Root
+tooling scripts, the CLI executable, and all owned website JavaScript are
+included in the centralized lint/format paths.
 
 ESLint covers retained TypeScript/TSX and the website's JavaScript/React. Narrow
 exceptions are documented beside their rules in `eslint.config.mjs`: only the

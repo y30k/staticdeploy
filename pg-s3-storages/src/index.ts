@@ -10,7 +10,7 @@ import {
     IStorages,
     IStoragesModule,
 } from "@staticdeploy/core";
-import { Knex, knex } from "knex";
+import { Knex } from "knex";
 import { createHash } from "node:crypto";
 import { extname, join } from "path";
 
@@ -21,6 +21,7 @@ import { isS3NotFoundError } from "./common/s3Errors";
 import EntrypointsStorage from "./EntrypointsStorage";
 import GroupsStorage from "./GroupsStorage";
 import OperationLogsStorage from "./OperationLogsStorage";
+import { createPostgresKnex } from "./postgres";
 import UsersStorage from "./UsersStorage";
 
 export interface IS3Config {
@@ -39,12 +40,13 @@ export default class PgS3Storages implements IStoragesModule {
     private s3Bucket: string;
     private s3Region: string;
     private s3EnableGCSCompatibility: boolean;
+    private destroyPromise?: Promise<void>;
 
     constructor(options: { postgresUrl: string; s3Config: IS3Config }) {
         const s3ClientConfig = this.getS3ClientConfig(options.s3Config);
 
-        // Instantiate knex
-        this.knex = knex(options.postgresUrl);
+        // Instantiate Knex with an explicit PostgreSQL client and bounded pool.
+        this.knex = createPostgresKnex(options.postgresUrl);
 
         // Instantiate S3 client. Omitting both credential values intentionally
         // leaves credential resolution to the AWS SDK's default Node provider
@@ -77,6 +79,26 @@ export default class PgS3Storages implements IStoragesModule {
             users: new UsersStorage(this.knex),
             checkHealth: this.checkHealth.bind(this),
         };
+    }
+
+    destroy(): Promise<void> {
+        if (this.destroyPromise === undefined) {
+            this.destroyPromise = (async () => {
+                let destroyError: unknown;
+                try {
+                    this.s3Client.destroy();
+                } catch (error) {
+                    destroyError = error;
+                }
+                try {
+                    await this.knex.destroy();
+                } catch (error) {
+                    if (destroyError === undefined) destroyError = error;
+                }
+                if (destroyError !== undefined) throw destroyError;
+            })();
+        }
+        return this.destroyPromise;
     }
 
     private getS3ClientConfig(s3Config: IS3Config): S3ClientConfig {
@@ -173,7 +195,7 @@ export default class PgS3Storages implements IStoragesModule {
             await this.knex.migrate.latest({
                 directory: join(__dirname, "./migrations"),
                 loadExtensions: [isCurrentFileTs ? ".ts" : ".js"],
-            } as any);
+            });
         } catch (err) {
             throw new StorageSetupError("Error running sql migration", err);
         }
