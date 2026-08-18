@@ -107,6 +107,24 @@ toolchain after the root ESLint phase has passed. None is set globally, in
 tests, or in service runtime configuration. Work item M4-10 must remove all
 three bridges when CRA/Webpack 4 is replaced.
 
+## Express 4 and convexpress compatibility bridge
+
+The legacy management API remains on exact `convexpress@2.3.0` and Express 4;
+Express 5 is intentionally outside the M2 HTTP dependency slice because it would
+change routing and error semantics. The regenerated lock resolves convexpress's
+compatible ranges to `express@4.21.2`, `body-parser@1.20.3`,
+`path-to-regexp@0.1.12`, and `qs@6.13.0`. Focused adapter tests preserve the
+current malformed-body, content-type, query, encoded-parameter, not-found,
+asynchronous-error, route-schema, and Swagger contracts. The oversized-body 500
+response is recorded only as temporary legacy characterization; M4 must reassess
+it and map rejected oversized payloads to an appropriate client error rather
+than preserve the 500 assertion.
+
+This is a bounded API compatibility bridge, not a vulnerability exception. The
+StaticDeploy backend maintainers own it, and the M4 API route modernization
+milestone must remove convexpress and reassess the Express major version while
+implementing the modern API routes.
+
 ## Distribution
 
 These commands install, check, compile, test, report, and build locally only.
