@@ -965,6 +965,17 @@ function offeredOrBranches(node) {
             ...offeredOrBranches(node.left),
             ...offeredOrBranches(node.right),
         ];
+    if (node?.conjunction === "and") {
+        const left = offeredOrBranches(node.left);
+        const right = offeredOrBranches(node.right);
+        return left.flatMap((leftBranch) =>
+            right.map((rightBranch) => ({
+                conjunction: "and",
+                left: leftBranch,
+                right: rightBranch,
+            }))
+        );
+    }
     return [node];
 }
 function validateObligationEvidence(evidence, field) {

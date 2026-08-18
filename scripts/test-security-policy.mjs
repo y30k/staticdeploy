@@ -666,6 +666,53 @@ try {
             },
         }
     );
+    expectPass(
+        "nested-or-exact-branch",
+        (fixture) =>
+            setFirstLicense(fixture, "((MIT OR CC0-1.0) AND Apache-2.0)"),
+        {
+            licenses: {
+                ...licensePolicy,
+                allowedSpdx: [...licensePolicy.allowedSpdx, "Apache-2.0"],
+                obligationEvidence: {
+                    ...licensePolicy.obligationEvidence,
+                    "Apache-2.0": completeEvidence("nested-apache"),
+                },
+                reviewedExpressions: [
+                    {
+                        expression: "((MIT OR CC0-1.0) AND Apache-2.0)",
+                        selected: "(MIT AND Apache-2.0)",
+                        owner: "owner",
+                        approver: "legal",
+                        reviewReference: "review",
+                        obligationEvidence: completeEvidence("nested-or"),
+                    },
+                ],
+            },
+        }
+    );
+    expectFail(
+        "nested-or-cannot-drop-and-branch",
+        (fixture) =>
+            setFirstLicense(fixture, "((MIT OR CC0-1.0) AND Apache-2.0)"),
+        {
+            licenses: {
+                ...licensePolicy,
+                reviewedExpressions: [
+                    {
+                        expression: "((MIT OR CC0-1.0) AND Apache-2.0)",
+                        selected: "MIT",
+                        owner: "owner",
+                        approver: "legal",
+                        reviewReference: "review",
+                        obligationEvidence: completeEvidence(
+                            "nested-or-incomplete"
+                        ),
+                    },
+                ],
+            },
+        }
+    );
     expectFail(
         "unavailable-or-selection",
         (fixture) =>
