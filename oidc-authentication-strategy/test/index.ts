@@ -342,10 +342,15 @@ describe("OidcAuthenticationStrategy", () => {
             throw new Error("Unsafe URL reached the HTTP client");
         }) as unknown as typeof axios.get;
         try {
+            const credentialedUrl = new URL(
+                "https://idp.example/.well-known/openid-configuration"
+            );
+            credentialedUrl.username = "test-user";
+            credentialedUrl.password = "test-password";
             for (const unsafeUrl of [
                 "file:///tmp/openid-configuration",
                 "http://idp.example/.well-known/openid-configuration",
-                "https://user:password@idp.example/.well-known/openid-configuration",
+                credentialedUrl.href,
             ]) {
                 expect(
                     await createStrategy(unsafeUrl).getIdpUserFromAuthToken(
