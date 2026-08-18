@@ -4,7 +4,6 @@ import {
     IArchiver,
     IFile,
 } from "@staticdeploy/core";
-import { map } from "bluebird";
 import { mkdirp, outputFile, readFile, remove } from "fs-extra";
 import { tmpdir } from "os";
 import { join } from "path";
@@ -48,13 +47,17 @@ const tarArchiver: ITarArchiver = {
                 throw new Error("Archive links are not supported");
             }
             const localPaths = await recursiveReaddir(stagingDirectoryPath);
-            return await map(localPaths, async (localPath) => {
-                const path = removePrefix(localPath, stagingDirectoryPath);
-                return {
-                    path: path,
-                    content: await readFile(join(stagingDirectoryPath, path)),
-                };
-            });
+            return await Promise.all(
+                localPaths.map(async (localPath) => {
+                    const path = removePrefix(localPath, stagingDirectoryPath);
+                    return {
+                        path: path,
+                        content: await readFile(
+                            join(stagingDirectoryPath, path)
+                        ),
+                    };
+                })
+            );
         } catch (err) {
             throw new ArchiveExtractionError();
         } finally {
@@ -68,8 +71,13 @@ const tarArchiver: ITarArchiver = {
         const tarArchivePath = join(workingDirectoryPath, "archive.tar.gz");
         try {
             await mkdirp(workingDirectoryPath);
-            await map(files, (file) =>
-                outputFile(join(stagingDirectoryPath, file.path), file.content)
+            await Promise.all(
+                files.map((file) =>
+                    outputFile(
+                        join(stagingDirectoryPath, file.path),
+                        file.content
+                    )
+                )
             );
             await createTar(
                 {

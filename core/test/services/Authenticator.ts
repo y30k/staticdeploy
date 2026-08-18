@@ -61,6 +61,64 @@ describe("service Authenticator", () => {
             });
         });
 
+        it("runs authentication strategies sequentially and stops at the first match", async () => {
+            const calls: number[] = [];
+            const authenticationStrategies: IAuthenticationStrategy[] = [
+                {
+                    getIdpUserFromAuthToken: async () => {
+                        calls.push(0);
+                        return null;
+                    },
+                },
+                {
+                    getIdpUserFromAuthToken: async () => {
+                        calls.push(1);
+                        return idpUser1;
+                    },
+                },
+                {
+                    getIdpUserFromAuthToken: async () => {
+                        calls.push(2);
+                        return idpUser0;
+                    },
+                },
+            ];
+            const authenticator = new Authenticator(
+                authenticationStrategies,
+                "authToken"
+            );
+
+            expect(await authenticator.getIdpUser()).to.equal(idpUser1);
+            expect(calls).to.deep.equal([0, 1]);
+        });
+
+        it("rejects if an authentication strategy rejects", async () => {
+            const expectedError = new Error("strategy failed");
+            let secondStrategyCalled = false;
+            const authenticationStrategies: IAuthenticationStrategy[] = [
+                {
+                    getIdpUserFromAuthToken: async () => {
+                        throw expectedError;
+                    },
+                },
+                {
+                    getIdpUserFromAuthToken: async () => {
+                        secondStrategyCalled = true;
+                        return null;
+                    },
+                },
+            ];
+            const authenticator = new Authenticator(
+                authenticationStrategies,
+                "authToken"
+            );
+
+            await expect(authenticator.getIdpUser()).to.be.rejectedWith(
+                expectedError
+            );
+            expect(secondStrategyCalled).to.equal(false);
+        });
+
         describe("returns null if all authentication strategies return null", () => {
             it("case: 0 authentication strategies", async () => {
                 const authenticator = new Authenticator([], "authToken");

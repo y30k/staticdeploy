@@ -26,7 +26,6 @@
     "test": "NODE_ENV=test mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'"
   },
   "dependencies": {
-    "bluebird": "^3.7.2",
     "cheerio": "1.2.0",
     "content-security-policy-builder": "2.3.0",
     "content-security-policy-parser": "0.6.0",

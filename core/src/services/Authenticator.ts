@@ -1,5 +1,3 @@
-import { reduce } from "bluebird";
-
 import IAuthenticationStrategy from "../dependencies/IAuthenticationStrategy";
 import { IIdpUser } from "../entities/User";
 
@@ -13,12 +11,13 @@ export default class Authenticator {
         if (!this.authToken) {
             return null;
         }
-        return reduce<IAuthenticationStrategy, IIdpUser | null>(
-            this.authenticationStrategies,
-            (idpUser, authenticationStrategy) =>
-                idpUser ||
-                authenticationStrategy.getIdpUserFromAuthToken(this.authToken!),
-            null
-        );
+        for (const authenticationStrategy of this.authenticationStrategies) {
+            const idpUser =
+                await authenticationStrategy.getIdpUserFromAuthToken(
+                    this.authToken
+                );
+            if (idpUser !== null) return idpUser;
+        }
+        return null;
     }
 }

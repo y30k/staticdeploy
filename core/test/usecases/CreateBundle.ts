@@ -151,6 +151,26 @@ describe("usecase CreateBundle", () => {
         });
     });
 
+    it("creates the byte-identical legacy MD5 hash for bundle bytes", async () => {
+        const deps = getMockDependencies();
+        deps.archiver.extractFiles.resolves([
+            { path: "/file", content: Buffer.from("file") },
+        ]);
+        const createBundle = new CreateBundle(deps);
+        await createBundle.exec({
+            name: "name",
+            tag: "tag",
+            description: "description",
+            content: Buffer.from([0, 1, 2, 127, 128, 255]),
+            fallbackAssetPath: "/file",
+            fallbackStatusCode: 200,
+            headers: {},
+        });
+        expect(deps.storages.bundles.createOne).to.have.been.calledOnceWith(
+            sinon.match.has("hash", "114bfec738cbd46e8243e9bca1f97018")
+        );
+    });
+
     it("logs the create bundle operation", async () => {
         const deps = getMockDependencies();
         deps.archiver.extractFiles.resolves([

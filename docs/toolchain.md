@@ -107,6 +107,33 @@ toolchain after the root ESLint phase has passed. None is set globally, in
 tests, or in service runtime configuration. Work item M4-10 must remove all
 three bridges when CRA/Webpack 4 is replaced.
 
+## Bounded CommonJS package bridges
+
+The retained TypeScript packages still emit CommonJS. The legacy CLI therefore
+pins `chalk@4.1.2` and `yargs@17.7.2`: Chalk's newer majors and the Yargs
+release line after 17 no longer provide the CommonJS boundary this executable
+consumes. These are module-format bridges, not general upgrade exceptions.
+StaticDeploy runtime maintainers own them, and M3-09 must either retire the
+legacy CLI or reassess its output boundary while splitting the supported runtime
+commands.
+
+Core likewise retains the CommonJS-compatible `mime@3` and
+`escape-string-regexp@4` release lines. It also temporarily retains `md5@2`: the
+core barrel is consumed through its browser build, and CRA/Webpack 4 cannot
+resolve `node:crypto` even though bundle creation runs on the backend. M4-05
+owns separating the server-only bundle finalizer from browser exports, replacing
+the legacy MD5 implementation with Node crypto, and replacing the MIME bridge
+when the v2 release finalizer takes over content detection. The M4 application
+and content-route implementation owns removing the legacy role-matcher escape
+bridge. No browser shim, hidden require, crypto polyfill, or newer ESM-only
+major may be loaded through an ad hoc dynamic-import wrapper in the current
+output.
+
+The only remaining direct Bluebird owner is immutable PostgreSQL migration `02`;
+current core, archive, and storage concurrency paths use native promises. The
+historical migration remains byte-stable so an existing database can still
+verify and execute the original migration source.
+
 ## Local structured logging
 
 The backend uses exact `pino@10.3.1` and `pino-http@11.0.0` without transports
@@ -125,8 +152,8 @@ responses, `request aborted` at `warn`, or `request failed` at `error` for
 errors/5xx. `SIGINT` and `SIGTERM` share an idempotent bounded close path and
 flush/drain standard output. Startup failures set a nonzero exit code only after
 the final structured error is drained. This local logging slice does not
-configure telemetry export, an endpoint, credentials, dashboards, analytics,
-or Eyes ingestion. Eyes product onboarding and application ingestion remain
+configure telemetry export, an endpoint, credentials, dashboards, analytics, or
+Eyes ingestion. Eyes product onboarding and application ingestion remain
 externally gated.
 
 ## Express 4 and convexpress compatibility bridge

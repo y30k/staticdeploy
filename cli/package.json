@@ -27,9 +27,9 @@
     "@staticdeploy/core": "^0.15.5",
     "@staticdeploy/sdk": "^0.15.5",
     "@staticdeploy/tar-archiver": "^0.15.5",
-    "chalk": "^4.1.2",
-    "fs-extra": "^10.0.0",
-    "yargs": "^17.3.0"
+    "chalk": "4.1.2",
+    "fs-extra": "11.4.0",
+    "yargs": "17.7.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",

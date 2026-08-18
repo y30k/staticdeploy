@@ -4001,17 +4001,17 @@ __metadata:
     "@types/yargs": "npm:^17.0.7"
     chai: "npm:^4.3.4"
     chai-as-promised: "npm:^7.1.1"
-    chalk: "npm:^4.1.2"
+    chalk: "npm:4.1.2"
     create-fs-tree: "npm:^1.0.0"
     deep-equal-in-any-order: "npm:^1.1.15"
-    fs-extra: "npm:^10.0.0"
+    fs-extra: "npm:11.4.0"
     mocha: "npm:^9.1.3"
     rimraf: "npm:^3.0.2"
     sinon: "npm:^9.2.2"
     sinon-chai: "npm:^3.7.0"
     ts-node: "npm:^10.4.0"
     typescript: "npm:5.9.3"
-    yargs: "npm:^17.3.0"
+    yargs: "npm:17.7.2"
   bin:
     staticdeploy: ./bin/staticdeploy.js
   languageName: unknown
@@ -4035,7 +4035,6 @@ __metadata:
     "@types/sinon": "npm:^9.0.9"
     "@types/sinon-chai": "npm:^3.2.6"
     "@types/validator": "npm:^13.7.0"
-    bluebird: "npm:^3.7.2"
     chai: "npm:^4.3.4"
     chai-as-promised: "npm:^7.1.1"
     cheerio: "npm:1.2.0"
@@ -4390,14 +4389,12 @@ __metadata:
   resolution: "@staticdeploy/tar-archiver@workspace:tar-archiver"
   dependencies:
     "@staticdeploy/core": "npm:^0.15.5"
-    "@types/bluebird": "npm:^3.5.36"
     "@types/chai": "npm:^4.3.0"
     "@types/deep-equal-in-any-order": "npm:^1.0.1"
     "@types/fs-extra": "npm:^9.0.13"
     "@types/mocha": "npm:^9.0.0"
     "@types/node": "npm:24.13.3"
     "@types/recursive-readdir": "npm:^2.2.0"
-    bluebird: "npm:^3.7.2"
     chai: "npm:^4.3.4"
     create-fs-tree: "npm:^1.0.0"
     deep-equal-in-any-order: "npm:^1.1.15"
@@ -8098,7 +8095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
+"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.1.0":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -28050,13 +28047,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"yargs-parser@npm:^21.0.0":
-  version: 21.0.0
-  resolution: "yargs-parser@npm:21.0.0"
-  checksum: 10c0/e7605acabf7a57bd382e781a83702bd2e13069b2c55bbe04d3c40aa6e8104f53ad4e3c78eabb8932306795187ef655e64ac7576f188914ce46c7c9f480155c99
-  languageName: node
-  linkType: hard
-
 "yargs-unparser@npm:2.0.0":
   version: 2.0.0
   resolution: "yargs-unparser@npm:2.0.0"
@@ -28152,21 +28142,6 @@ __metadata:
     y18n: "npm:^4.0.0"
     yargs-parser: "npm:^18.1.2"
   checksum: 10c0/f1ca680c974333a5822732825cca7e95306c5a1e7750eb7b973ce6dc4f97a6b0a8837203c8b194f461969bfe1fb1176d1d423036635285f6010b392fa498ab2d
-  languageName: node
-  linkType: hard
-
-"yargs@npm:^17.3.0":
-  version: 17.3.0
-  resolution: "yargs@npm:17.3.0"
-  dependencies:
-    cliui: "npm:^7.0.2"
-    escalade: "npm:^3.1.1"
-    get-caller-file: "npm:^2.0.5"
-    require-directory: "npm:^2.1.1"
-    string-width: "npm:^4.2.3"
-    y18n: "npm:^5.0.5"
-    yargs-parser: "npm:^21.0.0"
-  checksum: 10c0/0646e0a4bd62a345353df92745b57031ed3e3d73f416a1ba9adff3274a7eb454dd0b7a2876181dee818d3dd8a1931c30d98cab43ac1f37d2c85e953e07ea6113
   languageName: node
   linkType: hard
 
