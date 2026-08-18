@@ -1,5 +1,8 @@
 import { IStorages } from "@staticdeploy/core";
 
+export { createTree, destroyTree } from "./createFsTree";
+export type { IFsTreeDefinition } from "./createFsTree";
+
 import registerAppsStorageTests from "./AppsStorage";
 import registerBundlesStorageTests from "./BundlesStorage";
 import registerCheckHealthTests from "./checkHealth";

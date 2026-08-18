@@ -1,6 +1,6 @@
 import { ArchiveExtractionError } from "@staticdeploy/core";
 import { expect } from "chai";
-import { createTree, destroyTree } from "create-fs-tree";
+import { createTree, destroyTree } from "@staticdeploy/storages-test-suite";
 import { outputFile, pathExists, readFile, remove } from "fs-extra";
 import { tmpdir } from "os";
 import { join } from "path";

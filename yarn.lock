@@ -2503,6 +2503,7 @@ __metadata:
   dependencies:
     "@staticdeploy/core": "npm:^0.15.5"
     "@staticdeploy/sdk": "npm:^0.15.5"
+    "@staticdeploy/storages-test-suite": "npm:^0.15.5"
     "@staticdeploy/tar-archiver": "npm:^0.15.5"
     "@types/chai": "npm:4.3.20"
     "@types/chai-as-promised": "npm:7.1.8"
@@ -2516,7 +2517,6 @@ __metadata:
     chai: "npm:4.5.0"
     chai-as-promised: "npm:7.1.2"
     chalk: "npm:4.1.2"
-    create-fs-tree: "npm:^1.0.0"
     deep-equal-in-any-order: "npm:2.2.0"
     fs-extra: "npm:11.4.0"
     mocha: "npm:11.8.0"
@@ -2783,6 +2783,7 @@ __metadata:
     "@staticdeploy/core": "npm:^0.15.5"
     "@staticdeploy/http-adapters": "npm:^0.15.5"
     "@staticdeploy/memory-storages": "npm:^0.15.5"
+    "@staticdeploy/storages-test-suite": "npm:^0.15.5"
     "@staticdeploy/tar-archiver": "npm:^0.15.5"
     "@types/chai": "npm:4.3.20"
     "@types/express": "npm:4.17.25"
@@ -2790,7 +2791,6 @@ __metadata:
     "@types/node": "npm:24.13.3"
     "@types/supertest": "npm:7.2.1"
     chai: "npm:4.5.0"
-    create-fs-tree: "npm:^1.0.0"
     express: "npm:4.22.2"
     mocha: "npm:11.8.0"
     rimraf: "npm:6.1.3"
@@ -2854,6 +2854,7 @@ __metadata:
   resolution: "@staticdeploy/tar-archiver@workspace:tar-archiver"
   dependencies:
     "@staticdeploy/core": "npm:^0.15.5"
+    "@staticdeploy/storages-test-suite": "npm:^0.15.5"
     "@types/chai": "npm:4.3.20"
     "@types/deep-equal-in-any-order": "npm:1.0.4"
     "@types/fs-extra": "npm:^9.0.13"
@@ -2861,7 +2862,6 @@ __metadata:
     "@types/node": "npm:24.13.3"
     "@types/recursive-readdir": "npm:^2.2.0"
     chai: "npm:4.5.0"
-    create-fs-tree: "npm:^1.0.0"
     deep-equal-in-any-order: "npm:2.2.0"
     fs-extra: "npm:11.4.0"
     mocha: "npm:11.8.0"
@@ -5145,15 +5145,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"create-fs-tree@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "create-fs-tree@npm:1.0.0"
-  dependencies:
-    fs-extra: "npm:^3.0.1"
-  checksum: 10c0/2770f6b4c315b23de6dfaa8fb3afe4b72a9d54b6525147d9c8c54e787e0c821142fd5cc40f1ee31d431d1f39e48219c68ac1dbcca6d080bd8f84461a41cceb77
-  languageName: node
-  linkType: hard
-
 "create-require@npm:^1.1.0":
   version: 1.1.1
   resolution: "create-require@npm:1.1.1"
@@ -6674,17 +6665,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fs-extra@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "fs-extra@npm:3.0.1"
-  dependencies:
-    graceful-fs: "npm:^4.1.2"
-    jsonfile: "npm:^3.0.0"
-    universalify: "npm:^0.1.0"
-  checksum: 10c0/ac3a17c9355f80aa250e102dbc4939c50ec83fca49a144bdd432f43deb0a3c07f74ec313feb2b938d6b0c1de9bfb02c2358bc602efeed5174fca692b7d4694f1
-  languageName: node
-  linkType: hard
-
 "fs-minipass@npm:^3.0.0":
   version: 3.0.3
   resolution: "fs-minipass@npm:3.0.3"
@@ -7004,7 +6984,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.15, graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0":
+"graceful-fs@npm:^4.1.15, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0":
   version: 4.2.8
   resolution: "graceful-fs@npm:4.2.8"
   checksum: 10c0/68365485460f7d2e95c05c1b7aeee935349f3b7776488d5bd95a45d8a45bd4977442e88cbbdb4ea01bc72f49f01f75d83f049069774ac8cc4328af4bcff1c542
@@ -8341,18 +8321,6 @@ __metadata:
   version: 3.3.1
   resolution: "jsonc-parser@npm:3.3.1"
   checksum: 10c0/269c3ae0a0e4f907a914bf334306c384aabb9929bd8c99f909275ebd5c2d3bc70b9bcd119ad794f339dec9f24b6a4ee9cd5a8ab2e6435e730ad4075388fc2ab6
-  languageName: node
-  linkType: hard
-
-"jsonfile@npm:^3.0.0":
-  version: 3.0.1
-  resolution: "jsonfile@npm:3.0.1"
-  dependencies:
-    graceful-fs: "npm:^4.1.6"
-  dependenciesMeta:
-    graceful-fs:
-      optional: true
-  checksum: 10c0/159ec98712d5a0f77ddb96ddbde0ecc5fb1108fadab5b85cea18f508be78eabf03a3370b3769112fce1d8772b4e396f81d7c0d378ac5d7955bee5f1330cf1b19
   languageName: node
   linkType: hard
 
@@ -13225,13 +13193,6 @@ __metadata:
   version: 6.0.0
   resolution: "universal-user-agent@npm:6.0.0"
   checksum: 10c0/ebeb0206963666c13bcf9ebc86d0577c7daed5870c05cd34d4972ee7a43b9ef20679baf2a8c83bf1b71d899bae67243ac4982d84ddaf9ba0355ff76595819961
-  languageName: node
-  linkType: hard
-
-"universalify@npm:^0.1.0":
-  version: 0.1.2
-  resolution: "universalify@npm:0.1.2"
-  checksum: 10c0/e70e0339f6b36f34c9816f6bf9662372bd241714dc77508d231d08386d94f2c4aa1ba1318614f92015f40d45aae1b9075cd30bd490efbe39387b60a76ca3f045
   languageName: node
   linkType: hard
 

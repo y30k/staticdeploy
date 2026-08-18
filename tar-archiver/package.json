@@ -27,6 +27,7 @@
     "tar": "7.5.22"
   },
   "devDependencies": {
+    "@staticdeploy/storages-test-suite": "^0.15.5",
     "@types/chai": "4.3.20",
     "@types/deep-equal-in-any-order": "1.0.4",
     "@types/fs-extra": "^9.0.13",
@@ -34,7 +35,6 @@
     "@types/node": "24.13.3",
     "@types/recursive-readdir": "^2.2.0",
     "chai": "4.5.0",
-    "create-fs-tree": "^1.0.0",
     "deep-equal-in-any-order": "2.2.0",
     "mocha": "11.8.0",
     "rimraf": "6.1.3",

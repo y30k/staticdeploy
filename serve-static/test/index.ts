@@ -1,4 +1,4 @@
-import { createTree, destroyTree } from "create-fs-tree";
+import { createTree, destroyTree } from "@staticdeploy/storages-test-suite";
 import express from "express";
 import { tmpdir } from "os";
 import { join } from "path";
