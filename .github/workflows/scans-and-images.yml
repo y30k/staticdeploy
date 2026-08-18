@@ -14,12 +14,18 @@ jobs:
     scans-and-images:
         name: scans-and-images
         runs-on: ubuntu-22.04
-        timeout-minutes: 40
+        timeout-minutes: 60
         steps:
             - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
               with:
                   fetch-depth: 0
                   persist-credentials: false
+            - uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+              with:
+                  image: tonistiigi/binfmt:qemu-v10.2.1@sha256:d3b963f787999e6c0219a48dba02978769286ff61a5f4d26245cb6a6e5567ea3
+                  platforms: arm64
+            - id: buildx
+              uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
             - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24.19.0
@@ -32,13 +38,53 @@ jobs:
                   yarn install --immutable
                   node scripts/test-security-policy.mjs
                   node scripts/test-sanitize-trufflehog.mjs
+                  node scripts/test-multiarch-workflow.mjs
                   yarn check:install-scripts
-            - name: Build exact local service image without publishing
+            - name:
+                  Build and smoke exact local amd64 and arm64 images without
+                  publishing
               run: |
+                  set -euo pipefail
                   mkdir -p reports
-                  docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
-                  node scripts/test-image-conformance.mjs staticdeploy-service:ci
-                  docker image inspect staticdeploy-service:ci --format '{{.Id}}' > reports-image-config-digest.txt
+                  commit=$(git rev-parse HEAD)
+                  test "$commit" = "$GITHUB_SHA"
+                  docker buildx build \
+                    --builder '${{ steps.buildx.outputs.name }}' \
+                    --platform linux/amd64 \
+                    --file staticdeploy/Dockerfile \
+                    --label "org.opencontainers.image.revision=$commit" \
+                    --metadata-file reports/build-amd64-metadata.raw.json \
+                    --output type=oci,dest=reports/image-amd64.oci.raw.tar \
+                    --load \
+                    --tag staticdeploy-service:amd64 .
+                  node scripts/test-image-conformance.mjs \
+                    staticdeploy-service:amd64 linux/amd64 \
+                    reports/image-conformance-amd64.json
+                  docker buildx build \
+                    --builder '${{ steps.buildx.outputs.name }}' \
+                    --platform linux/arm64 \
+                    --file staticdeploy/Dockerfile \
+                    --label "org.opencontainers.image.revision=$commit" \
+                    --metadata-file reports/build-arm64-metadata.raw.json \
+                    --output type=oci,dest=reports/image-arm64.oci.raw.tar \
+                    --load \
+                    --tag staticdeploy-service:arm64 .
+                  node scripts/test-image-conformance.mjs \
+                    staticdeploy-service:arm64 linux/arm64 \
+                    reports/image-conformance-arm64.json
+                  node scripts/write-multiarch-image-evidence.mjs \
+                    reports/multiarch-images.json \
+                    linux/amd64=staticdeploy-service:amd64,reports/image-conformance-amd64.json,reports/build-amd64-metadata.raw.json,reports/image-amd64.oci.raw.tar \
+                    linux/arm64=staticdeploy-service:arm64,reports/image-conformance-arm64.json,reports/build-arm64-metadata.raw.json,reports/image-arm64.oci.raw.tar
+                  jq -e '
+                    .registryNegative == true and
+                    ([.images[].platform] | sort) == ["linux/amd64", "linux/arm64"] and
+                    ([.images[].revision] | unique) == [.commit] and
+                    ([.images[].configDigest] | unique | length) == 2 and
+                    ([.images[].manifestDigest] | unique | length) == 2 and
+                    all(.images[]; .conformance.passed and (.repoDigests | length == 0))
+                  ' reports/multiarch-images.json >/dev/null
+                  docker image inspect staticdeploy-service:amd64 --format '{{.Id}}' > reports-image-config-digest.txt
                   grep -Eq '^sha256:[a-f0-9]{64}$' reports-image-config-digest.txt
                   node scripts/security-policy.mjs subject reports/subject.json "$(cat reports-image-config-digest.txt)"
             - name: Scan exact tracked subject for verified or unknown secrets
@@ -128,6 +174,17 @@ jobs:
                   SCANNER_NAME=syft SCANNER_VERSION=1.51.0 \
                   SCANNER_IDENTITY='anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0' \
                     node scripts/security-policy.mjs record image-sbom reports/image-sbom.raw.json reports/image-sbom.json
+
+                  arm64_image_id=$(docker image inspect staticdeploy-service:arm64 --format '{{.Id}}')
+                  grep -Eq '^sha256:[a-f0-9]{64}$' <<<"$arm64_image_id"
+                  docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock \
+                    --volume "$PWD/reports:/reports" \
+                    anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0 \
+                    "docker:$arm64_image_id" -o spdx-json=/reports/image-sbom-arm64.raw.json
+                  node scripts/compare-multiarch-image-inventory.mjs \
+                    reports/multiarch-inventory.json \
+                    reports/image-sbom.raw.json reports/image-sbom-arm64.raw.json \
+                    "$image_id" "$arm64_image_id"
             - name: Update and validate pinned Grype database
               run: |
                   mkdir -p reports/grype-cache
@@ -190,6 +247,8 @@ jobs:
                   for report in \
                     subject.json dependency-vulnerabilities.json sast.json secrets.json \
                     image-vulnerabilities.json source-sbom.json image-sbom.json \
+                    image-conformance-amd64.json image-conformance-arm64.json \
+                    multiarch-images.json multiarch-inventory.json \
                     license-inventory.json normalized-findings.json \
                     vulnerability-evaluation.json normalized-license-inventory.json \
                     license-evaluation.json; do
@@ -203,7 +262,8 @@ jobs:
             - name: Remove raw scanner output
               if: always()
               run: |
-                  rm -f reports/*.raw.json reports/*.raw.ndjson reports/grype-db.json reports-image-config-digest.txt
+                  rm -f reports/*.raw.json reports/*.raw.ndjson reports/*.raw.tar \
+                    reports/grype-db.json reports-image-config-digest.txt
                   sudo rm -rf reports/grype-cache
                   find reports -type f -exec chmod 600 {} +
             - name: Upload sanitized policy evidence

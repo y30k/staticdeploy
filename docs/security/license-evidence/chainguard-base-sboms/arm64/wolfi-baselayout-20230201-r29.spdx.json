@@ -1,0 +1,152 @@
+{
+  "spdxVersion": "SPDX-2.3",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "apk-wolfi-baselayout-20230201-r29",
+  "documentNamespace": "https://spdx.org/spdxdocs/chainguard/melange/635ba48bbc6e356eb6c8e67e49eb2ec4",
+  "creationInfo": {
+    "licenseListVersion": "3.22",
+    "creators": [
+      "Tool: melange (v0.50.0)",
+      "Organization: Chainguard, Inc"
+    ],
+    "created": "2026-04-17T19:17:28Z"
+  },
+  "packages": [
+    {
+      "name": "wolfi",
+      "SPDXID": "SPDXRef-OperatingSystem",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "description": "Operating System",
+      "primaryPackagePurpose": "OPERATING-SYSTEM"
+    },
+    {
+      "name": "wolfi-baselayout",
+      "SPDXID": "SPDXRef-Package-apk-wolfi-baselayout-20230201-r29",
+      "versionInfo": "20230201-r29",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/wolfi/wolfi-baselayout@20230201-r29?arch=aarch64\u0026distro=wolfi"
+        }
+      ],
+      "primaryPackagePurpose": "APPLICATION"
+    },
+    {
+      "name": "wolfi-baselayout.yaml",
+      "SPDXID": "SPDXRef-Package-Melange-wolfi-baselayout.yaml-35e7b4713442869116936fae3fe8cf7c69bc9054",
+      "versionInfo": "35e7b4713442869116936fae3fe8cf7c69bc9054",
+      "supplier": "Organization: Wolfi",
+      "originator": "Organization: Wolfi",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "Apache-2.0",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:github/chainguard-dev/stereo@35e7b4713442869116936fae3fe8cf7c69bc9054#wolfi-baselayout.yaml"
+        }
+      ],
+      "primaryPackagePurpose": "INSTALL"
+    },
+    {
+      "name": "wolfi-baselayout",
+      "SPDXID": "SPDXRef-Package-apk-wolfi-baselayout-64d02eed92ca55e3",
+      "versionInfo": "20230201-r29",
+      "supplier": "Organization: chainguard",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "sourceInfo": "acquired package info from APK DB: /.PKGINFO",
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "MIT",
+      "copyrightText": "NOASSERTION",
+      "description": "baselayout data for Wolfi",
+      "externalRefs": [
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi-baselayout:wolfi-baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi-baselayout:wolfi_baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi_baselayout:wolfi-baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi_baselayout:wolfi_baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi:wolfi-baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "SECURITY",
+          "referenceType": "cpe23Type",
+          "referenceLocator": "cpe:2.3:a:wolfi:wolfi_baselayout:20230201-r29:*:*:*:*:*:*:*"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:apk/wolfi/wolfi-baselayout@20230201-r29?arch=aarch64\u0026origin=wolfi-baselayout"
+        }
+      ]
+    },
+    {
+      "name": "wolfi-baselayout",
+      "SPDXID": "SPDXRef-DocumentRoot-Directory-wolfi-baselayout",
+      "versionInfo": "20230201-r29",
+      "supplier": "Organization: chainguard",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": false,
+      "licenseConcluded": "NOASSERTION",
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "primaryPackagePurpose": "FILE"
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-Package-apk-wolfi-baselayout-20230201-r29",
+      "relatedSpdxElement": "SPDXRef-Package-Melange-wolfi-baselayout.yaml-35e7b4713442869116936fae3fe8cf7c69bc9054",
+      "relationshipType": "DESCRIBED_BY"
+    },
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-apk-wolfi-baselayout-20230201-r29",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-DocumentRoot-Directory-wolfi-baselayout",
+      "relatedSpdxElement": "SPDXRef-Package-apk-wolfi-baselayout-64d02eed92ca55e3",
+      "relationshipType": "CONTAINS"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-apk-wolfi-baselayout-20230201-r29",
+      "relatedSpdxElement": "SPDXRef-DocumentRoot-Directory-wolfi-baselayout",
+      "relationshipType": "CONTAINS"
+    }
+  ]
+}

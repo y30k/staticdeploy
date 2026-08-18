@@ -11,7 +11,9 @@ requires a new review.
   `cgr.dev/chainguard/glibc-dynamic@sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303`
 - Current derived image configuration at evidence generation:
   `sha256:19e9d3e8eec1a3ca09f53b8283c99b4140fd47f3f0dfe50013288624df53c49f`
-- Architecture: `amd64` only; multi-architecture evidence belongs to M2-08.
+- Architecture: this document records the original `amd64` evidence; the
+  approved M2-08 `arm64` extension and exact SBOM hashes are retained in
+  `m2-08-multiarch-approval.md`.
 - Base package declaration: inherited `/etc/apko.json` in the image.
 
 The image conformance test byte-compares each inherited package SBOM below with
@@ -26,6 +28,7 @@ evidence is regenerated and reviewed.
 | `ld-linux@2.43-r13`                  | `LGPL-2.1-or-later`                       | `3af9e0b1cf6cd659bb027d4b7aedf8673eee96f39a102377958095b3f697d685` |
 | `libgcc@16.1.0-r4`                   | `GPL-3.0-or-later WITH GCC-exception-3.1` | `d9ca803e39b73744a8f9cb348d41bf7b3ed537da634d7c8166f5d0e15cde4bf2` |
 | `libstdc++@16.1.0-r4`                | `GPL-3.0-or-later WITH GCC-exception-3.1` | `9c09f88a89cb340798aeb14dd8008307b5652ba4fd9e91b597d3d7dec843969b` |
+| `wolfi-baselayout@20230201-r29`      | `MIT`                                     | `d065690a90e0c709b1be4a950adbc59439b15e8b9619a7c0e9203c82a3496dc5` |
 
 ## Exact source locations
 

@@ -7,11 +7,22 @@ import path from "node:path";
 import process from "node:process";
 
 const image = process.argv[2];
-if (!image) throw new Error("usage: test-image-conformance.mjs IMAGE");
+const hostArchitecture = process.arch === "x64" ? "amd64" : process.arch;
+const expectedPlatform = process.argv[3] || `linux/${hostArchitecture}`;
+const evidencePath = process.argv[4] || null;
+if (!image || !/^linux\/(?:amd64|arm64)$/.test(expectedPlatform))
+    throw new Error(
+        "usage: test-image-conformance.mjs IMAGE [linux/amd64|linux/arm64] [EVIDENCE_JSON]"
+    );
 
 const docker = (...args) =>
     execFileSync("docker", args, { encoding: "utf8" }).trim();
 const inspect = JSON.parse(docker("image", "inspect", image))[0];
+assert.equal(
+    `${inspect.Os}/${inspect.Architecture}`,
+    expectedPlatform,
+    "loaded image must match the requested platform"
+);
 assert.equal(
     inspect.Config.User,
     "65532:65532",
@@ -25,6 +36,8 @@ assert.equal(
     docker(
         "run",
         "--rm",
+        "--platform",
+        expectedPlatform,
         "--entrypoint",
         "/nodejs/bin/node",
         image,
@@ -67,21 +80,36 @@ try {
     assert.equal(has("licenses/node/LICENSE"), true);
     assert.equal(has("licenses/staticdeploy/LICENSE"), true);
     assert.equal(has("licenses/THIRD_PARTY_NOTICES.txt"), true);
+    const baseSbomNames = [
+        "ca-certificates-bundle-20260413-r1",
+        "glibc-2.43-r13",
+        "glibc-locale-posix-2.43-r13",
+        "ld-linux-2.43-r13",
+        "libgcc-16.1.0-r4",
+        "libstdc++-16.1.0-r4",
+        "wolfi-baselayout-20230201-r29",
+    ];
+    assert.deepEqual(
+        entries
+            .filter(
+                (entry) =>
+                    entry.startsWith("var/lib/db/sbom/") &&
+                    entry.endsWith(".spdx.json")
+            )
+            .sort(),
+        baseSbomNames.map((name) => `var/lib/db/sbom/${name}.spdx.json`).sort(),
+        "runtime base SBOM package set must be exact"
+    );
     const trackedEvidence = new Map([
         [
             "licenses/THIRD_PARTY_NOTICES.txt",
             "docs/security/license-evidence/m2-runtime-third-party-notices.txt",
         ],
-        ...[
-            "ca-certificates-bundle-20260413-r1",
-            "glibc-2.43-r13",
-            "glibc-locale-posix-2.43-r13",
-            "ld-linux-2.43-r13",
-            "libgcc-16.1.0-r4",
-            "libstdc++-16.1.0-r4",
-        ].map((name) => [
+        ...baseSbomNames.map((name) => [
             `var/lib/db/sbom/${name}.spdx.json`,
-            `docs/security/license-evidence/chainguard-base-sboms/${name}.spdx.json`,
+            `docs/security/license-evidence/chainguard-base-sboms/${
+                inspect.Architecture === "arm64" ? "arm64/" : ""
+            }${name}.spdx.json`,
         ]),
     ]);
     for (const [imagePath, evidencePath] of trackedEvidence)
@@ -150,6 +178,8 @@ try {
         "--rm",
         "--name",
         name,
+        "--platform",
+        expectedPlatform,
         "--read-only",
         "--cap-drop",
         "ALL",
@@ -230,4 +260,21 @@ try {
     if (started) spawnSync("docker", ["stop", name], { encoding: "utf8" });
 }
 
+if (evidencePath) {
+    fs.mkdirSync(path.dirname(evidencePath), { recursive: true });
+    fs.writeFileSync(
+        evidencePath,
+        `${JSON.stringify(
+            {
+                schemaVersion: 1,
+                platform: expectedPlatform,
+                configDigest: inspect.Id,
+                passed: true,
+            },
+            null,
+            2
+        )}\n`,
+        { mode: 0o600 }
+    );
+}
 console.log(`Image conformance passed for ${inspect.Id}`);
