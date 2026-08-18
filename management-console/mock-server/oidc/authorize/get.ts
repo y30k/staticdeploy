@@ -1,35 +1,50 @@
-import { generateKeyPair, SignJWT } from "jose";
 import { Request, RequestHandler } from "express";
-import qs from "querystring";
+
+import { CLIENT_ID, createAuthorizationCode, REDIRECT_URIS } from "../state";
 
 interface Query {
-    redirect_uri: string;
-    state?: string;
-    nonce?: string;
     client_id?: string;
+    code_challenge?: string;
+    code_challenge_method?: string;
+    nonce?: string;
+    redirect_uri?: string;
+    response_type?: string;
+    state?: string;
 }
 
-const signingKey = generateKeyPair("RS256").then(
-    ({ privateKey }) => privateKey
-);
-
-export default (async (req: Request<any, any, any, Query>, res) => {
-    const { redirect_uri, state, nonce, client_id = "clientId" } = req.query;
-    const idToken = await new SignJWT({ nonce })
-        .setProtectedHeader({ alg: "RS256" })
-        .setIssuer("http://localhost:3456")
-        .setAudience(client_id)
-        .setSubject("mock-user")
-        .setIssuedAt()
-        .setExpirationTime("5m")
-        .sign(await signingKey);
-    const redirectUrl = [
+export default ((req: Request<any, any, any, Query>, res) => {
+    const {
+        client_id,
+        code_challenge,
+        code_challenge_method,
+        nonce,
         redirect_uri,
-        "#?",
-        qs.stringify({
-            id_token: idToken,
-            state,
-        }),
-    ].join("");
-    res.status(302).location(redirectUrl).send();
+        response_type,
+        state,
+    } = req.query;
+    if (
+        client_id !== CLIENT_ID ||
+        response_type !== "code" ||
+        code_challenge_method !== "S256" ||
+        typeof code_challenge !== "string" ||
+        !/^[A-Za-z0-9_-]{43,128}$/.test(code_challenge) ||
+        (nonce !== undefined && typeof nonce !== "string") ||
+        typeof state !== "string" ||
+        typeof redirect_uri !== "string" ||
+        !REDIRECT_URIS.has(redirect_uri)
+    ) {
+        res.status(400).send({ message: "Invalid authorization request" });
+        return;
+    }
+
+    const code = createAuthorizationCode({
+        challenge: code_challenge,
+        clientId: client_id,
+        nonce,
+        redirectUri: redirect_uri,
+    });
+    const redirect = new URL(redirect_uri);
+    redirect.searchParams.set("code", code);
+    redirect.searchParams.set("state", state);
+    res.redirect(302, redirect.toString());
 }) as RequestHandler<any, any, any, Query>;

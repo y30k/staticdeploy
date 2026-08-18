@@ -19,9 +19,10 @@
   "scripts": {
     "test": "vitest run",
     "dev:mock-server": "tsx watch mock-server/index.ts",
-    "dev:server": "vite --host 127.0.0.1",
-    "dev": "vite --host 127.0.0.1",
-    "compile": "vite build"
+    "dev:server": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
+    "compile": "vite build",
+    "test:build": "node scripts/check-build.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "5.6.1",
@@ -45,7 +46,6 @@
   "devDependencies": {
     "@testing-library/dom": "10.4.1",
     "@testing-library/react": "16.3.2",
-    "@testing-library/user-event": "14.6.5",
     "@types/chai": "4.3.20",
     "@types/express": "4.17.25",
     "@types/faker": "5.5.9",
@@ -63,11 +63,12 @@
     "chai": "4.5.0",
     "express": "4.22.2",
     "faker": "5.5.3",
+    "history": "4.10.1",
     "jose": "5.10.0",
     "jsdom": "30.0.1",
+    "react-router": "5.3.4",
     "sinon": "22.1.0",
     "sinon-chai": "3.7.0",
-    "ts-node": "10.9.2",
     "tsx": "4.23.12",
     "typescript": "5.9.3",
     "vite": "8.2.1",

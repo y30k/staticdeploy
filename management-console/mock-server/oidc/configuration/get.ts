@@ -1,12 +1,18 @@
 import { RequestHandler } from "express";
 
+import { ISSUER } from "../state";
+
 export default ((_req, res) => {
-    if (Math.random() > 0.9) {
-        res.status(400).send({ message: "Random error" });
-    } else {
-        res.status(200).send({
-            issuer: "http://localhost:3456",
-            authorization_endpoint: "http://localhost:3456/oidc/authorize",
-        });
-    }
+    res.send({
+        authorization_endpoint: `${ISSUER}/oidc/authorize`,
+        code_challenge_methods_supported: ["S256"],
+        grant_types_supported: ["authorization_code"],
+        id_token_signing_alg_values_supported: ["RS256"],
+        issuer: ISSUER,
+        jwks_uri: `${ISSUER}/oidc/jwks`,
+        response_types_supported: ["code"],
+        scopes_supported: ["openid", "profile"],
+        subject_types_supported: ["public"],
+        token_endpoint: `${ISSUER}/oidc/token`,
+    });
 }) as RequestHandler;

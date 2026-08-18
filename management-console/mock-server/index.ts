@@ -2,8 +2,8 @@ import express, { RequestHandler } from "express";
 import { readdir } from "node:fs/promises";
 import { extname, relative, resolve, sep } from "node:path";
 
-const host = "127.0.0.1";
-const port = 3456;
+import { DEV_ORIGIN, MOCK_HOST, MOCK_PORT } from "./oidc/state";
+
 const root = __dirname;
 const methods = new Set(["delete", "get", "patch", "post", "put"]);
 
@@ -35,19 +35,29 @@ function routeFor(file: string) {
     return { method, route };
 }
 
-async function main() {
+export async function createMockApp() {
     const app = express();
     app.use(express.json({ limit: "1mb" }));
-    app.use((_req, res, next) => {
-        res.setHeader("access-control-allow-origin", "http://127.0.0.1:5173");
-        res.setHeader(
-            "access-control-allow-headers",
-            "authorization, content-type"
-        );
-        res.setHeader(
-            "access-control-allow-methods",
-            "DELETE, GET, PATCH, POST, PUT"
-        );
+    app.use(express.urlencoded({ extended: false, limit: "16kb" }));
+    app.use((req, res, next) => {
+        const origin = req.get("origin");
+        if (origin === DEV_ORIGIN) {
+            res.setHeader("access-control-allow-origin", DEV_ORIGIN);
+            res.setHeader("access-control-allow-credentials", "true");
+            res.setHeader("vary", "Origin");
+            res.setHeader(
+                "access-control-allow-headers",
+                "authorization, content-type"
+            );
+            res.setHeader(
+                "access-control-allow-methods",
+                "DELETE, GET, OPTIONS, PATCH, POST, PUT"
+            );
+        }
+        if (req.method === "OPTIONS") {
+            res.sendStatus(origin === DEV_ORIGIN ? 204 : 403);
+            return;
+        }
         setTimeout(next, 100);
     });
 
@@ -73,15 +83,23 @@ async function main() {
                 break;
         }
     }
+    return app;
+}
 
-    app.listen(port, host, () => {
+async function main() {
+    const app = await createMockApp();
+    app.listen(MOCK_PORT, MOCK_HOST, () => {
         process.stdout.write(
-            `Management console mock API listening on http://${host}:${port}\n`
+            `Management console mock API listening on http://${MOCK_HOST}:${MOCK_PORT}\n`
         );
     });
 }
 
-main().catch((error) => {
-    process.stderr.write(`${error instanceof Error ? error.stack : error}\n`);
-    process.exitCode = 1;
-});
+if (process.env.NODE_ENV !== "test") {
+    main().catch((error) => {
+        process.stderr.write(
+            `${error instanceof Error ? error.stack : error}\n`
+        );
+        process.exitCode = 1;
+    });
+}

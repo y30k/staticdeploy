@@ -31,17 +31,28 @@ export function isRoleValid(role: string): boolean {
     );
 }
 
+function normalizePosixPath(path: string) {
+    const normalizedSegments: string[] = [];
+    for (const segment of path.split("/")) {
+        if (!segment || segment === ".") continue;
+        if (segment === "..") normalizedSegments.pop();
+        else normalizedSegments.push(segment);
+    }
+    const normalized = `/${normalizedSegments.join("/")}`;
+    return path.endsWith("/") && normalized !== "/"
+        ? `${normalized}/`
+        : normalized;
+}
+
 export function isEntrypointUrlMatcherValid(urlMatcher: string): boolean {
     const firstSlash = urlMatcher.indexOf("/");
     if (firstSlash === -1) return false;
     const domain = urlMatcher.slice(0, firstSlash);
     const path = urlMatcher.slice(firstSlash);
-    if (!isFQDN(domain, { allow_trailing_dot: false })) return false;
-    if (!path.startsWith("/") || !path.endsWith("/")) return false;
-
-    // WHATWG URL path normalization is browser-native. Equality preserves the
-    // legacy contract that dot segments and non-normalized paths are rejected.
-    const normalizedPath = new URL(path, "https://staticdeploy.invalid")
-        .pathname;
-    return normalizedPath === path;
+    return (
+        isFQDN(domain, { allow_trailing_dot: false }) &&
+        path.startsWith("/") &&
+        path.endsWith("/") &&
+        normalizePosixPath(path) === path
+    );
 }

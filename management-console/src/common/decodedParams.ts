@@ -1,5 +1,5 @@
 import mapValues from "lodash/mapValues";
-import { match as Match } from "react-router";
+import type { match as Match } from "react-router";
 
 export default function decodedParams<
     Params extends { [K in keyof Params]?: string },

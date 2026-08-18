@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
-    base: "./",
+    base: "/",
     plugins: [react()],
     resolve: {
         alias: {
@@ -20,6 +20,8 @@ export default defineConfig({
     },
     server: {
         host: "127.0.0.1",
+        port: 5173,
+        strictPort: true,
     },
     build: {
         outDir: "build",
@@ -27,6 +29,11 @@ export default defineConfig({
     },
     test: {
         environment: "jsdom",
+        environmentOptions: {
+            jsdom: {
+                url: "http://127.0.0.1:5173/",
+            },
+        },
         globals: true,
         setupFiles: ["./test/setup.ts"],
         include: ["test/**/*.ts", "test/**/*.tsx"],

@@ -103,12 +103,19 @@ than Enzyme and tests rendered behavior in JSDOM.
 
 The dynamic `script#app-config` marker remains in `index.html` so the existing
 server embedding path can inject trusted runtime configuration before the Vite
-module entry executes. Vite uses a narrow `@staticdeploy/core/browser` facade;
-it adds no Node core polyfill to the browser bundle. The browser OIDC client is
-exact `oidc-client-ts@3.5.0`, while the local mock token endpoint uses the same
-bounded `jose@5.10.0` CommonJS-compatible release already accepted for backend
-tests. The local mock API is repository-owned and runs loopback-only with
-`yarn workspace @staticdeploy/management-console dev:mock-server`.
+module entry executes. Vite uses root-relative assets so deep-route HTML
+fallback cannot resolve JavaScript beneath the route path. Its build check
+rejects `unsafe-eval`-style code construction. Vite uses a narrow
+`@staticdeploy/core/browser` facade; it adds no Node core polyfill to the
+browser bundle.
+
+The browser OIDC client is exact `oidc-client-ts@3.5.0` and uses Authorization
+Code with PKCE. The repository-owned loopback mock provides one-time codes, an
+exact `127.0.0.1:5173` redirect allowlist, token and JWKS endpoints, and RS256
+tokens using the same bounded `jose@5.10.0` release accepted for backend tests.
+Credentialed CORS and preflight are restricted to that exact origin. Run it with
+`yarn workspace @staticdeploy/management-console dev:mock-server`; it is never a
+production identity provider.
 
 ## Exact registry security corrections
 

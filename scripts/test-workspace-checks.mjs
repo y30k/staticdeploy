@@ -171,7 +171,7 @@ assert.equal(
 const consoleIndex = fs.readFileSync("management-console/index.html", "utf8");
 assert.match(
     consoleIndex,
-    /<script\s+id="app-config"\s+src="\.\/app-config\.js"\s*><\/script>/,
+    /<script\s+id="app-config"\s+src="\/app-config\.js"\s*><\/script>/,
     "The server-injected runtime configuration marker must remain intact"
 );
 assert.match(
@@ -179,4 +179,11 @@ assert.match(
     /<script type="module" src="\/src\/index\.tsx"><\/script>/,
     "The Vite module entry must remain explicit"
 );
+const devConfig = fs.readFileSync(
+    "management-console/public/app-config.js",
+    "utf8"
+);
+assert.match(devConfig, /http:\/\/127\.0\.0\.1:3456/);
+assert.match(devConfig, /http:\/\/127\.0\.0\.1:5173/);
+assert.doesNotMatch(devConfig, /localhost/);
 console.log("Central check contract covers all 13 retained workspaces.");

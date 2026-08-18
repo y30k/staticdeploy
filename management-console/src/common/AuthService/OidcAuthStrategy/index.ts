@@ -29,8 +29,10 @@ export default class OidcAuthStrategy implements IAuthStrategy {
             client_id: clientId,
             redirect_uri: urlUtils.getRedirectUrl(baseRedirectUrl),
             silent_redirect_uri: urlUtils.getSilentRedirectUrl(baseRedirectUrl),
-            response_type: "id_token",
+            response_type: "code",
+            response_mode: "query",
             scope: "openid profile",
+            loadUserInfo: false,
             userStore: new WebStorageStateStore({ store: window.localStorage }),
         });
         this.displayName = providerName;

@@ -12,7 +12,7 @@ describe("OidcAuthStrategy urlUtils", () => {
 
     describe("getRedirectUrl / isRedirectPage", () => {
         it("getRedirectUrl produces a url which marks the page being a redirect page", () => {
-            const baseRedirectUrl = "http://localhost:3000";
+            const baseRedirectUrl = "http://127.0.0.1:5173";
             setLocation(urlUtils.getRedirectUrl(baseRedirectUrl));
             expect(urlUtils.isRedirectPage()).to.equal(true);
         });
@@ -20,7 +20,7 @@ describe("OidcAuthStrategy urlUtils", () => {
 
     describe("getSilentRedirectUrl / isSilentRedirectIframe", () => {
         it("getSilentRedirectUrl produces a url which marks the page being a silent redirect page", () => {
-            const baseRedirectUrl = "http://localhost:3000";
+            const baseRedirectUrl = "http://127.0.0.1:5173";
             setLocation(urlUtils.getSilentRedirectUrl(baseRedirectUrl));
             expect(urlUtils.isSilentRedirectPage()).to.equal(true);
         });

@@ -1,6 +1,6 @@
 import { IGroup, IUser, IUserWithGroups } from "@staticdeploy/core/browser";
 import StaticdeployClient from "@staticdeploy/sdk";
-import { History, Location } from "history";
+import type { History, Location } from "history";
 import React from "react";
 
 import emphasizeString from "../../common/emphasizeString";
