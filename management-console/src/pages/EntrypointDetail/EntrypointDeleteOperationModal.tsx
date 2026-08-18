@@ -1,4 +1,4 @@
-import { IEntrypoint } from "@staticdeploy/core";
+import { IEntrypoint } from "@staticdeploy/core/browser";
 import StaticdeployClient from "@staticdeploy/sdk";
 import { History } from "history";
 import React from "react";

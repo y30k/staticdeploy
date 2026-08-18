@@ -1,4 +1,4 @@
-import { IGroup, UserType } from "@staticdeploy/core";
+import { IGroup, UserType } from "@staticdeploy/core/browser";
 import React from "react";
 import { InjectedFormProps } from "redux-form";
 

@@ -1,4 +1,4 @@
-import { isEntrypointUrlMatcherValid } from "@staticdeploy/core";
+import { isEntrypointUrlMatcherValid } from "@staticdeploy/core/browser";
 
 import { getErrors } from "../../common/configurationUtils";
 import { IInternalFormValues } from "./IFormValues";

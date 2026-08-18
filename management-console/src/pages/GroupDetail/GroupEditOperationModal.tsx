@@ -1,4 +1,4 @@
-import { IGroup } from "@staticdeploy/core";
+import { IGroup } from "@staticdeploy/core/browser";
 import StaticdeployClient from "@staticdeploy/sdk";
 import { History, Location } from "history";
 import React from "react";

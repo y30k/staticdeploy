@@ -1,4 +1,4 @@
-import { IBundle } from "@staticdeploy/core";
+import { IBundle } from "@staticdeploy/core/browser";
 import Table, { ColumnProps } from "antd/lib/table";
 import Tooltip from "antd/lib/tooltip";
 import dayjs from "dayjs";

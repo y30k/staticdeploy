@@ -1,4 +1,4 @@
-import { IUser } from "@staticdeploy/core";
+import { IUser } from "@staticdeploy/core/browser";
 import StaticdeployClient from "@staticdeploy/sdk";
 import { History } from "history";
 import React from "react";

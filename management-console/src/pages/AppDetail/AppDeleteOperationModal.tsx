@@ -1,4 +1,4 @@
-import { IApp } from "@staticdeploy/core";
+import { IApp } from "@staticdeploy/core/browser";
 import StaticdeployClient from "@staticdeploy/sdk";
 import { History } from "history";
 import React from "react";

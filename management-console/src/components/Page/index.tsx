@@ -6,6 +6,7 @@ import "./index.css";
 interface IProps {
     title?: React.ReactNode;
     actions?: React.ReactNode[];
+    children?: React.ReactNode;
 }
 
 export default class Page extends React.Component<IProps> {

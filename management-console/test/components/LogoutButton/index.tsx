@@ -1,25 +1,23 @@
+import { fireEvent, render } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
 import sinon from "sinon";
 
 import LogoutButton from "../../../src/components/LogoutButton";
 
 describe("LogoutButton", () => {
     it("doesn't render when auth is not enforced", () => {
-        const authService = { authEnforced: false };
-        const logoutButton = shallow(
-            <LogoutButton authService={authService as any} />
+        const { container } = render(
+            <LogoutButton authService={{ authEnforced: false } as any} />
         );
-        expect(logoutButton.isEmptyRender()).to.equal(true);
+        expect(container.childElementCount).to.equal(0);
     });
 
-    it("on click, calls the authService logout method", () => {
+    it("calls the auth service logout method when clicked", () => {
         const authService = { authEnforced: true, logout: sinon.spy() };
-        const logoutButton = shallow(
+        const { container } = render(
             <LogoutButton authService={authService as any} />
         );
-        logoutButton.find("div").simulate("click");
+        fireEvent.click(container.querySelector(".c-LogoutButton")!);
         expect(authService.logout).to.have.callCount(1);
     });
 });

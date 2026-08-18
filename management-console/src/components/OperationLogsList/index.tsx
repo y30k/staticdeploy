@@ -1,10 +1,10 @@
-import { IOperationLog, Operation } from "@staticdeploy/core";
+import { IOperationLog, Operation } from "@staticdeploy/core/browser";
 import Table, { ColumnProps } from "antd/lib/table";
 import Tag from "antd/lib/tag";
 import dayjs from "dayjs";
 import sortBy from "lodash/sortBy";
 import React from "react";
-import JSONTree from "react-json-tree";
+import { JSONTree } from "react-json-tree";
 import { Link } from "react-router-dom";
 
 import "./index.css";

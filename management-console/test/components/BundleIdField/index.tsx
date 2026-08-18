@@ -1,12 +1,13 @@
 import { expect } from "chai";
 import sinon, { SinonFakeTimers } from "sinon";
+import { afterAll } from "vitest";
 
 import { WrappedBundleIdField } from "../../../src/components/BundleIdField";
 
 describe("BundleIdField", () => {
     describe("getOptions method", () => {
         let clock: SinonFakeTimers;
-        after(() => {
+        afterAll(() => {
             clock.restore();
         });
 

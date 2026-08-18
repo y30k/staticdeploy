@@ -18,7 +18,6 @@ node scripts/check-install-policy.mjs
 node scripts/test-install-policy.mjs
 yarn install --immutable
 yarn check:install-scripts
-yarn provision:optipng
 ```
 
 Immutable installs must not change `yarn.lock`. TypeScript `5.9.3` is
@@ -52,15 +51,13 @@ Lerna's Nx-backed runner is disabled because its postinstall is blocked; Lerna
 10 uses its supported legacy task runner instead. Do not enable scripts
 globally.
 
-## Reviewed legacy build binary
+## Retired website source
 
-The retired website workspace still requires `optipng-bin@5.1.0` to compile, but
-its upstream postinstall downloads and executes mutable remote content. That
-postinstall remains blocked. `yarn provision:optipng` instead downloads the
-reviewed Linux x64 artifact, verifies its repository-owned SHA-256 before it can
-execute, and fails on unsupported platforms or digest mismatch. This narrow
-bridge is for retained compile evidence only and must not be reused for release
-artifacts.
+The Docusaurus 1 website is no longer an installable Yarn workspace and its
+publication path remains retired. Historical website source and documentation
+stay in the repository for reference and remain covered by centralized format
+and lint checks, but modern install, compile, test, image, and audit graphs do
+not resolve Docusaurus or its mutable image-optimization binaries.
 
 ## Central quality checks
 
@@ -77,16 +74,16 @@ compiled `lib/` artifacts; the supported execution order is therefore
 tooling scripts, the CLI executable, and all owned website JavaScript are
 included in the centralized lint/format paths.
 
-ESLint covers retained TypeScript/TSX and the website's JavaScript/React. Narrow
-exceptions are documented beside their rules in `eslint.config.mjs`: only the
-exact inventoried v1 serialization, adapter, form, callback, test, and typing
-boundary files may retain explicit `any` until M2-04/M4 replaces those
-contracts; new files remain prohibited. TypeScript owns unused-symbol
-correctness, typed console props do not duplicate runtime PropTypes, and
-Docusaurus v1 receives dynamic props. The configuration still applies ESLint,
-typescript-eslint, and React recommended correctness rules and rejects unused
-disable comments. Add exceptions only for an exact rule and file scope with a
-rationale; do not add blanket file or project disables.
+ESLint covers retained TypeScript/TSX and the historical website's
+JavaScript/React. Narrow exceptions are documented beside their rules in
+`eslint.config.mjs`: only the exact inventoried v1 serialization, adapter, form,
+callback, test, and typing boundary files may retain explicit `any` until
+M2-04/M4 replaces those contracts; new files remain prohibited. TypeScript owns
+unused-symbol correctness and typed console props do not duplicate runtime
+PropTypes. The configuration still applies ESLint, typescript-eslint, and React
+recommended correctness rules and rejects unused disable comments. Add
+exceptions only for an exact rule and file scope with a rationale; do not add
+blanket file or project disables.
 
 Prettier `3.6.2` centralizes the supported formatting contract. Its one-time,
 mechanical output update is included with this migration and does not alter
@@ -95,17 +92,23 @@ forwarding workspace configs and copies of formatter dependencies are forbidden
 by the workspace-contract test. Dependency-managed Git hooks were removed
 because GitHub Actions required checks are authoritative.
 
-## Legacy console build bridge
+## Management console build and test foundation
 
-Only `@staticdeploy/management-console`'s `compile` command sets
-`NODE_OPTIONS=--openssl-legacy-provider`, `SKIP_PREFLIGHT_CHECK=true`, and
-`DISABLE_ESLINT_PLUGIN=true`. All three are build-only compatibility bridges for
-CRA 4/Webpack 4: the OpenSSL bridge permits Webpack 4 hashing, the preflight
-bridge permits the centralized supported TypeScript/ESLint versions, and the
-ESLint-plugin bridge prevents CRA from invoking its obsolete embedded lint
-toolchain after the root ESLint phase has passed. None is set globally, in
-tests, or in service runtime configuration. Work item M4-10 must remove all
-three bridges when CRA/Webpack 4 is replaced.
+`@staticdeploy/management-console` builds with exact Vite `8.2.1` and the React
+plugin `6.0.5`; CRA, Webpack 4, the OpenSSL legacy provider, preflight bypass,
+and embedded-lint bypass are removed. React `18.3.1` and Ant Design `5.29.3`
+are the supported compatibility line while M4-11 still owns routing and form
+replacement. The console's Vitest `4.1.10` suite uses Testing Library rather
+than Enzyme and tests rendered behavior in JSDOM.
+
+The dynamic `script#app-config` marker remains in `index.html` so the existing
+server embedding path can inject trusted runtime configuration before the Vite
+module entry executes. Vite uses a narrow `@staticdeploy/core/browser` facade;
+it adds no Node core polyfill to the browser bundle. The browser OIDC client is
+exact `oidc-client-ts@3.5.0`, while the local mock token endpoint uses the same
+bounded `jose@5.10.0` CommonJS-compatible release already accepted for backend
+tests. The local mock API is repository-owned and runs loopback-only with
+`yarn workspace @staticdeploy/management-console dev:mock-server`.
 
 ## Bounded CommonJS package bridges
 
@@ -118,12 +121,12 @@ legacy CLI or reassess its output boundary while splitting the supported runtime
 commands.
 
 Core likewise retains the CommonJS-compatible `mime@3` and
-`escape-string-regexp@4` release lines. It also temporarily retains `md5@2`: the
-core barrel is consumed through its browser build, and CRA/Webpack 4 cannot
-resolve `node:crypto` even though bundle creation runs on the backend. M4-05
-owns separating the server-only bundle finalizer from browser exports, replacing
-the legacy MD5 implementation with Node crypto, and replacing the MIME bridge
-when the v2 release finalizer takes over content detection. The M4 application
+`escape-string-regexp@4` release lines. It also temporarily retains `md5@2` in
+the server-oriented barrel. The Vite console now consumes the narrow
+`@staticdeploy/core/browser` facade and receives no Node crypto polyfill; M4-05
+still owns separating the server-only bundle finalizer from the package's main
+exports, replacing the legacy MD5 implementation with Node crypto, and replacing
+the MIME bridge when the v2 release finalizer takes over content detection. The M4 application
 and content-route implementation owns removing the legacy role-matcher escape
 bridge. No browser shim, hidden require, crypto polyfill, or newer ESM-only
 major may be loaded through an ad hoc dynamic-import wrapper in the current

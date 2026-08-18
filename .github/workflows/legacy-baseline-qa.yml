@@ -53,8 +53,6 @@ jobs:
               run: yarn install --immutable
             - name: Verify install-script inventory
               run: yarn check:install-scripts
-            - name: Provision checksum-verified build tool
-              run: yarn provision:optipng
             - name: Check formatting
               run: yarn format:check
             - name: Lint retained source

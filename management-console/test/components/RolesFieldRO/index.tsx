@@ -1,18 +1,17 @@
+import { render, screen } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
 
 import RolesFieldRO from "../../../src/components/RolesFieldRO";
 
 describe("RolesFieldRO", () => {
     it("renders each role", () => {
-        const rolesFieldRO = shallow(
+        render(
             <RolesFieldRO
                 title="title"
                 roles={["root", "app-manager:12345678"]}
             />
         );
-        expect(rolesFieldRO.contains("root")).to.equal(true);
-        expect(rolesFieldRO.contains("app-manager:12345678")).to.equal(true);
+        expect(screen.getByText("root")).to.not.equal(null);
+        expect(screen.getByText("app-manager:12345678")).to.not.equal(null);
     });
 });

@@ -24,6 +24,7 @@ type SuccessMessageFunction<Result> = (result: Result) => React.ReactNode;
 
 interface IProps<Result> {
     title: React.ReactNode;
+    children?: React.ReactNode;
     operation: (staticdeployClient: StaticdeployClient) => Promise<Result>;
     trigger?: React.ReactNode;
     cancelButtonText?: React.ReactNode;

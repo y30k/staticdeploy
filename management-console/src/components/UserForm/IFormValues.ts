@@ -1,4 +1,4 @@
-import { UserType } from "@staticdeploy/core";
+import { UserType } from "@staticdeploy/core/browser";
 
 export interface IInternalFormValues {
     idp: string;

@@ -1,7 +1,7 @@
 import PlusOutlined from "@ant-design/icons/PlusOutlined";
 import RobotOutlined from "@ant-design/icons/RobotOutlined";
 import UserOutlined from "@ant-design/icons/UserOutlined";
-import { IGroup, IUser, UserType } from "@staticdeploy/core";
+import { IGroup, IUser, UserType } from "@staticdeploy/core/browser";
 import isNil from "lodash/isNil";
 import React from "react";
 import { RouteComponentProps } from "react-router-dom";

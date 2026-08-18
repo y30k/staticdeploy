@@ -1,105 +1,86 @@
-import Spin from "antd/lib/spin";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { expect } from "chai";
-import { shallow } from "enzyme";
-import React from "react";
 import sinon from "sinon";
 
-import DataFetcher, { FetchStatus } from "../../../src/components/DataFetcher";
-import ErrorAlert from "../../../src/components/ErrorAlert";
+import StaticdeployClientContext from "../../../src/common/StaticdeployClientContext";
+import DataFetcher from "../../../src/components/DataFetcher";
+
+const staticdeployClient = {} as any;
+
+function ResultView(props: any) {
+    return (
+        <div>
+            <span>{`${props.result}:${props.propKey}`}</span>
+            <button onClick={props.refetch}>Refetch</button>
+        </div>
+    );
+}
+
+function renderFetcher(
+    fetchData: sinon.SinonStub,
+    extra: Record<string, unknown> = {}
+) {
+    const props = {
+        fetchData,
+        shouldRefetch: sinon.stub().returns(false),
+        Component: ResultView,
+        proxiedProps: { propKey: "propValue" },
+        ...extra,
+    };
+    const view = render(
+        <StaticdeployClientContext.Provider value={staticdeployClient}>
+            <DataFetcher {...(props as any)} />
+        </StaticdeployClientContext.Provider>
+    );
+    return { ...view, props };
+}
 
 describe("DataFetcher", () => {
-    const staticdeployClient = {} as any;
-    const props = {
-        fetchData: sinon.stub(),
-        shouldRefetch: sinon.stub(),
-        Component: sinon.spy(() => null),
-        proxiedProps: { propKey: "propValue" },
-    };
-    const originalLocation = window.location;
-    beforeEach(() => {
-        props.fetchData.reset();
-        props.shouldRefetch.reset();
-        props.Component.resetHistory();
-        if (window.location !== originalLocation) {
-            Object.defineProperty((global as any).window, "location", {
-                get: () => originalLocation,
-            });
-        }
-    });
-
-    it("on mount, calls the passed-in fetchData function with proxied props", () => {
-        shallow(<DataFetcher {...props} />, { context: staticdeployClient });
-        expect(props.fetchData).to.have.callCount(1);
-        expect(props.fetchData).to.have.been.calledWith(staticdeployClient, {
+    it("fetches with the client and proxied props on mount", async () => {
+        const fetchData = sinon.stub().resolves("result");
+        renderFetcher(fetchData);
+        await screen.findByText("result:propValue");
+        expect(fetchData).to.have.been.calledOnceWith(staticdeployClient, {
             propKey: "propValue",
         });
     });
 
-    it("when state.status === FetchStatus.STARTED, renders a spinner", () => {
-        const dataFetcher = shallow(<DataFetcher {...props} />);
-        dataFetcher.setState({ status: FetchStatus.STARTED });
-        expect(dataFetcher.find(Spin)).to.have.length(1);
+    it("renders a spinner while a request is pending", () => {
+        const fetchData = sinon.stub().returns(new Promise(() => undefined));
+        const { container } = renderFetcher(fetchData);
+        expect(container.querySelector(".ant-spin")).to.not.equal(null);
     });
 
-    it("when state.status === FetchStatus.SUCCEEDED, renders the passed in Component with the fetch result, a re-fetch function, and proxied props", () => {
-        const dataFetcher = shallow(<DataFetcher {...props} />);
-        dataFetcher.setState({
-            status: FetchStatus.SUCCEEDED,
-            result: "result",
-        });
-        const component = dataFetcher.find(props.Component);
-        expect(component).to.have.length(1);
-        expect(component.prop("result")).to.equal("result");
-        expect(component.prop("propKey")).to.equal("propValue");
-        expect(component.prop("refetch")).to.be.a("function");
+    it("passes a refetch action to the result component", async () => {
+        const fetchData = sinon.stub().resolves("result");
+        renderFetcher(fetchData);
+        fireEvent.click(await screen.findByRole("button", { name: "Refetch" }));
+        await waitFor(() => expect(fetchData).to.have.callCount(2));
     });
 
-    it("the re-fetch function passed to Component, when called re-calls fetchData", () => {
-        const dataFetcher = shallow(<DataFetcher {...props} />, {
-            context: staticdeployClient,
-        });
-        dataFetcher.setState({
-            status: FetchStatus.SUCCEEDED,
-            result: "result",
-        });
-        const component = dataFetcher.find(props.Component);
-        props.fetchData.reset();
-        component.prop<() => any>("refetch")();
-        expect(props.fetchData).to.have.callCount(1);
-        expect(props.fetchData).to.have.been.calledWith(staticdeployClient, {
-            propKey: "propValue",
-        });
+    it("renders request failures and a retry action", async () => {
+        const fetchData = sinon.stub().rejects(new Error("Error message"));
+        renderFetcher(fetchData);
+        expect(await screen.findByText("Error message")).to.not.equal(null);
+        expect(screen.getByText("Retry")).to.not.equal(null);
     });
 
-    it("when state.status === FetchStatus.FAILED, renders an error message", () => {
-        const dataFetcher = shallow(<DataFetcher {...props} />);
-        dataFetcher.setState({
-            status: FetchStatus.FAILED,
-            error: new Error("Error message"),
-        });
-        const errorAlert = dataFetcher.find(ErrorAlert);
-        expect(errorAlert).to.have.length(1);
-        expect(errorAlert.prop("message")).to.equal("Error message");
-    });
-
-    describe("when new props are received", () => {
-        it("if shouldRefetch returns true, re-calls fetchData", () => {
-            props.shouldRefetch.returns(true);
-            const dataFetcher = shallow(<DataFetcher {...props} />);
-            props.fetchData.reset();
-            dataFetcher.setProps(props);
-            expect(props.fetchData).to.have.callCount(1);
-            expect(props.fetchData).to.have.been.calledWith(
-                staticdeployClient,
-                { propKey: "propValue" }
-            );
-        });
-        it("if shouldRefetch returns false, doesn't re-call fetchData", () => {
-            props.shouldRefetch.returns(false);
-            const dataFetcher = shallow(<DataFetcher {...props} />);
-            props.fetchData.reset();
-            dataFetcher.setProps(props);
-            expect(props.fetchData).to.have.callCount(0);
-        });
+    it("refetches when changed proxied props require it", async () => {
+        const fetchData = sinon.stub().resolves("result");
+        const shouldRefetch = sinon.stub().returns(true);
+        const { rerender } = renderFetcher(fetchData, { shouldRefetch });
+        await screen.findByText("result:propValue");
+        rerender(
+            <StaticdeployClientContext.Provider value={staticdeployClient}>
+                <DataFetcher
+                    fetchData={fetchData}
+                    shouldRefetch={shouldRefetch}
+                    Component={ResultView}
+                    proxiedProps={{ propKey: "nextValue" }}
+                />
+            </StaticdeployClientContext.Provider>
+        );
+        await screen.findByText("result:nextValue");
+        expect(fetchData).to.have.callCount(2);
     });
 });

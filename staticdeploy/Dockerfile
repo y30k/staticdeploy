@@ -7,8 +7,8 @@ WORKDIR /opt/staticdeploy
 # Use the repository-pinned Yarn release and immutable node-modules install.
 COPY package.json lerna.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY config/install-scripts.json ./config/install-scripts.json
-COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs scripts/provision-optipng.mjs ./scripts/
-COPY management-console/package.json management-console/tsconfig.json ./management-console/
+COPY scripts/check-install-policy.mjs scripts/check-install-scripts.mjs ./scripts/
+COPY management-console/package.json management-console/tsconfig.json management-console/index.html management-console/vite.config.mts ./management-console/
 COPY cli/package.json ./cli/
 COPY core/package.json core/tsconfig.json core/tsconfig.browser.json ./core/
 COPY http-adapters/package.json http-adapters/tsconfig.json ./http-adapters/
@@ -21,7 +21,6 @@ COPY serve-static/package.json serve-static/tsconfig.json ./serve-static/
 COPY staticdeploy/package.json staticdeploy/tsconfig.json ./staticdeploy/
 COPY storages-test-suite/package.json storages-test-suite/tsconfig.json ./storages-test-suite/
 COPY tar-archiver/package.json tar-archiver/tsconfig.json ./tar-archiver/
-COPY website/package.json ./website/
 
 COPY management-console/public ./management-console/public/
 COPY management-console/src ./management-console/src/
@@ -43,11 +42,10 @@ RUN corepack enable && \
     node scripts/check-install-policy.mjs && \
     yarn install --immutable && \
     yarn check:install-scripts && \
-    yarn provision:optipng && \
     yarn lerna run compile --scope=@staticdeploy/staticdeploy --include-dependencies --stream --concurrency 1 && \
     yarn workspaces focus @staticdeploy/staticdeploy --production && \
     rm yarn.lock tsconfig.json && \
-    rm -rf management-console/tsconfig.json management-console/public management-console/src && \
+    rm -rf management-console/tsconfig.json management-console/vite.config.mts management-console/index.html management-console/public management-console/src && \
     rm -rf core/tsconfig.json core/tsconfig.browser.json core/src && \
     rm -rf http-adapters/tsconfig.json http-adapters/src && \
     rm -rf jwt-authentication-strategy/tsconfig.json jwt-authentication-strategy/src && \

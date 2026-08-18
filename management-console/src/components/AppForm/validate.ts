@@ -1,4 +1,4 @@
-import { isAppNameValid } from "@staticdeploy/core";
+import { isAppNameValid } from "@staticdeploy/core/browser";
 
 import { getErrors } from "../../common/configurationUtils";
 import { IInternalFormValues } from "./IFormValues";

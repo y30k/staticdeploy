@@ -1,4 +1,4 @@
-import { isRoleValid } from "@staticdeploy/core";
+import { isRoleValid } from "@staticdeploy/core/browser";
 import set from "lodash/set";
 
 import { IInternalFormValues } from "./IFormValues";

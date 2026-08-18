@@ -1,26 +1,32 @@
+import { cleanup } from "@testing-library/react";
 import chai from "chai";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { configure } from "enzyme";
-import Adapter from "@wojtekmaj/enzyme-adapter-react-17";
-import "ignore-styles";
-import jsdomGlobal from "jsdom-global";
 import sinonChai from "sinon-chai";
+import { afterEach } from "vitest";
 
-// Setup dayjs
+// Match the production date formatting setup.
 dayjs.extend(relativeTime);
 
-// Setup jsdom
-jsdomGlobal(undefined, { pretendToBeVisual: true });
-(global as any).requestAnimationFrame = (
-    global as any
-).window.requestAnimationFrame;
-(global as any).cancelAnimationFrame = (
-    global as any
-).window.cancelAnimationFrame;
+// Ant Design uses these browser APIs in components and responsive hooks.
+globalThis.matchMedia ??= (() => ({
+    matches: false,
+    media: "",
+    onchange: null,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    dispatchEvent: () => false,
+})) as typeof globalThis.matchMedia;
+globalThis.ResizeObserver ??= class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+globalThis.requestAnimationFrame ??= (callback) =>
+    setTimeout(callback, 0) as unknown as number;
+globalThis.cancelAnimationFrame ??= (handle) => clearTimeout(handle);
 
-// Setup enzyme
-configure({ adapter: new Adapter() });
-
-// Setup chai
 chai.use(sinonChai);
+afterEach(() => cleanup());
