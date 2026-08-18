@@ -253,6 +253,22 @@ architecture-normalized component/version/license multiset; arm64 also uses
 separately retained base SBOM bytes and the same reviewed notice, source, and
 hardening contract.
 
+## Exact M2 gate
+
+The required `legacy-baseline-qa` and `scans-and-images` contexts are jobs in one
+workflow. The first retains supported-toolchain, coverage, PostgreSQL, and MinIO
+evidence; an internal scan job retains the sanitized policy and dual-platform
+image evidence. The required `scans-and-images` context is the final aggregator:
+it runs only after both evidence jobs, invokes `./scripts/gates/m2-toolchain.sh`,
+and uploads `m2-gate-manifest.json`.
+
+The gate rejects mixed commits or lockfiles, incomplete toolchain checks,
+blocking vulnerability/secret/license results, missing raw-output cleanup,
+architecture or digest mismatches, failed conformance, registry-associated
+images, and unequal normalized image inventories. Its manifest retains one
+commit plus exact amd64/arm64 OCI manifest, configuration, layer, and
+conformance digests. It never publishes or deploys an artifact.
+
 ## Distribution
 
 These commands install, check, compile, test, report, and build locally only.

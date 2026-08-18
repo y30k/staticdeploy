@@ -11,8 +11,79 @@ permissions:
     contents: read
 
 jobs:
-    scans-and-images:
-        name: scans-and-images
+    legacy-baseline-qa:
+        name: legacy-baseline-qa
+        runs-on: ubuntu-22.04
+        timeout-minutes: 30
+        services:
+            postgres:
+                image: postgres:13@sha256:4689940c683801b4ab839ab3b0a0a3555a5fe425371422310944e89eca7d8068
+                env:
+                    POSTGRES_PASSWORD: password
+                options: >-
+                    --health-cmd "pg_isready -U postgres" --health-interval 10s
+                    --health-timeout 5s --health-retries 5
+                ports:
+                    - 5432:5432
+        steps:
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+              with:
+                  node-version: 24.19.0
+            - name: Start disposable MinIO
+              run: |
+                  docker run --detach --rm --name staticdeploy-test-minio \
+                    --publish 127.0.0.1:9000:9000 \
+                    --env MINIO_ACCESS_KEY=accessKeyId \
+                    --env MINIO_SECRET_KEY=secretAccessKey \
+                    minio/minio:RELEASE.2021-11-24T23-19-33Z@sha256:0b72f427261aa0d37f3c42d46ab6d2e5e47309bf5922bed5fbbbd68518521b08 server /data
+                  for _ in {1..30}; do
+                    curl --fail --silent --show-error http://127.0.0.1:9000/minio/health/live && exit 0
+                    sleep 1
+                  done
+                  docker logs staticdeploy-test-minio
+                  exit 1
+            - name: Enable pinned Yarn
+              run: |
+                  corepack enable
+                  test "$(yarn --version)" = "4.18.0"
+            - name: Verify pre-install policy and negative cases
+              run: |
+                  node scripts/check-install-policy.mjs
+                  node scripts/test-install-policy.mjs
+            - name: Install immutable dependencies
+              run: yarn install --immutable
+            - name: Verify install-script inventory
+              run: yarn check:install-scripts
+            - name: Check formatting
+              run: yarn format:check
+            - name: Lint retained source
+              run: yarn lint
+            - name: Typecheck all workspaces without emit
+              run: yarn typecheck
+            - name: Compile workspaces
+              run: yarn compile
+            - name: Run centralized unit and integration tests with coverage
+              run: yarn coverage
+            - name: Record exact supported-toolchain evidence
+              run:
+                  node scripts/write-m2-toolchain-evidence.mjs
+                  reports/toolchain-evidence.json
+            - name: Upload coverage report
+              if: always()
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+              with:
+                  name: supported-toolchain-coverage
+                  path: |
+                      coverage/
+                      management-console/coverage/
+                      reports/toolchain-evidence.json
+                  if-no-files-found: error
+
+    scans-evidence:
+        name: scans-and-images-evidence
         runs-on: ubuntu-22.04
         timeout-minutes: 60
         steps:
@@ -39,6 +110,8 @@ jobs:
                   node scripts/test-security-policy.mjs
                   node scripts/test-sanitize-trufflehog.mjs
                   node scripts/test-multiarch-workflow.mjs
+                  docker run --rm --volume "$PWD:/repo:ro" --workdir /repo \
+                    rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
                   yarn check:install-scripts
             - name:
                   Build and smoke exact local amd64 and arm64 images without
@@ -275,4 +348,54 @@ jobs:
                       github.run_attempt }}
                   path: artifact-evidence/
                   if-no-files-found: error
-                  retention-days: 14
+                  retention-days: 30
+
+    m2-gate:
+        name: scans-and-images
+        if: always()
+        needs: [legacy-baseline-qa, scans-evidence]
+        runs-on: ubuntu-22.04
+        timeout-minutes: 10
+        steps:
+            - name: Require complete prerequisite jobs
+              env:
+                  TOOLCHAIN_RESULT: ${{ needs['legacy-baseline-qa'].result }}
+                  SCANS_RESULT: ${{ needs['scans-evidence'].result }}
+              run: |
+                  test "$TOOLCHAIN_RESULT" = success
+                  test "$SCANS_RESULT" = success
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+              with:
+                  node-version: 24.19.0
+            - name: Install pinned gate policy dependency
+              run: |
+                  corepack enable
+                  test "$(yarn --version)" = "4.18.0"
+                  node scripts/check-install-policy.mjs
+                  yarn install --immutable
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: supported-toolchain-coverage
+                  path: gate-input/toolchain
+            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  pattern: m2-security-policy-reports-*
+                  path: gate-input/security
+                  merge-multiple: true
+            - name: Close exact local M2 gate
+              run: >-
+                  ./scripts/gates/m2-toolchain.sh
+                  gate-input/toolchain/reports/toolchain-evidence.json
+                  gate-input/security reports/m2-gate-manifest.json
+            - name: Upload exact M2 gate manifest
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+              with:
+                  name:
+                      m2-toolchain-gate-${{ github.run_id }}-${{
+                      github.run_attempt }}
+                  path: reports/m2-gate-manifest.json
+                  if-no-files-found: error
+                  retention-days: 30
