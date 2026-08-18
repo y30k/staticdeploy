@@ -23,8 +23,7 @@ class GroupForm extends React.Component<
     }
 }
 
-export interface IGroupFormInstance
-    extends IConverterForm<IExternalFormValues> {}
+export type IGroupFormInstance = IConverterForm<IExternalFormValues>;
 
 export default reduxForm<IExternalFormValues, IInternalFormValues>({
     form: "GroupForm",

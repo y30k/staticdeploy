@@ -66,10 +66,10 @@ export default class LoginMask extends React.Component<IProps> {
         const content = authStatus.loginError
             ? this.renderError(authStatus.loginError!)
             : authStatus.requiresUserCreation
-            ? this.renderRequiresUserCreationError(
-                  authStatus.requiresUserCreationError!
-              )
-            : this.renderLogins();
+              ? this.renderRequiresUserCreationError(
+                    authStatus.requiresUserCreationError!
+                )
+              : this.renderLogins();
         return (
             <div className="c-LoginMask">
                 <Card className="c-LoginMask-card">

@@ -1,7 +1,8 @@
-// tslint:disable:ban-types
 import log from "./log";
 
-export default function handleCommandHandlerErrors<T extends Function>(
+type CommandHandler = (this: any, ...args: any[]) => any;
+
+export default function handleCommandHandlerErrors<T extends CommandHandler>(
     commandHandler: T
 ): T {
     // Don't wrap the command handler when testing, to make it easier to test
@@ -9,12 +10,15 @@ export default function handleCommandHandlerErrors<T extends Function>(
     if (process.env.NODE_ENV === "test") {
         return commandHandler;
     }
-    return async function commandHandlerWrapper(this: any) {
+    return async function commandHandlerWrapper(
+        this: ThisParameterType<T>,
+        ...args: Parameters<T>
+    ) {
         try {
-            return await commandHandler.apply(this, arguments);
+            return await commandHandler.apply(this, args);
         } catch (err) {
             log.error(err.message);
             process.exit(1);
         }
-    } as any;
+    } as T;
 }

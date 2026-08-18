@@ -4,7 +4,11 @@
         "target": "es5",
         "module": "esnext",
         "moduleResolution": "node",
-        "lib": ["dom", "dom.iterable", "esnext"],
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ],
         "types": [
             "@types/chai",
             "@types/enzyme",
@@ -25,7 +29,6 @@
         ],
         "jsx": "react-jsx",
         "allowSyntheticDefaultImports": true,
-        "suppressImplicitAnyIndexErrors": true,
         "allowJs": true,
         "skipLibCheck": true,
         "strict": true,
@@ -33,5 +36,7 @@
         "isolatedModules": true,
         "noEmit": true
     },
-    "include": ["src"]
+    "include": [
+        "src"
+    ]
 }

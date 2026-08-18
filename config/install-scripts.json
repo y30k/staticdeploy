@@ -59,15 +59,6 @@
             }
         },
         {
-            "package": "husky",
-            "version": "4.3.8",
-            "allowed": false,
-            "scripts": {
-                "install": "node husky install",
-                "postinstall": "opencollective-postinstall || exit 0"
-            }
-        },
-        {
             "package": "jpegtran-bin",
             "version": "4.0.0",
             "allowed": false,

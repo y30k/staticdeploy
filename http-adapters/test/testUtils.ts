@@ -46,7 +46,7 @@ function getServer(
     return express()
         .use((req: IBaseRequest, _res, next) => {
             req.makeUsecase = (name: string) =>
-                ({ exec: execMocks[name] } as any);
+                ({ exec: execMocks[name] }) as any;
             next();
         })
         .use(mountPath, app);

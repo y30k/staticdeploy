@@ -28,9 +28,11 @@ export interface IConverterForm<ExternalValues> {
     getValues: () => ExternalValues;
 }
 
-export function reduxForm<ExternalValues, InternalValues, AdditionalProps = {}>(
-    config: IConfig<ExternalValues, InternalValues>
-) {
+export function reduxForm<
+    ExternalValues,
+    InternalValues,
+    AdditionalProps = object,
+>(config: IConfig<ExternalValues, InternalValues>) {
     const toInternal: any = config.toInternal || identity;
     const toExternal: any = config.toExternal || identity;
     return (
@@ -49,7 +51,7 @@ export function reduxForm<ExternalValues, InternalValues, AdditionalProps = {}>(
         {
             private form!: FormInstance<
                 InternalValues,
-                Partial<ConfigProps<InternalValues, {}>>
+                Partial<ConfigProps<InternalValues, object>>
             >;
             submit(): Promise<any> {
                 return this.form.submit();

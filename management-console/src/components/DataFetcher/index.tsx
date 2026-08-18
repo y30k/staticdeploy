@@ -39,7 +39,7 @@ interface IState<FecthDataResult> {
 
 export default class DataFetcher<
     FecthDataResult,
-    ProxiedProps
+    ProxiedProps,
 > extends React.Component<
     IProps<FecthDataResult, ProxiedProps>,
     IState<FecthDataResult>

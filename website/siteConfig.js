@@ -17,21 +17,21 @@ module.exports = {
         { label: "Docs", doc: "getting-started-overview" },
         {
             label: "GitHub",
-            href: "https://github.com/staticdeploy/staticdeploy"
+            href: "https://github.com/staticdeploy/staticdeploy",
         },
         {
             label: "Privacy",
-            href: "./privacyPolicy"
-        }
+            href: "./privacyPolicy",
+        },
     ],
     headerIcon: "images/logo.svg",
     favicon: "images/favicon.png",
     colors: {
         primaryColor: "#4a90e2",
-        secondaryColor: "#33639d"
+        secondaryColor: "#33639d",
     },
     copyright: `Copyright © ${new Date().getFullYear()} Paolo Scanferla`,
     highlight: {
-        theme: "default"
-    }
+        theme: "default",
+    },
 };

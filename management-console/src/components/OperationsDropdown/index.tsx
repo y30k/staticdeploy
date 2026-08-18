@@ -38,7 +38,6 @@ export default class OperationsDropdown extends React.Component<IProps> {
                 trigger={["click"]}
                 placement="bottomRight"
             >
-                {/* eslint-disable-next-line */}
                 <a className="c-OperationsDropdown-link ant-dropdown-link">
                     {"Actions "}
                     <DownOutlined />

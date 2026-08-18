@@ -71,16 +71,14 @@ export default (storages: IStorages) => {
                 createdAt: new Date(),
                 updatedAt: new Date(),
             });
-            const anyUserExists = await storages.users.anyExistsWithGroup(
-                "id0"
-            );
+            const anyUserExists =
+                await storages.users.anyExistsWithGroup("id0");
             expect(anyUserExists).to.equal(true);
         });
 
         it("check if (at least) one user with a non-existing groupId exists and get false", async () => {
-            const anyUserExists = await storages.users.anyExistsWithGroup(
-                "id0"
-            );
+            const anyUserExists =
+                await storages.users.anyExistsWithGroup("id0");
             expect(anyUserExists).to.equal(false);
         });
 

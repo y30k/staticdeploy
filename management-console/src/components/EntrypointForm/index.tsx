@@ -90,8 +90,7 @@ class EntrypointForm extends React.Component<
     }
 }
 
-export interface IEntrypointFormInstance
-    extends IConverterForm<IExternalFormValues> {}
+export type IEntrypointFormInstance = IConverterForm<IExternalFormValues>;
 
 export default reduxForm<IExternalFormValues, IInternalFormValues, IProps>({
     form: "EntrypointForm",

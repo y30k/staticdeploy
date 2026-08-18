@@ -14,9 +14,8 @@ export default class CreateRootUserAndGroup {
         const now = new Date();
 
         // Create the root group if it doesn't exist
-        let rootGroup = await this.storages.groups.findOneByName(
-            ROOT_GROUP_NAME
-        );
+        let rootGroup =
+            await this.storages.groups.findOneByName(ROOT_GROUP_NAME);
         if (!rootGroup) {
             rootGroup = await this.storages.groups.createOne({
                 id: generateId(),

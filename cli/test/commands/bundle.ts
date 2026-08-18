@@ -179,7 +179,9 @@ describe("bundle command", () => {
                 ...commonOptions,
                 from: join(targetTree, "target"),
             });
-            const { content } = bundlesCreateStub.getCall(0).args[0];
+            const { content } = bundlesCreateStub.getCall(0).args[0] as {
+                content: string;
+            };
             const files = await tarArchiver.extractFiles(
                 Buffer.from(content, "base64")
             );

@@ -18,17 +18,19 @@ Dependency lifecycle scripts are globally disabled. See
 [`docs/toolchain.md`](docs/toolchain.md) before changing a resolved dependency
 that declares an install script.
 
-From the project's root directory, you can run the following npm scripts:
+From the project's root directory, run the centralized checks used by CI:
 
-- `yarn lint`: runs each subproject's code linters
-- `yarn test`: runs each subproject's tests
-- `yarn coverage`: runs each subproject's tests, calculates global code coverage
-- `yarn compile`: compiles each subproject's code
-- `yarn lerna ...`: runs lerna with the supplied command line options
+- `yarn format:check`: checks retained source and website formatting;
+- `yarn lint`: runs the shared ESLint flat configuration;
+- `yarn typecheck`: typechecks every TypeScript project without emitting;
+- `yarn unit`: verifies the 14-workspace contract and runs workspace tests;
+- `yarn coverage`: runs the centralized unit command with global coverage;
+- `yarn compile`: separately emits every retained workspace build; and
+- `yarn lerna ...`: runs Lerna with the supplied command-line options.
 
-Each subproject defines its own npm scripts, which you can run from the
-subproject's directory. Look at the subproject's **package.json** file too see
-which scripts are available.
+Use `yarn format` to apply the centralized Prettier configuration. Workspace
+manifests retain only workspace-specific build and test commands; lint, format,
+typecheck, and unit orchestration belongs at the root.
 
 ## Installing dependencies
 
@@ -58,9 +60,10 @@ yarn workspace @staticdeploy/dependant-subproject add \
   formatting. Installing the prettier extension for your editor of choice is
   **highly recommended**
 
-- commit messages MUST be formatted using the
-  [conventional commits commit message guidelines](https://conventionalcommits.org/)
-  (committing will fail otherwise).
+- commit messages should follow the
+  [conventional commits commit message guidelines](https://conventionalcommits.org/).
+  No dependency-managed local Git hook is installed; required repository checks
+  are authoritative.
 
 ## Releasing
 

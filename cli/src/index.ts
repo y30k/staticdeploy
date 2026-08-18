@@ -1,4 +1,4 @@
-import yargs = require("yargs");
+import yargs from "yargs";
 
 import bundle from "./commands/bundle";
 import deploy from "./commands/deploy";

@@ -37,7 +37,7 @@ class AppForm extends React.Component<
     }
 }
 
-export interface IAppFormInstance extends IConverterForm<IExternalFormValues> {}
+export type IAppFormInstance = IConverterForm<IExternalFormValues>;
 
 export default reduxForm<IExternalFormValues, IInternalFormValues, IProps>({
     form: "AppForm",

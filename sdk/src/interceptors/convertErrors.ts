@@ -11,8 +11,8 @@ export default function convertErrors() {
         const errorTitle = responseErrorName
             ? responseErrorName
             : responseStatusCode
-            ? `Error ${responseStatusCode}`
-            : "Error";
+              ? `Error ${responseStatusCode}`
+              : "Error";
         const errorDescription = responseErrorMessage
             ? responseErrorMessage
             : err.message;
