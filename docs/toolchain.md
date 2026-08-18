@@ -239,6 +239,20 @@ package code. Its browser dependencies are therefore development/build
 requirements and are absent from the production-focused service image while its
 built files remain available to the management router.
 
+The required `scans-and-images` job uses digest-pinned QEMU and Buildx setup to
+build and locally load separate `linux/amd64` and `linux/arm64` images from the
+same checked-out commit. Both images run the complete conformance and restricted
+live smoke. `reports/multiarch-images.json` retains the exact commit, lockfile,
+platform configuration and complete OCI manifest digests, sizes, runtime
+identity, commands, digest-bound conformance results, and explicit empty
+registry-digest state. Static workflow tests reject registry login, image push,
+manifest creation, registry outputs, package-write permissions, and common
+publication CLIs. The amd64 image remains the exact subject of the M2
+vulnerability/license scan. A second Syft inventory proves arm64 has the same
+architecture-normalized component/version/license multiset; arm64 also uses
+separately retained base SBOM bytes and the same reviewed notice, source, and
+hardening contract.
+
 ## Distribution
 
 These commands install, check, compile, test, report, and build locally only.
