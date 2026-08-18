@@ -243,7 +243,31 @@ const licensePolicy = {
     reviewedExpressions: [],
     componentAssertions: [],
     evidenceArtifacts: [],
+    approvedInventory: null,
 };
+function normalizedFixtureLicenseComponents(fixture) {
+    const documentRoots = new Set(
+        fixture.reports["image-sbom"].payload.documentDescribes
+    );
+    return [
+        ...fixture.reports["license-inventory"].payload.components,
+        ...fixture.reports["image-sbom"].payload.packages
+            .filter((component) => !documentRoots.has(component.SPDXID))
+            .map((component, index) => ({
+                component: component.name || `unknown-image-component-${index}`,
+                locator: component.SPDXID || `image-component-${index}`,
+                version: component.versionInfo || "NOASSERTION",
+                scope: "image",
+                spdxExpression:
+                    component.licenseConcluded &&
+                    component.licenseConcluded !== "NOASSERTION"
+                        ? component.licenseConcluded
+                        : component.licenseDeclared || "NOASSERTION",
+            })),
+    ].sort((left, right) =>
+        JSON.stringify(left).localeCompare(JSON.stringify(right))
+    );
+}
 function writeCase(name, mutate = () => {}, policies = {}) {
     const directory = path.join(temp, name);
     fs.mkdirSync(directory);
@@ -256,6 +280,9 @@ function writeCase(name, mutate = () => {}, policies = {}) {
             ])
         ),
     };
+    const approvedBeforeMutation = policies.freezeApprovedInventory
+        ? normalizedFixtureLicenseComponents(fixture)
+        : null;
     mutate(fixture);
     fs.writeFileSync(
         path.join(directory, "subject.json"),
@@ -274,10 +301,52 @@ function writeCase(name, mutate = () => {}, policies = {}) {
             policies.exceptions || { schemaVersion: 1, exceptions: [] }
         )
     );
-    fs.writeFileSync(
-        licensePath,
-        JSON.stringify(policies.licenses || licensePolicy)
+    const selectedLicensePolicy = structuredClone(
+        policies.licenses || licensePolicy
     );
+    const approvedComponents =
+        approvedBeforeMutation || normalizedFixtureLicenseComponents(fixture);
+    const approvedInventoryPath = `docs/security/license-evidence/.test-approved-${process.pid}-${name}.json`;
+    const approvedInventory = {
+        schemaVersion: 1,
+        lockDigest,
+        imageConfigDigest,
+        components: approvedComponents,
+    };
+    fs.writeFileSync(
+        approvedInventoryPath,
+        `${JSON.stringify(approvedInventory, null, 2)}\n`
+    );
+    const approvedInventoryReference = {
+        path: approvedInventoryPath,
+        digest: digest(fs.readFileSync(approvedInventoryPath)),
+    };
+    selectedLicensePolicy.approvedInventory = approvedInventoryReference;
+    selectedLicensePolicy.evidenceArtifacts = [
+        ...(selectedLicensePolicy.evidenceArtifacts || []),
+        approvedInventoryReference,
+    ];
+    const obligationEvidence = [
+        ...Object.values(selectedLicensePolicy.obligationEvidence || {}),
+        ...(selectedLicensePolicy.reviewedExpressions || []).map(
+            (item) => item.obligationEvidence
+        ),
+        ...(selectedLicensePolicy.componentAssertions || []).map(
+            (item) => item.obligationEvidence
+        ),
+    ].filter((evidence) => evidence?.obligationsComplete === true);
+    if (!policies.preserveEvidenceArtifacts)
+        for (const evidence of obligationEvidence)
+            if (
+                !selectedLicensePolicy.evidenceArtifacts.some(
+                    (artifact) => artifact.path === evidence.evidencePath
+                )
+            )
+                selectedLicensePolicy.evidenceArtifacts.push({
+                    path: evidence.evidencePath,
+                    digest: evidence.evidenceDigest,
+                });
+    fs.writeFileSync(licensePath, JSON.stringify(selectedLicensePolicy));
     const result = spawnSync(
         process.execPath,
         [checker, "evaluate", directory],
@@ -290,6 +359,7 @@ function writeCase(name, mutate = () => {}, policies = {}) {
             },
         }
     );
+    fs.rmSync(approvedInventoryPath, { force: true });
     return { directory, result };
 }
 const expectPass = (name, mutate, policies) => {
@@ -520,6 +590,29 @@ try {
             "image-sbom"
         ].payload.packages.filter((item) => item.name !== "node");
     });
+    expectFail(
+        "same-license-image-component-drift",
+        (fixture) => {
+            fixture.reports["image-sbom"].payload.packages.push({
+                name: "future-mit-component",
+                SPDXID: "SPDXRef-Package-future-mit-component",
+                versionInfo: "1.0.0",
+                licenseDeclared: "MIT",
+                licenseConcluded: "NOASSERTION",
+                externalRefs: [],
+            });
+        },
+        { freezeApprovedInventory: true }
+    );
+    expectFail(
+        "same-license-image-version-drift",
+        (fixture) => {
+            fixture.reports["image-sbom"].payload.packages.find(
+                (item) => item.name === "fixture-package"
+            ).versionInfo = "1.0.1";
+        },
+        { freezeApprovedInventory: true }
+    );
     expectFail("license-omission", (fixture) => {
         fixture.reports["license-inventory"].payload.components.pop();
     });
@@ -586,20 +679,22 @@ try {
             },
         }
     );
-    assert.deepEqual(
+    assert.ok(
         JSON.parse(
             fs.readFileSync(
                 path.join(retainedEvidence.directory, "license-evaluation.json")
             )
-        ).evidenceArtifacts,
-        [
-            {
-                path: obligationArtifact,
-                digest: digest(fs.readFileSync(obligationArtifact)),
-            },
-        ],
+        ).evidenceArtifacts.some(
+            (artifact) =>
+                artifact.path === obligationArtifact &&
+                artifact.digest === digest(fs.readFileSync(obligationArtifact))
+        ),
         "license evaluation must bind retained evidence paths and digests"
     );
+    expectFail("missing-completed-obligation-artifact", undefined, {
+        licenses: licensePolicy,
+        preserveEvidenceArtifacts: true,
+    });
     expectFail("stale-license-evidence-artifact", undefined, {
         licenses: {
             ...licensePolicy,
@@ -1058,6 +1153,27 @@ try {
     assert.deepEqual(sanitizedGrype.payload.matches[0].aliases, [
         "CVE-2026-0001",
     ]);
+    const assembledEvidence = path.join(temp, "assembled-license-evidence");
+    const assembly = spawnSync(
+        process.execPath,
+        [
+            checker,
+            "assemble-license-evidence",
+            "config/license-policy.json",
+            assembledEvidence,
+        ],
+        { encoding: "utf8" }
+    );
+    assert.equal(assembly.status, 0, assembly.stderr);
+    const repositoryPolicy = JSON.parse(
+        fs.readFileSync("config/license-policy.json", "utf8")
+    );
+    for (const artifact of repositoryPolicy.evidenceArtifacts)
+        assert.deepEqual(
+            fs.readFileSync(path.join(assembledEvidence, artifact.path)),
+            fs.readFileSync(artifact.path),
+            `assembled evidence must match ${artifact.path}`
+        );
     console.log("Security-policy record/evaluation and negative tests passed.");
 } finally {
     fs.rmSync(temp, { recursive: true, force: true });

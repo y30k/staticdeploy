@@ -1029,6 +1029,7 @@ function validateLicensePolicy(policy) {
             "reviewedExpressions",
             "componentAssertions",
             "evidenceArtifacts",
+            "approvedInventory",
         ],
         "license policy"
     );
@@ -1170,7 +1171,101 @@ function validateLicensePolicy(policy) {
             );
         evidencePaths.add(artifact.path);
     }
+    const requiredEvidence = [
+        ...Object.values(policy.obligationEvidence),
+        ...reviewed.map((item) => item.obligationEvidence),
+        ...assertions.map((item) => item.obligationEvidence),
+    ].filter((evidence) => evidence.obligationsComplete === true);
+    for (const evidence of requiredEvidence)
+        if (
+            !evidenceArtifacts.some(
+                (artifact) =>
+                    artifact.path === evidence.evidencePath &&
+                    artifact.digest === evidence.evidenceDigest
+            )
+        )
+            fail(
+                "Completed obligation evidence is absent from retained artifacts"
+            );
+    exactKeys(
+        policy.approvedInventory,
+        ["path", "digest"],
+        "approved license inventory"
+    );
+    if (
+        !policy.approvedInventory.path.startsWith(
+            "docs/security/license-evidence/"
+        ) ||
+        path.normalize(policy.approvedInventory.path) !==
+            policy.approvedInventory.path ||
+        !DIGEST.test(policy.approvedInventory.digest || "") ||
+        !fs.existsSync(policy.approvedInventory.path) ||
+        sha256File(policy.approvedInventory.path) !==
+            policy.approvedInventory.digest ||
+        !evidenceArtifacts.some(
+            (artifact) =>
+                artifact.path === policy.approvedInventory.path &&
+                artifact.digest === policy.approvedInventory.digest
+        )
+    )
+        fail("Approved license inventory is missing, stale, or not retained");
+    readApprovedLicenseInventory(policy.approvedInventory.path);
     return policy;
+}
+function readApprovedLicenseInventory(inventoryPath) {
+    const inventory = readJson(inventoryPath);
+    exactKeys(
+        inventory,
+        ["schemaVersion", "lockDigest", "imageConfigDigest", "components"],
+        "approved license inventory"
+    );
+    if (
+        inventory.schemaVersion !== SCHEMA_VERSION ||
+        !DIGEST.test(inventory.lockDigest || "") ||
+        !DIGEST.test(inventory.imageConfigDigest || "")
+    )
+        fail("Approved license inventory subject is invalid");
+    const components = asArray(
+        inventory.components,
+        "approved license inventory components"
+    );
+    if (!components.length) fail("Approved license inventory is empty");
+    const seen = new Set();
+    for (const component of components) {
+        exactKeys(
+            component,
+            ["component", "locator", "version", "scope", "spdxExpression"],
+            "approved license inventory component"
+        );
+        if (
+            !["resolved", "workspace", "image"].includes(component.scope) ||
+            ![
+                component.component,
+                component.locator,
+                component.version,
+                component.spdxExpression,
+            ].every((value) => typeof value === "string" && value)
+        )
+            fail("Approved license inventory component is invalid");
+        const key = JSON.stringify(component);
+        if (seen.has(key))
+            fail("Approved license inventory duplicates a component");
+        seen.add(key);
+    }
+    return inventory;
+}
+function assembleLicenseEvidence(policyPath, outputDirectory) {
+    const policy = validateLicensePolicy(readJson(policyPath));
+    fs.mkdirSync(outputDirectory, { recursive: true, mode: 0o700 });
+    for (const artifact of policy.evidenceArtifacts) {
+        const destination = path.join(outputDirectory, artifact.path);
+        fs.mkdirSync(path.dirname(destination), { recursive: true });
+        fs.copyFileSync(artifact.path, destination);
+        fs.chmodSync(destination, 0o600);
+    }
+    console.log(
+        `Assembled ${policy.evidenceArtifacts.length} digest-verified license evidence artifacts.`
+    );
 }
 function licenseAllowed(expression, policy) {
     const blocked = (selected = null, missingObligationReasons = []) => ({
@@ -1544,6 +1639,33 @@ function evaluate(directory) {
                     : component.licenseDeclared || "NOASSERTION",
         }));
     const components = [...dependencyComponents, ...imageComponents];
+    const approvedInventory = readApprovedLicenseInventory(
+        licensePolicy.approvedInventory.path
+    );
+    if (
+        approvedInventory.lockDigest !== subjectReport.lockDigest ||
+        approvedInventory.imageConfigDigest !== subjectReport.imageConfigDigest
+    )
+        fail("Approved license inventory identifies a different subject");
+    const componentKey = (component) =>
+        JSON.stringify([
+            component.scope,
+            component.component,
+            component.version,
+            component.locator,
+            component.spdxExpression,
+        ]);
+    const actualComponentKeys = components.map(componentKey).sort();
+    const approvedComponentKeys = approvedInventory.components
+        .map(componentKey)
+        .sort();
+    if (
+        actualComponentKeys.length !== approvedComponentKeys.length ||
+        actualComponentKeys.some(
+            (key, index) => key !== approvedComponentKeys[index]
+        )
+    )
+        fail("License inventory differs from the exact owner-approved graph");
     writeJson(path.join(directory, "normalized-license-inventory.json"), {
         schemaVersion: SCHEMA_VERSION,
         subject: subjectReport,
@@ -1594,6 +1716,7 @@ function evaluate(directory) {
         evaluatedAt: new Date(now).toISOString(),
         passed: licensePassed,
         prohibitedCount: licenseResults.filter((item) => !item.allowed).length,
+        approvedInventory: licensePolicy.approvedInventory,
         evidenceArtifacts: licensePolicy.evidenceArtifacts,
         components: licenseResults,
     });
@@ -1613,7 +1736,9 @@ else if (command === "record" && args.length === 3)
 else if (command === "generate-source-sbom" && args.length === 2)
     generateSourceSbom(args[0], args[1]);
 else if (command === "evaluate" && args.length === 1) evaluate(args[0]);
+else if (command === "assemble-license-evidence" && args.length === 2)
+    assembleLicenseEvidence(args[0], args[1]);
 else
     fail(
-        "usage: security-policy.mjs subject OUTPUT IMAGE_CONFIG_DIGEST | record TYPE RAW OUTPUT | generate-source-sbom LICENSE_REPORT OUTPUT | evaluate REPORT_DIRECTORY"
+        "usage: security-policy.mjs subject OUTPUT IMAGE_CONFIG_DIGEST | record TYPE RAW OUTPUT | generate-source-sbom LICENSE_REPORT OUTPUT | evaluate REPORT_DIRECTORY | assemble-license-evidence POLICY OUTPUT_DIRECTORY"
     );

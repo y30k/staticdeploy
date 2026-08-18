@@ -13,8 +13,8 @@ The project remains licensed under its existing MIT license. Third-party works
 are not relicensed as MIT; they retain their native terms and are accepted only
 with the notices, source references, and conditions recorded by this candidate.
 
-The approver explicitly approved all dispositions requested in
-`docs/security/m2-license-approval-request.md`, including:
+The exact approval comprises the following dispositions and no broader future
+component or version authorization:
 
 - the initially allowed permissive set: `0BSD`, `Apache-2.0`, `BSD-2-Clause`,
   `BSD-3-Clause`, `CC0-1.0`, `ISC`, and `MIT`;
@@ -27,6 +27,13 @@ The approver explicitly approved all dispositions requested in
   obligation or the GCC exception;
 - the exact Node `24.19.0` MIT assertion where Syft reports `NOASSERTION`, bound
   to the exact copied Node license and image component/version;
+- the exact 1,603-component scoped license inventory retained in
+  `m2-approved-license-components.json`, bound to lock digest
+  `sha256:1ddb2bfaa38c5b33c279d57e9fe0434fe4c1aa571558f5e25cfa3366936f06dc`,
+  image configuration digest
+  `sha256:19e9d3e8eec1a3ca09f53b8283c99b4140fd47f3f0dfe50013288624df53c49f`, and
+  inventory artifact SHA-256
+  `85bd3c99d037f7c60da486896d9ff57dfce1a5dbb8abfa8226e6355b465bd7ff`;
 - the deterministic runtime notice artifact with SHA-256
   `37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3`;
 - the component/version-bound Chainguard evidence and analysis in

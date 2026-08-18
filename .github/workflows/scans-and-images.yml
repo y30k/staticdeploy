@@ -197,27 +197,8 @@ jobs:
                       install -m 600 "reports/$report" "artifact-evidence/$report"
                     fi
                   done
-                  jq -r '
-                    [
-                      .obligationEvidence[] | select(.obligationsComplete == true) | .evidencePath
-                    ] + [
-                      .reviewedExpressions[] | select(.obligationEvidence.obligationsComplete == true) |
-                      .obligationEvidence.evidencePath
-                    ] + [
-                      .componentAssertions[] | select(.obligationEvidence.obligationsComplete == true) |
-                      .obligationEvidence.evidencePath
-                    ] + [
-                      .evidenceArtifacts[].path
-                    ] | unique[]
-                  ' config/license-policy.json | while IFS= read -r evidence; do
-                    case "$evidence" in
-                      docs/security/license-evidence/*)
-                        test -f "$evidence"
-                        install -D -m 600 "$evidence" "artifact-evidence/$evidence"
-                        ;;
-                      *) exit 1 ;;
-                    esac
-                  done
+                  node scripts/security-policy.mjs assemble-license-evidence \
+                    config/license-policy.json artifact-evidence
                   test -n "$(find artifact-evidence -maxdepth 1 -type f -print -quit)"
             - name: Remove raw scanner output
               if: always()
