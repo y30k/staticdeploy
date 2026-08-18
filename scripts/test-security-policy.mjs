@@ -241,6 +241,7 @@ const licensePolicy = {
         "CC0-1.0": completeEvidence("review-cc0"),
     },
     reviewedExpressions: [],
+    componentAssertions: [],
 };
 function writeCase(name, mutate = () => {}, policies = {}) {
     const directory = path.join(temp, name);
@@ -540,10 +541,22 @@ try {
         setFirstLicense(fixture, "NOASSERTION")
     );
     const missingObligations = expectFail(
-        "repository-policy-reports-missing-obligations",
+        "policy-reports-missing-obligations",
         undefined,
         {
-            licenses: JSON.parse(fs.readFileSync("config/license-policy.json")),
+            licenses: {
+                ...licensePolicy,
+                obligationEvidence: {
+                    ...licensePolicy.obligationEvidence,
+                    MIT: {
+                        obligationsComplete: false,
+                        evidencePath: null,
+                        evidenceDigest: null,
+                        reviewReference: "pending-license-review",
+                        missingReason: "retained notice review is incomplete",
+                    },
+                },
+            },
         }
     );
     const missingEvaluation = JSON.parse(
@@ -708,6 +721,63 @@ try {
                         obligationEvidence: completeEvidence(
                             "nested-or-incomplete"
                         ),
+                    },
+                ],
+            },
+        }
+    );
+    expectPass(
+        "exact-image-component-license-assertion",
+        (fixture) => {
+            const node = fixture.reports["image-sbom"].payload.packages.find(
+                (item) => item.name === "node"
+            );
+            node.licenseDeclared = "NOASSERTION";
+            node.licenseConcluded = "NOASSERTION";
+        },
+        {
+            licenses: {
+                ...licensePolicy,
+                componentAssertions: [
+                    {
+                        scope: "image",
+                        component: "node",
+                        version: "24.19.0",
+                        observed: "NOASSERTION",
+                        asserted: "MIT",
+                        owner: "runtime-owner",
+                        approver: "license-owner",
+                        reviewReference: "exact-node-review",
+                        obligationEvidence: completeEvidence("node-license"),
+                    },
+                ],
+            },
+        }
+    );
+    expectFail(
+        "component-license-assertion-version-mismatch",
+        (fixture) => {
+            const node = fixture.reports["image-sbom"].payload.packages.find(
+                (item) => item.name === "node"
+            );
+            node.licenseDeclared = "NOASSERTION";
+            node.licenseConcluded = "NOASSERTION";
+        },
+        {
+            licenses: {
+                ...licensePolicy,
+                componentAssertions: [
+                    {
+                        scope: "image",
+                        component: "node",
+                        version: "24.18.0",
+                        observed: "NOASSERTION",
+                        asserted: "MIT",
+                        owner: "runtime-owner",
+                        approver: "license-owner",
+                        reviewReference: "wrong-node-review",
+                        obligationEvidence:
+                            completeEvidence("wrong-node-license"),
                     },
                 ],
             },

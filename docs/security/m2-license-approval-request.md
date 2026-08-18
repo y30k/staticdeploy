@@ -2,16 +2,17 @@
 
 **Candidate:** `feature/m2-06-backend-dependencies` at `9490ffd` or later
 
-**Status:** Blocking decision; no approval or waiver is implied by this
-document.
+**Status:** Approved on 2026-08-18 by Mike Davies (`LoganAvatar`) as project,
+security/license, and release owner. The encoded decision is retained in
+`docs/security/license-evidence/m2-license-review-decision.md`.
 
 ## Why approval is required
 
 The fail-closed M2 policy allows only its initially approved permissive set and
 requires retained notice/attribution evidence. The exact lock and image are
-technically clean of critical/high vulnerabilities, but CI must remain red until
-a security/license owner reviews the additional expressions and a release owner
-accepts the retained notice bundle.
+technically clean of critical/high vulnerabilities. CI remained red until the
+additional expressions and retained notice bundle received the owner approval
+now recorded below.
 
 ## Exact source/development graph inventory
 
@@ -56,18 +57,15 @@ image build regenerates and byte-compares it before shipping it at
 closure's retained texts or package/version/manifest-digest-bound fallback
 evidence, Node/application texts, standard base-runtime texts, and the GCC
 Runtime Library Exception 3.1 text pinned from SPDX license-list-data commit
-`5bf6d9610255540bfbee6890765a616042bf1e11`. It remains unapproved until a named
-owner reviews it; `config/license-policy.json` therefore stays fail closed.
+`5bf6d9610255540bfbee6890765a616042bf1e11`. Its approval is exact-component and
+exact-digest bound in `config/license-policy.json`; any drift remains fail
+closed.
 
-## Approval needed
+## Approval recorded
 
-Provide either:
-
-1. named security/license and release-owner approval for each disposition above,
-   including the selected `OR` branches and Node assertion, plus authorization
-   to record the reviewed notice artifact; or
-2. rejection/replacement instructions for any expression.
-
-Approval must also identify who may perform the bootstrap review of the
-repository-controlled PR evaluator. Self-approval by the implementing agent is
-not valid.
+Mike Davies (`LoganAvatar`) approved every disposition above, the selected `OR`
+branches, the exact Node assertion, the notice and component evidence, the
+source-retention publication gate, and the repository-controlled evaluator
+bootstrap. This owner approval is encoded fail-closed in
+`config/license-policy.json`; future component, version, expression, evidence,
+or digest drift requires a new review.

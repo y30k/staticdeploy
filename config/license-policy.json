@@ -3,62 +3,196 @@
     "allowedSpdx": [
         "0BSD",
         "Apache-2.0",
+        "BlueOak-1.0.0",
         "BSD-2-Clause",
         "BSD-3-Clause",
+        "CC-BY-3.0",
+        "CC-BY-4.0",
         "CC0-1.0",
+        "GPL-3.0-or-later",
         "ISC",
-        "MIT"
+        "LGPL-2.1-or-later",
+        "MIT",
+        "MIT-0",
+        "MPL-2.0",
+        "Python-2.0",
+        "WTFPL"
     ],
     "obligationEvidence": {
         "0BSD": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
         },
         "Apache-2.0": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing exact Apache license and NOTICE material has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "BlueOak-1.0.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
         },
         "BSD-2-Clause": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
         },
         "BSD-3-Clause": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "CC-BY-3.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "CC-BY-4.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
         },
         "CC0-1.0": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "GPL-3.0-or-later": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
         },
         "ISC": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "LGPL-2.1-or-later": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
         },
         "MIT": {
-            "obligationsComplete": false,
-            "evidencePath": null,
-            "evidenceDigest": null,
-            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions",
-            "missingReason": "A reviewed release notice bundle containing the exact distributed component license texts has not yet been retained."
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "MIT-0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "MPL-2.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "missingReason": null
+        },
+        "Python-2.0": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
+        },
+        "WTFPL": {
+            "obligationsComplete": true,
+            "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+            "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "missingReason": null
         }
     },
-    "reviewedExpressions": []
+    "reviewedExpressions": [
+        {
+            "expression": "(MIT OR CC0-1.0)",
+            "selected": "MIT",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        },
+        {
+            "expression": "(BSD-2-Clause OR WTFPL)",
+            "selected": "BSD-2-Clause",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        },
+        {
+            "expression": "(GPL-3.0-or-later WITH GCC-exception-3.1)",
+            "selected": "GPL-3.0-or-later WITH GCC-exception-3.1",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+                "reviewReference": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+                "missingReason": null
+            }
+        }
+    ],
+    "componentAssertions": [
+        {
+            "scope": "image",
+            "component": "node",
+            "version": "24.19.0",
+            "observed": "NOASSERTION",
+            "asserted": "MIT",
+            "owner": "StaticDeploy maintainers",
+            "approver": "Mike Davies (LoganAvatar)",
+            "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+            "obligationEvidence": {
+                "obligationsComplete": true,
+                "evidencePath": "docs/security/license-evidence/m2-license-review-decision.md",
+                "evidenceDigest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969",
+                "reviewReference": "docs/security/license-evidence/m2-license-review-decision.md",
+                "missingReason": null
+            }
+        }
+    ]
 }

@@ -1027,6 +1027,7 @@ function validateLicensePolicy(policy) {
             "allowedSpdx",
             "obligationEvidence",
             "reviewedExpressions",
+            "componentAssertions",
         ],
         "license policy"
     );
@@ -1103,6 +1104,47 @@ function validateLicensePolicy(policy) {
         validateObligationEvidence(
             item.obligationEvidence,
             `reviewed expression ${item.expression}`
+        );
+    }
+    const assertions = asArray(
+        policy.componentAssertions,
+        "component license assertions"
+    );
+    const assertionKeys = new Set();
+    for (const assertion of assertions) {
+        exactKeys(
+            assertion,
+            [
+                "scope",
+                "component",
+                "version",
+                "observed",
+                "asserted",
+                "owner",
+                "approver",
+                "reviewReference",
+                "obligationEvidence",
+            ],
+            "component license assertion"
+        );
+        const key = `${assertion.scope}:${assertion.component}@${assertion.version}:${assertion.observed}`;
+        if (
+            assertion.scope !== "image" ||
+            !assertion.component ||
+            !assertion.version ||
+            !assertion.observed ||
+            !assertion.asserted ||
+            assertionKeys.has(key)
+        )
+            fail("Component license assertion identity is invalid");
+        assertionKeys.add(key);
+        parseSpdx(assertion.asserted);
+        for (const field of ["owner", "approver", "reviewReference"])
+            if (typeof assertion[field] !== "string" || !assertion[field])
+                fail(`Component license assertion ${key} lacks ${field}`);
+        validateObligationEvidence(
+            assertion.obligationEvidence,
+            `component license assertion ${key}`
         );
     }
     return policy;
@@ -1485,10 +1527,43 @@ function evaluate(directory) {
         generatedAt: new Date(now).toISOString(),
         components,
     });
-    const licenseResults = components.map((component) => ({
-        ...component,
-        ...licenseAllowed(component.spdxExpression, licensePolicy),
-    }));
+    const usedAssertions = new Set();
+    const licenseResults = components.map((component) => {
+        const assertion = licensePolicy.componentAssertions.find(
+            (item) =>
+                item.scope === component.scope &&
+                item.component === component.component &&
+                item.version === component.version &&
+                item.observed === component.spdxExpression
+        );
+        if (assertion)
+            usedAssertions.add(
+                `${assertion.scope}:${assertion.component}@${assertion.version}:${assertion.observed}`
+            );
+        return {
+            ...component,
+            observedSpdxExpression: component.spdxExpression,
+            assertedSpdxExpression: assertion?.asserted || null,
+            assertionReviewReference: assertion?.reviewReference || null,
+            assertionEvidence: assertion
+                ? {
+                      path: assertion.obligationEvidence.evidencePath,
+                      digest: assertion.obligationEvidence.evidenceDigest,
+                  }
+                : null,
+            ...licenseAllowed(
+                assertion?.asserted || component.spdxExpression,
+                licensePolicy
+            ),
+        };
+    });
+    for (const assertion of licensePolicy.componentAssertions) {
+        const key = `${assertion.scope}:${assertion.component}@${assertion.version}:${assertion.observed}`;
+        if (!usedAssertions.has(key))
+            fail(
+                `Component license assertion did not match exact evidence: ${key}`
+            );
+    }
     const licensePassed = licenseResults.every((item) => item.allowed);
     writeJson(path.join(directory, "license-evaluation.json"), {
         schemaVersion: SCHEMA_VERSION,
