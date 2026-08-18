@@ -4032,7 +4032,6 @@ __metadata:
     ts-node: "npm:^10.4.0"
     typescript: "npm:5.9.3"
     validator: "npm:^13.7.0"
-    vm2: "npm:^3.9.5"
   languageName: unknown
   linkType: soft
 
@@ -26781,15 +26780,6 @@ __metadata:
   version: 1.1.2
   resolution: "vm-browserify@npm:1.1.2"
   checksum: 10c0/0cc1af6e0d880deb58bc974921320c187f9e0a94f25570fca6b1bd64e798ce454ab87dfd797551b1b0cc1849307421aae0193cedf5f06bdb5680476780ee344b
-  languageName: node
-  linkType: hard
-
-"vm2@npm:^3.9.5":
-  version: 3.9.5
-  resolution: "vm2@npm:3.9.5"
-  bin:
-    vm2: bin/vm2
-  checksum: 10c0/8d4bfbed473084b1e0edc01e960579d44fa6d217356c4aefef0c290626f93249b6dbe91b8dacc42a9a483828ba4ec4970e8634cc0b97998c6cc01e7039fe8a87
   languageName: node
   linkType: hard
 
