@@ -19,9 +19,10 @@ owner provisions and approves them.
 
 ## Lifecycle rules
 
-1. **Start with M1-R1.** Milestone 1 is reopened because repository evidence
-   still conflicts with the recorded retirement claim. No Milestone 2
-   implementation starts until M1-R1 passes.
+1. **Begin delivery with M2-01.** M1-R1 is a closed prerequisite: PR #20, its
+   two successful required checks, the retired-path searches, and
+   `docs/ci-retirement-evidence.md` are its immutable evidence. It is not a
+   future script or open blocker.
 2. **Gates are evidence, not status labels.** A milestone exits only when its
    evidence index links immutable CI artifacts, test output, review decisions,
    and any required external approval. A merged PR alone is insufficient.

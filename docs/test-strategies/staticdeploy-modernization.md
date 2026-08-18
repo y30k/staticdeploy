@@ -21,19 +21,19 @@ floating install.
 
 ## Required gate commands
 
-| Gate ID | Command                                                                 | Required result/evidence                                                                                                     |
-| ------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| G-M1    | `./scripts/gates/m1-residual.sh`                                        | No residual legacy CI/publication path; corrected repository evidence; clean required Actions checks                         |
-| G-M2    | `./scripts/gates/m2-toolchain.sh`                                       | Frozen install, format/lint/type/unit/characterization/contracts/integration, scan policy, image/security/architecture tests |
-| G-M3    | `./scripts/gates/m3-foundation.sh`                                      | V2 schema, sessions/RBAC, storage/jobs, command separation, projection, Compose and initial Helm boundaries                  |
-| G-M4    | `./scripts/gates/m4-direct-golden.sh`                                   | Complete direct-file API/worker/content/browser/accessibility/security path                                                  |
-| G-M5    | `./scripts/gates/m5-zip-policy.sh`                                      | Hostile ZIP, scanner, MIME, policy/header/sandbox/quota and ZIP golden path                                                  |
-| G-M6-C  | `./scripts/gates/m6-compose.sh --images-lock artifacts/images.lock`     | Compose install/upgrade/verify/rollback/restart/recovery/teardown by digest                                                  |
-| G-M6-H  | `./scripts/gates/m6-helm.sh --release-lock artifacts/release.lock`      | Helm lint/render/install/upgrade/verify/rollback/disruption/uninstall by digest                                              |
-| G-M6-R  | `./scripts/gates/m6-recovery.sh --profile compose` and `--profile helm` | Provider-neutral database restore and object/routing reconciliation                                                          |
-| G-M6-O  | `./scripts/gates/m6-operations.sh`                                      | Redaction/cardinality/correlation/outage/resilience/runbook evidence with exporters off by default                           |
-| G-M6    | Run G-M6-C, G-M6-H, G-M6-R, and G-M6-O for the same release lock        | Aggregate portable deployment, recovery, and operations evidence; every concrete subgate must pass                           |
-| G-M7    | `./scripts/gates/m7-pilot-cutover.sh --evidence-index <path>`           | R1-R16 index, fixture/pilot, greenfield or migration reconciliation, cutover/rollback/retirement gates                       |
+| Gate ID | Command                                                                                     | Required result/evidence                                                                                                     |
+| ------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| G-M1    | Closed evidence: PR #20 checks, retired-path searches, and `docs/ci-retirement-evidence.md` | No residual legacy CI/publication path; corrected repository evidence; clean required Actions checks                         |
+| G-M2    | `./scripts/gates/m2-toolchain.sh`                                                           | Frozen install, format/lint/type/unit/characterization/contracts/integration, scan policy, image/security/architecture tests |
+| G-M3    | `./scripts/gates/m3-foundation.sh`                                                          | V2 schema, sessions/RBAC, storage/jobs, command separation, projection, Compose and initial Helm boundaries                  |
+| G-M4    | `./scripts/gates/m4-direct-golden.sh`                                                       | Complete direct-file API/worker/content/browser/accessibility/security path                                                  |
+| G-M5    | `./scripts/gates/m5-zip-policy.sh`                                                          | Hostile ZIP, scanner, MIME, policy/header/sandbox/quota and ZIP golden path                                                  |
+| G-M6-C  | `./scripts/gates/m6-compose.sh --images-lock artifacts/images.lock`                         | Compose install/upgrade/verify/rollback/restart/recovery/teardown by digest                                                  |
+| G-M6-H  | `./scripts/gates/m6-helm.sh --release-lock artifacts/release.lock`                          | Helm lint/render/install/upgrade/verify/rollback/disruption/uninstall by digest                                              |
+| G-M6-R  | `./scripts/gates/m6-recovery.sh --profile compose` and `--profile helm`                     | Provider-neutral database restore and object/routing reconciliation                                                          |
+| G-M6-O  | `./scripts/gates/m6-operations.sh`                                                          | Redaction/cardinality/correlation/outage/resilience/runbook evidence with exporters off by default                           |
+| G-M6    | Run G-M6-C, G-M6-H, G-M6-R, and G-M6-O for the same release lock                            | Aggregate portable deployment, recovery, and operations evidence; every concrete subgate must pass                           |
+| G-M7    | `./scripts/gates/m7-pilot-cutover.sh --evidence-index <path>`                               | R1-R16 index, fixture/pilot, greenfield or migration reconciliation, cutover/rollback/retirement gates                       |
 
 The scripts may compose focused tests instead of duplicating logic. Their
 checked-in manifest must enumerate each test ID below so CI can detect
@@ -100,6 +100,10 @@ omissions.
 - `API-02` — pagination/error/UTC/idempotency behavior is stable and conflict
   reuse is rejected.
 - `API-03` — every write endpoint participates in the generated R9 role matrix.
+- `AUTHZ-01` — the M3 policy engine and binding service cover every defined
+  capability for administrator, owner, publisher, viewer, and denied cases,
+  including escalation, transactional rollback, and group-change behavior;
+  endpoint-wide API-03 coverage begins only after M4 commits OpenAPI/routes.
 
 ### Sessions and trust boundaries
 
@@ -214,13 +218,14 @@ omissions.
 
 ## Milestone executable gates
 
-### M1 residual pre-gate
+### M1 closed prerequisite
 
-`G-M1` runs first. It searches tracked files for the residual patterns named in
-the lifecycle, validates retirement evidence, runs the two required PR workflows
-on a clean branch, and attaches a settings-level review. Any approved
-compatibility exception must name its consumer and test; otherwise a match
-fails.
+`G-M1` is historical evidence, not a script to create: PR #20 passed both
+required workflows, tracked-file retirement searches, local build/lint and a
+service/CLI roundtrip; `docs/ci-retirement-evidence.md` records settings and
+integration evidence. New delivery begins at M2. A future change that
+reintroduces a retired path fails the normal Actions scans/review and requires a
+new compatibility decision; it does not leave M2 waiting on an unowned M1 job.
 
 ### Milestone 2
 
@@ -241,7 +246,7 @@ artifact contract passes; M6 publication cannot pass without it.
 
 ### Milestone 3
 
-`G-M3` runs SCH-01 through SCH-05, AUTH-01 through AUTH-05, STO-01/02,
+`G-M3` runs SCH-01 through SCH-05, AUTH-01 through AUTH-05, AUTHZ-01, STO-01/02,
 JOB-01/02/03, PROJ-01 through PROJ-06, command startup/configuration tests,
 Compose security inspection, and initial Helm render/install isolation. AUTH-06
 and real DNS/storage policy tests are mandatory for production-like exit but
