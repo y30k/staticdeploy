@@ -4,7 +4,8 @@ title: Quickstart
 ---
 
 This legacy quickstart builds the source locally; this fork publishes neither
-the service image nor the CLI. You need Docker, Git, Node 14, and Yarn 1.
+the service image nor the CLI. You need Docker, Git, Node 24.19.0, and Yarn
+4.18.0 through Corepack.
 
 ## Check out and start StaticDeploy
 
@@ -28,7 +29,8 @@ Visit the Management Console at <http://localhost:8080/>.
 In another terminal, from the same checkout:
 
 ```sh
-yarn install --frozen-lockfile
+corepack enable
+yarn install --immutable
 yarn lerna run compile \
   --scope=@staticdeploy/cli \
   --include-dependencies \

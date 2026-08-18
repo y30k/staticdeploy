@@ -8,7 +8,8 @@ The SDK is retained for legacy characterization only and is not published by
 this fork. Build it with its workspace dependencies from a frozen checkout:
 
 ```sh
-yarn install --frozen-lockfile
+corepack enable
+yarn install --immutable
 yarn lerna run compile \
   --scope=@staticdeploy/sdk \
   --include-dependencies \
