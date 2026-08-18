@@ -70,6 +70,7 @@
     "minipass": "3.1.6",
     "nyc": "18.0.0",
     "prettier": "3.6.2",
+    "spdx-expression-parse": "5.0.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0"
   }

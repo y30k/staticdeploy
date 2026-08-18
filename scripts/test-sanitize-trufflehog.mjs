@@ -10,6 +10,7 @@ const directory = fs.mkdtempSync(
 const input = path.join(directory, "raw.jsonl");
 const output = path.join(directory, "sanitized.json");
 const rawMarker = "fake-secret-value-that-must-not-survive";
+const commit = "a".repeat(40);
 
 try {
     fs.writeFileSync(
@@ -21,7 +22,7 @@ try {
             RawV2: rawMarker,
             SourceMetadata: {
                 Data: {
-                    Git: { commit: "abc123", file: "example.txt", line: 7 },
+                    Git: { commit, file: "example.txt", line: 7 },
                 },
             },
         }) + "\n"
@@ -40,7 +41,7 @@ try {
         {
             detector: "SyntheticDetector",
             status: "verified",
-            source: { commit: "abc123", file: "example.txt", line: 7 },
+            source: { commit, file: "example.txt", line: 7 },
         },
     ]);
 

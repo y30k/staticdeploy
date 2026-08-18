@@ -9,5 +9,42 @@
         "ISC",
         "MIT"
     ],
+    "obligationEvidence": {
+        "0BSD": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "Apache-2.0": {
+            "obligationsComplete": true,
+            "evidence": "The package license and NOTICE material are retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "BSD-2-Clause": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "BSD-3-Clause": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "CC0-1.0": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "ISC": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        },
+        "MIT": {
+            "obligationsComplete": true,
+            "evidence": "The package license text is retained in the installed component and inventoried in the source/image SBOM.",
+            "reviewReference": "docs/security/vulnerability-license-policy.md#license-decisions"
+        }
+    },
     "reviewedExpressions": []
 }

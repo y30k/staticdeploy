@@ -14,7 +14,7 @@ jobs:
     scans-and-images:
         name: scans-and-images
         runs-on: ubuntu-22.04
-        timeout-minutes: 35
+        timeout-minutes: 40
         steps:
             - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
               with:
@@ -23,124 +23,63 @@ jobs:
             - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
               with:
                   node-version: 24.19.0
-            - name: Enable pinned Yarn
+            - name: Enable pinned Yarn and verify policy tooling
               run: |
                   corepack enable
                   test "$(yarn --version)" = "4.18.0"
-            - name: Verify policy tooling and immutable install
-              run: |
                   node scripts/check-install-policy.mjs
                   node scripts/test-install-policy.mjs
                   node scripts/test-security-policy.mjs
+                  node scripts/test-sanitize-trufflehog.mjs
                   yarn install --immutable
                   yarn check:install-scripts
             - name: Build exact local service image without publishing
               run: |
+                  mkdir -p reports
                   docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
                   docker image inspect staticdeploy-service:ci --format '{{.Id}}' > reports-image-digest.txt
                   grep -Eq '^sha256:[a-f0-9]{64}$' reports-image-digest.txt
-                  mkdir -p reports
                   node scripts/security-policy.mjs subject reports/subject.json "$(cat reports-image-digest.txt)"
-            - name: Scan tracked content for verified or unknown secrets
-              env:
-                  BASE_SHA:
-                      ${{ github.event.pull_request.base.sha ||
-                      github.event.before || '' }}
-                  HEAD_SHA:
-                      ${{ github.event.pull_request.head.sha || github.sha }}
+            - name: Scan exact tracked subject for verified or unknown secrets
               run: |
-                  mkdir -p reports
-                  node scripts/test-sanitize-trufflehog.mjs
-                  if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
-                    BASE_SHA=$(git rev-list --max-parents=0 HEAD | tail -1)
-                  fi
+                  scan_root=$(mktemp -d)
                   raw_report=$(mktemp)
-                  trap 'rm -f "$raw_report"' EXIT
+                  trap 'rm -rf "$scan_root" "$raw_report"' EXIT
+                  git archive HEAD | tar -x -C "$scan_root"
                   started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   set +e
-                  docker run --rm --volume "$PWD:/repo:ro" \
+                  docker run --rm --volume "$scan_root:/subject:ro" \
                     trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33 \
-                    git file:///repo --since-commit "$BASE_SHA" --branch "$HEAD_SHA" \
-                    --json --results=verified,unknown --fail --fail-on-scan-errors \
-                    > "$raw_report"
+                    filesystem /subject --json --results=verified,unknown \
+                    --fail --fail-on-scan-errors > "$raw_report"
                   scan_exit=$?
                   set -e
-                  node scripts/sanitize-trufflehog.mjs "$raw_report" reports/trufflehog.raw-sanitized.json
+                  TRUFFLEHOG_SUBJECT_COMMIT="$(git rev-parse HEAD)" \
+                    node scripts/sanitize-trufflehog.mjs "$raw_report" reports/trufflehog.raw-sanitized.json
                   completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  SCANNER_STARTED_AT="$started_at" \
-                  SCANNER_COMPLETED_AT="$completed_at" \
-                  SCANNER_EXIT_CODE="$scan_exit" \
-                  SCANNER_ACCEPTED_EXIT_CODES="0,183" \
-                  SCANNER_COMPLETE=true \
-                  SCANNER_NAME=trufflehog \
-                  SCANNER_VERSION=3.97.0 \
+                  SCANNER_STARTED_AT="$started_at" SCANNER_COMPLETED_AT="$completed_at" \
+                  SCANNER_EXIT_CODE="$scan_exit" SCANNER_COMPLETE=true \
+                  SCANNER_NAME=trufflehog SCANNER_VERSION=3.97.0 \
                   SCANNER_IDENTITY='trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33' \
                   SCANNER_RULESET_DIGEST='sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33' \
                     node scripts/security-policy.mjs record secrets reports/trufflehog.raw-sanitized.json reports/secrets.json
-                  rm -f "$raw_report" reports/trufflehog.raw-sanitized.json
+                  rm -rf "$scan_root" "$raw_report" reports/trufflehog.raw-sanitized.json
                   trap - EXIT
-            - name: Scan exact dependency graph and inventory licenses
-              env:
-                  GH_TOKEN: ${{ github.token }}
-              run: |
-                  advisory=$(curl --fail --silent --show-error \
-                    --header "Authorization: Bearer $GH_TOKEN" \
-                    --header 'X-GitHub-Api-Version: 2022-11-28' \
-                    https://api.github.com/repos/github/advisory-database/commits/main)
-                  advisory_sha=$(printf '%s' "$advisory" | jq -r .sha)
-                  advisory_time=$(printf '%s' "$advisory" | jq -r .commit.committer.date)
-                  test -n "$advisory_sha" && test "$advisory_sha" != null
-                  started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  set +e
-                  yarn npm audit --all --recursive --json > reports/yarn-audit.raw.ndjson
-                  audit_exit=$?
-                  set -e
-                  completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  SCANNER_STARTED_AT="$started_at" \
-                  SCANNER_COMPLETED_AT="$completed_at" \
-                  SCANNER_EXIT_CODE="$audit_exit" \
-                  SCANNER_ACCEPTED_EXIT_CODES="0,1" \
-                  SCANNER_COMPLETE=true \
-                  SCANNER_NAME=yarn-npm-audit \
-                  SCANNER_VERSION=4.18.0 \
-                  SCANNER_IDENTITY="github/advisory-database@$advisory_sha" \
-                  SCANNER_DATABASE_UPDATED_AT="$advisory_time" \
-                    node scripts/security-policy.mjs record dependency-vulnerabilities reports/yarn-audit.raw.ndjson reports/dependency-vulnerabilities.json
-
-                  started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  set +e
-                  yarn info --all --recursive --manifest --json > reports/yarn-licenses.raw.ndjson
-                  license_exit=$?
-                  set -e
-                  completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  SCANNER_STARTED_AT="$started_at" \
-                  SCANNER_COMPLETED_AT="$completed_at" \
-                  SCANNER_EXIT_CODE="$license_exit" \
-                  SCANNER_COMPLETE=true \
-                  SCANNER_NAME=yarn-info \
-                  SCANNER_VERSION=4.18.0 \
-                  SCANNER_IDENTITY='yarn@npm:4.18.0' \
-                  SCANNER_RULESET_DIGEST="$(sha256sum yarn.lock | cut -d' ' -f1)" \
-                    node scripts/security-policy.mjs record license-inventory reports/yarn-licenses.raw.ndjson reports/license-inventory.json
             - name: Scan source with immutable local Semgrep rules
               run: |
                   rules_digest="sha256:$(sha256sum config/semgrep.yml | cut -d' ' -f1)"
                   started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   set +e
-                  docker run --rm --volume "$PWD:/src" \
+                  docker run --rm --volume "$PWD:/src:ro" --volume "$PWD/reports:/reports" \
                     returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700 \
                     semgrep scan --error --config /src/config/semgrep.yml \
-                    --json --output /src/reports/semgrep.raw.json /src
+                    --json --output /reports/semgrep.raw.json /src
                   scan_exit=$?
                   set -e
                   completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-                  SCANNER_STARTED_AT="$started_at" \
-                  SCANNER_COMPLETED_AT="$completed_at" \
-                  SCANNER_EXIT_CODE="$scan_exit" \
-                  SCANNER_ACCEPTED_EXIT_CODES="0,1" \
-                  SCANNER_COMPLETE=true \
-                  SCANNER_NAME=semgrep \
-                  SCANNER_VERSION=1.97.0 \
+                  SCANNER_STARTED_AT="$started_at" SCANNER_COMPLETED_AT="$completed_at" \
+                  SCANNER_EXIT_CODE="$scan_exit" SCANNER_COMPLETE=true \
+                  SCANNER_NAME=semgrep SCANNER_VERSION=1.97.0 \
                   SCANNER_IDENTITY='returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700' \
                   SCANNER_RULESET_DIGEST="$rules_digest" \
                     node scripts/security-policy.mjs record sast reports/semgrep.raw.json reports/sast.json
@@ -158,15 +97,15 @@ jobs:
                   SCANNER_EXIT_CODE="$source_exit" SCANNER_COMPLETE=true \
                   SCANNER_NAME=syft SCANNER_VERSION=1.51.0 \
                   SCANNER_IDENTITY='anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0' \
-                  SCANNER_RULESET_DIGEST='sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0' \
                     node scripts/security-policy.mjs record source-sbom reports/source-sbom.raw.json reports/source-sbom.json
 
+                  image_id=$(cat reports-image-digest.txt)
                   started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   set +e
                   docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock \
                     --volume "$PWD/reports:/reports" \
                     anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0 \
-                    docker:staticdeploy-service:ci -o spdx-json=/reports/image-sbom.raw.json
+                    "docker:$image_id" -o spdx-json=/reports/image-sbom.raw.json
                   image_exit=$?
                   set -e
                   completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
@@ -174,40 +113,80 @@ jobs:
                   SCANNER_EXIT_CODE="$image_exit" SCANNER_COMPLETE=true \
                   SCANNER_NAME=syft SCANNER_VERSION=1.51.0 \
                   SCANNER_IDENTITY='anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0' \
-                  SCANNER_RULESET_DIGEST='sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0' \
                     node scripts/security-policy.mjs record image-sbom reports/image-sbom.raw.json reports/image-sbom.json
-            - name: Scan exact image with fresh Grype database
+            - name: Inventory exact dependency licenses
               run: |
-                  mkdir -p reports/grype-cache
                   started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   set +e
-                  docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock \
-                    --volume "$PWD/reports/grype-cache:/cache" \
+                  yarn info --all --recursive --manifest --json > reports/yarn-licenses.raw.ndjson
+                  license_exit=$?
+                  set -e
+                  completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  SCANNER_STARTED_AT="$started_at" SCANNER_COMPLETED_AT="$completed_at" \
+                  SCANNER_EXIT_CODE="$license_exit" SCANNER_COMPLETE=true \
+                  SCANNER_NAME=yarn-info SCANNER_VERSION=4.18.0 \
+                  SCANNER_IDENTITY='yarn@npm:4.18.0' \
+                  SCANNER_RULESET_DIGEST="sha256:$(sha256sum yarn.lock | cut -d' ' -f1)" \
+                    node scripts/security-policy.mjs record license-inventory reports/yarn-licenses.raw.ndjson reports/license-inventory.json
+            - name: Update and validate pinned Grype database
+              run: |
+                  mkdir -p reports/grype-cache
+                  docker run --rm --volume "$PWD/reports/grype-cache:/cache" \
                     --env GRYPE_DB_CACHE_DIR=/cache \
                     anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253 \
-                    docker:staticdeploy-service:ci -o json > reports/grype.raw.json
-                  scan_exit=$?
-                  set -e
+                    db update
                   docker run --rm --volume "$PWD/reports/grype-cache:/cache" \
                     --env GRYPE_DB_CACHE_DIR=/cache \
                     anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253 \
                     db status -o json > reports/grype-db.json
+                  jq -e '.valid == true and (.built | fromdateiso8601) > 0' reports/grype-db.json >/dev/null
+            - name: Scan exact source SBOM and image with pinned Grype database
+              run: |
                   database_updated_at=$(jq -r .built reports/grype-db.json)
+                  database_identity=$(jq -r '.schemaVersion + "|" + .from' reports/grype-db.json)
+                  source_sbom_digest="sha256:$(sha256sum reports/source-sbom.raw.json | cut -d' ' -f1)"
+                  started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  set +e
+                  docker run --rm --volume "$PWD/reports:/reports" \
+                    --env GRYPE_DB_AUTO_UPDATE=false --env GRYPE_DB_CACHE_DIR=/reports/grype-cache \
+                    anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253 \
+                    sbom:/reports/source-sbom.raw.json -o json > reports/grype-source.raw.json
+                  source_exit=$?
+                  set -e
                   completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
                   SCANNER_STARTED_AT="$started_at" SCANNER_COMPLETED_AT="$completed_at" \
-                  SCANNER_EXIT_CODE="$scan_exit" SCANNER_COMPLETE=true \
+                  SCANNER_EXIT_CODE="$source_exit" SCANNER_COMPLETE=true \
                   SCANNER_NAME=grype SCANNER_VERSION=0.117.0 \
                   SCANNER_IDENTITY='anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253' \
-                  SCANNER_DATABASE_UPDATED_AT="$database_updated_at" \
-                    node scripts/security-policy.mjs record image-vulnerabilities reports/grype.raw.json reports/image-vulnerabilities.json
-                  rm -rf reports/grype-cache
+                  SCANNER_DATABASE_UPDATED_AT="$database_updated_at" SCANNER_DATABASE_VALID=true \
+                  SCANNER_DATABASE_IDENTITY="$database_identity" SCANNER_INPUT_DIGEST="$source_sbom_digest" \
+                    node scripts/security-policy.mjs record dependency-vulnerabilities reports/grype-source.raw.json reports/dependency-vulnerabilities.json
+
+                  image_id=$(cat reports-image-digest.txt)
+                  started_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  set +e
+                  docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock \
+                    --volume "$PWD/reports:/reports" \
+                    --env GRYPE_DB_AUTO_UPDATE=false --env GRYPE_DB_CACHE_DIR=/reports/grype-cache \
+                    anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253 \
+                    "docker:$image_id" -o json > reports/grype-image.raw.json
+                  image_exit=$?
+                  set -e
+                  completed_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+                  SCANNER_STARTED_AT="$started_at" SCANNER_COMPLETED_AT="$completed_at" \
+                  SCANNER_EXIT_CODE="$image_exit" SCANNER_COMPLETE=true \
+                  SCANNER_NAME=grype SCANNER_VERSION=0.117.0 \
+                  SCANNER_IDENTITY='anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253' \
+                  SCANNER_DATABASE_UPDATED_AT="$database_updated_at" SCANNER_DATABASE_VALID=true \
+                  SCANNER_DATABASE_IDENTITY="$database_identity" SCANNER_INPUT_DIGEST="$image_id" \
+                    node scripts/security-policy.mjs record image-vulnerabilities reports/grype-image.raw.json reports/image-vulnerabilities.json
             - name: Evaluate fail-closed vulnerability and license policy
               run: node scripts/security-policy.mjs evaluate reports
             - name: Remove raw scanner output
               if: always()
               run: |
                   rm -f reports/*.raw.json reports/*.raw.ndjson reports/grype-db.json reports-image-digest.txt
-                  rm -rf reports/grype-cache
+                  sudo rm -rf reports/grype-cache
                   find reports -type f -exec chmod 600 {} +
             - name: Upload sanitized policy evidence
               if: always()

@@ -13,10 +13,15 @@ const temp = fs.mkdtempSync(
 const commit = execFileSync("git", ["rev-parse", "HEAD"], {
     encoding: "utf8",
 }).trim();
-const lockDigest = `sha256:${createHash("sha256").update(fs.readFileSync("yarn.lock")).digest("hex")}`;
+const digest = (value) =>
+    `sha256:${createHash("sha256").update(value).digest("hex")}`;
+const lockDigest = digest(fs.readFileSync("yarn.lock"));
 const imageDigest = `sha256:${"a".repeat(64)}`;
 const now = Date.now();
 const timestamp = new Date(now - 60_000).toISOString();
+const databaseTimestamp = new Date(now - 2 * 60 * 60 * 1000).toISOString();
+const sourceSbomRawDigest = `sha256:${"c".repeat(64)}`;
+const semgrepDigest = digest(fs.readFileSync("config/semgrep.yml"));
 const subject = {
     schemaVersion: 1,
     commit,
@@ -30,66 +35,163 @@ const subject = {
         ref: "fixture",
     },
 };
-const scanner = {
-    name: "fixture",
-    version: "1.0.0",
-    identity: "fixture@sha256:abc",
-    rulesetDigest: "sha256:rules",
-    databaseUpdatedAt: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
-};
-const payloads = {
-    "dependency-vulnerabilities": { advisories: [] },
-    sast: { results: [] },
-    secrets: { findings: [] },
+const contracts = {
+    "dependency-vulnerabilities": {
+        name: "grype",
+        version: "0.117.0",
+        identity:
+            "anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253",
+        database: true,
+        inputDigest: sourceSbomRawDigest,
+    },
     "image-vulnerabilities": {
-        source: { target: { imageID: imageDigest } },
-        matches: [],
+        name: "grype",
+        version: "0.117.0",
+        identity:
+            "anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253",
+        database: true,
+        inputDigest: imageDigest,
     },
     "source-sbom": {
-        bomFormat: "CycloneDX",
-        components: [{ name: "fixture" }],
+        name: "syft",
+        version: "1.51.0",
+        identity:
+            "anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0",
     },
     "image-sbom": {
+        name: "syft",
+        version: "1.51.0",
+        identity:
+            "anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0",
+    },
+    sast: {
+        name: "semgrep",
+        version: "1.97.0",
+        identity:
+            "returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700",
+        rulesetDigest: semgrepDigest,
+    },
+    secrets: {
+        name: "trufflehog",
+        version: "3.97.0",
+        identity:
+            "trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33",
+        rulesetDigest:
+            "sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33",
+    },
+    "license-inventory": {
+        name: "yarn-info",
+        version: "4.18.0",
+        identity: "yarn@npm:4.18.0",
+        rulesetDigest: lockDigest,
+    },
+};
+const lockPackages = [
+    ...fs
+        .readFileSync("yarn.lock", "utf8")
+        .matchAll(/^\s*resolution:\s*"((?:@[^/"]+\/)?[^@"]+)@npm:([^"]+)"/gm),
+]
+    .map((match) => ({ name: match[1], version: match[2] }))
+    .filter(
+        (item, index, values) =>
+            values.findIndex(
+                (candidate) =>
+                    candidate.name === item.name &&
+                    candidate.version === item.version
+            ) === index
+    );
+const licenseComponents = lockPackages.map((item) => ({
+    component: item.name,
+    locator: `${item.name}@npm:${item.version}`,
+    version: item.version,
+    scope: "resolved",
+    spdxExpression: "MIT",
+}));
+const sourceComponents = lockPackages.map((item) => ({
+    name: item.name,
+    version: item.version,
+    purl: `pkg:npm/${encodeURIComponent(item.name).replace("%40", "@")}@${encodeURIComponent(item.version)}`,
+}));
+
+function scanner(type) {
+    const contract = contracts[type];
+    return {
+        name: contract.name,
+        version: contract.version,
+        identity: contract.identity,
+        rulesetDigest: contract.rulesetDigest || null,
+        databaseUpdatedAt: contract.database ? databaseTimestamp : null,
+        databaseValid: contract.database ? true : null,
+        databaseIdentity: contract.database
+            ? "v6.1.9|https://grype.example/database.tar.zst"
+            : null,
+        inputDigest: contract.inputDigest || null,
+    };
+}
+const payloads = {
+    "dependency-vulnerabilities": {
+        target: { userInput: "source-sbom.raw.json" },
+        matches: [],
+    },
+    sast: { results: [] },
+    secrets: { findings: [] },
+    "image-vulnerabilities": { target: { imageID: imageDigest }, matches: [] },
+    "source-sbom": { bomFormat: "CycloneDX", components: sourceComponents },
+    "image-sbom": {
         spdxVersion: "SPDX-2.3",
+        name: `staticdeploy-${imageDigest.slice(7)}`,
+        documentNamespace: `https://anchore.example/${imageDigest.slice(7)}`,
         packages: [
             {
                 name: "fixture-image",
                 SPDXID: "SPDXRef-fixture-image",
-                versionInfo: "1.0.0",
+                versionInfo: imageDigest.slice("sha256:".length),
                 licenseDeclared: "MIT",
                 licenseConcluded: "MIT",
+                externalRefs: [
+                    {
+                        referenceLocator: `pkg:oci/fixture?tag=${imageDigest.slice("sha256:".length)}`,
+                    },
+                ],
             },
         ],
     },
-    "license-inventory": {
-        components: [
-            {
-                component: "fixture",
-                locator: "fixture@npm:1.0.0",
-                version: "1.0.0",
-                scope: "resolved",
-                spdxExpression: "MIT",
-            },
-        ],
-    },
+    "license-inventory": { components: licenseComponents },
 };
-
-function makeReport(type, payload, overrides = {}) {
+function makeReport(type, payload) {
     return {
         schemaVersion: 1,
         type,
-        subject,
-        scanner: structuredClone(scanner),
+        subject: structuredClone(subject),
+        scanner: scanner(type),
         startedAt: timestamp,
         completedAt: timestamp,
         exitCode: 0,
-        acceptedExitCodes: [0],
         complete: true,
-        rawDigest: `sha256:${"b".repeat(64)}`,
+        rawDigest:
+            type === "source-sbom"
+                ? sourceSbomRawDigest
+                : `sha256:${"b".repeat(64)}`,
         payload,
-        ...overrides,
     };
 }
+const licensePolicy = {
+    schemaVersion: 1,
+    allowedSpdx: ["MIT", "CC0-1.0"],
+    obligationEvidence: {
+        MIT: {
+            obligationsComplete: true,
+            evidence: "fixture MIT notice",
+            reviewReference: "review-mit",
+        },
+        "CC0-1.0": {
+            obligationsComplete: true,
+            evidence: "fixture CC0 notice",
+            reviewReference: "review-cc0",
+        },
+    },
+    reviewedExpressions: [],
+};
 function writeCase(name, mutate = () => {}, policies = {}) {
     const directory = path.join(temp, name);
     fs.mkdirSync(directory);
@@ -122,13 +224,7 @@ function writeCase(name, mutate = () => {}, policies = {}) {
     );
     fs.writeFileSync(
         licensePath,
-        JSON.stringify(
-            policies.licenses || {
-                schemaVersion: 1,
-                allowedSpdx: ["MIT"],
-                reviewedExpressions: [],
-            }
-        )
+        JSON.stringify(policies.licenses || licensePolicy)
     );
     const result = spawnSync(
         process.execPath,
@@ -152,77 +248,212 @@ const expectFail = (name, mutate, policies) => {
     const { result } = writeCase(name, mutate, policies);
     assert.notEqual(result.status, 0, `${name} should fail`);
 };
-const addDependencyFinding = (fixture, severity = "high") => {
-    fixture.reports["dependency-vulnerabilities"].payload.advisories.push({
-        value: "fixture-package",
-        children: {
-            ID: "GHSA-fixture",
-            Severity: severity,
-            "Tree Versions": ["1.0.0"],
-            Dependents: ["fixture-root"],
-        },
+function addFinding(fixture, severity = "High", scope = "resolved-dependency") {
+    fixture.reports[
+        scope === "image"
+            ? "image-vulnerabilities"
+            : "dependency-vulnerabilities"
+    ].payload.matches.push({
+        id: "GHSA-fixture",
+        severity,
+        aliases: ["CVE-2026-0001"],
+        component: "fixture-package",
+        version: "1.0.0",
+        locations: ["node_modules/fixture-package/package.json"],
     });
-};
+}
+function validException(scope = "resolved-dependency") {
+    return {
+        id: `EX-${scope}`,
+        findingId: "GHSA-fixture",
+        aliases: ["CVE-2026-0001"],
+        component: "fixture-package",
+        version: "1.0.0",
+        path: "node_modules/fixture-package/package.json",
+        scope,
+        severity: "high",
+        subjectCommit: commit,
+        imageDigest: scope === "image" ? imageDigest : null,
+        owner: "owner",
+        securityApprover: "security-owner",
+        releaseOwnerApprover: null,
+        reviewReference: "review-1",
+        remediationTracker: "issue-1",
+        riskRationale: "bounded fixture risk",
+        compensatingControls: "fixture isolation",
+        createdAt: new Date(now - 60_000).toISOString(),
+        expiresAt: new Date(now + 86_400_000).toISOString(),
+    };
+}
+
+function runRecord(name, type, raw, env = {}) {
+    const directory = path.join(temp, `record-${name}`);
+    fs.mkdirSync(directory);
+    fs.writeFileSync(
+        path.join(directory, "subject.json"),
+        JSON.stringify(subject)
+    );
+    const rawPath = path.join(directory, "raw");
+    fs.writeFileSync(rawPath, raw);
+    const output = path.join(directory, "output.json");
+    const contract = contracts[type];
+    const result = spawnSync(
+        process.execPath,
+        [checker, "record", type, rawPath, output],
+        {
+            encoding: "utf8",
+            env: {
+                ...process.env,
+                SCANNER_STARTED_AT: timestamp,
+                SCANNER_COMPLETED_AT: timestamp,
+                SCANNER_EXIT_CODE: "0",
+                SCANNER_COMPLETE: "true",
+                SCANNER_NAME: contract.name,
+                SCANNER_VERSION: contract.version,
+                SCANNER_IDENTITY: contract.identity,
+                SCANNER_RULESET_DIGEST: contract.rulesetDigest || "",
+                SCANNER_DATABASE_UPDATED_AT: contract.database
+                    ? databaseTimestamp
+                    : "",
+                SCANNER_DATABASE_VALID: contract.database ? "true" : "",
+                SCANNER_DATABASE_IDENTITY: contract.database
+                    ? "v6.1.9|https://grype.example/database.tar.zst"
+                    : "",
+                SCANNER_INPUT_DIGEST: contract.inputDigest || "",
+                ...env,
+            },
+        }
+    );
+    return { result, output };
+}
 
 try {
     expectPass("valid");
-    expectPass("medium-visible", (fixture) =>
-        addDependencyFinding(fixture, "moderate")
-    );
-    expectFail("critical", (fixture) =>
-        addDependencyFinding(fixture, "critical")
-    );
-    expectFail("high", (fixture) => addDependencyFinding(fixture, "high"));
-    expectFail("unknown", (fixture) =>
-        addDependencyFinding(fixture, "mystery")
-    );
+    expectPass("medium-visible", (fixture) => addFinding(fixture, "Medium"));
+    expectFail("critical", (fixture) => addFinding(fixture, "Critical"));
+    expectFail("high", (fixture) => addFinding(fixture));
+    expectFail("unknown", (fixture) => addFinding(fixture, "mystery"));
     expectFail("verified-secret", (fixture) =>
-        fixture.reports.secrets.payload.findings.push({ status: "verified" })
+        fixture.reports.secrets.payload.findings.push({
+            detector: "fixture",
+            status: "verified",
+            source: { commit, file: "a", line: 1 },
+        })
     );
-    expectFail("unknown-secret", (fixture) =>
-        fixture.reports.secrets.payload.findings.push({ status: "unknown" })
+    expectFail("malformed-secret-status", (fixture) =>
+        fixture.reports.secrets.payload.findings.push({
+            detector: "fixture",
+            status: "typo",
+            source: { commit, file: "a", line: 1 },
+        })
+    );
+    expectFail("secret-raw-field", (fixture) =>
+        fixture.reports.secrets.payload.findings.push({
+            detector: "fixture",
+            status: "unknown",
+            source: { commit, file: "a", line: 1 },
+            Raw: "must-not-survive",
+        })
     );
     expectFail("scanner-failure", (fixture) => {
-        fixture.reports.sast.complete = false;
-        fixture.reports.sast.exitCode = 2;
+        fixture.reports.sast.complete = "true";
+    });
+    expectFail("bad-raw-digest", (fixture) => {
+        fixture.reports.sast.rawDigest = "bad";
+    });
+    expectFail("wrong-subject-field", (fixture) => {
+        fixture.reports.sast.subject.workflow.ref = "other";
     });
     expectFail("stale-report", (fixture) => {
         fixture.reports.sast.completedAt = new Date(
-            now - 3 * 60 * 60 * 1000
+            now - 3 * 3600000
         ).toISOString();
     });
-    expectFail("stale-database", (fixture) => {
-        fixture.reports["image-vulnerabilities"].scanner.databaseUpdatedAt =
-            new Date(now - 25 * 60 * 60 * 1000).toISOString();
+    expectFail("stale-db-at-evaluation", (fixture) => {
+        fixture.reports[
+            "dependency-vulnerabilities"
+        ].scanner.databaseUpdatedAt = new Date(
+            now - 25 * 3600000
+        ).toISOString();
     });
-    expectFail("wrong-commit", (fixture) => {
-        fixture.reports.sast.subject = { ...subject, commit: "f".repeat(40) };
+    expectFail("invalid-db", (fixture) => {
+        fixture.reports["image-vulnerabilities"].scanner.databaseValid = false;
     });
-    expectFail("wrong-image", (fixture) => {
-        fixture.reports["image-vulnerabilities"].payload.source.target.imageID =
-            `sha256:${"f".repeat(64)}`;
+    expectFail("invalid-db-identity", (fixture) => {
+        fixture.reports["dependency-vulnerabilities"].scanner.databaseIdentity =
+            "unrelated";
     });
-    expectFail("malformed-sbom", (fixture) => {
-        fixture.reports["source-sbom"].payload = { components: [] };
+    expectFail("wrong-source-sbom-input", (fixture) => {
+        fixture.reports["dependency-vulnerabilities"].scanner.inputDigest =
+            `sha256:${"e".repeat(64)}`;
     });
-    expectFail("tag-spoof", (fixture) => {
-        fixture.subject.workflow.ref = "refs/tags/untrusted";
+    expectFail("wrong-image-input", (fixture) => {
+        fixture.reports["image-vulnerabilities"].scanner.inputDigest =
+            `sha256:${"e".repeat(64)}`;
     });
-    expectFail("untrusted-fork-event", (fixture) => {
-        fixture.subject.workflow.eventName = "pull_request_target";
+    expectFail("wrong-image-payload", (fixture) => {
+        fixture.reports["image-vulnerabilities"].payload.target.imageID =
+            `sha256:${"e".repeat(64)}`;
     });
-    expectFail("unknown-license", (fixture) => {
+    expectFail("wrong-image-sbom", (fixture) => {
+        fixture.reports["image-sbom"].payload.packages[0].versionInfo =
+            "not-the-image-digest";
+    });
+    expectFail("license-omission", (fixture) => {
+        fixture.reports["license-inventory"].payload.components.pop();
+    });
+    expectFail("malformed-spdx", (fixture) => {
+        fixture.reports[
+            "license-inventory"
+        ].payload.components[0].spdxExpression = "MIT AND (Apache-2.0";
+    });
+    expectFail("noassertion", (fixture) => {
         fixture.reports[
             "license-inventory"
         ].payload.components[0].spdxExpression = "NOASSERTION";
     });
-    expectFail("prohibited-license", (fixture) => {
+    expectFail("unreviewed-with-exception", (fixture) => {
         fixture.reports[
             "license-inventory"
-        ].payload.components[0].spdxExpression = "GPL-3.0-only";
+        ].payload.components[0].spdxExpression =
+            "Apache-2.0 WITH LLVM-exception";
     });
     expectPass(
-        "completed-license-obligation",
+        "reviewed-with-exception",
+        (fixture) => {
+            fixture.reports[
+                "license-inventory"
+            ].payload.components[0].spdxExpression =
+                "Apache-2.0 WITH LLVM-exception";
+        },
+        {
+            licenses: {
+                ...licensePolicy,
+                allowedSpdx: [...licensePolicy.allowedSpdx, "Apache-2.0"],
+                obligationEvidence: {
+                    ...licensePolicy.obligationEvidence,
+                    "Apache-2.0": {
+                        obligationsComplete: true,
+                        evidence: "fixture Apache notice",
+                        reviewReference: "review-apache",
+                    },
+                },
+                reviewedExpressions: [
+                    {
+                        expression: "Apache-2.0 WITH LLVM-exception",
+                        selected: "Apache-2.0 WITH LLVM-exception",
+                        owner: "owner",
+                        approver: "legal",
+                        reviewReference: "review",
+                        obligationsComplete: true,
+                        obligationEvidence: "fixture exception terms",
+                    },
+                ],
+            },
+        }
+    );
+    expectPass(
+        "reviewed-or",
         (fixture) => {
             fixture.reports[
                 "license-inventory"
@@ -230,92 +461,174 @@ try {
         },
         {
             licenses: {
-                schemaVersion: 1,
-                allowedSpdx: ["MIT", "CC0-1.0"],
+                ...licensePolicy,
                 reviewedExpressions: [
                     {
                         expression: "(MIT OR CC0-1.0)",
                         selected: "MIT",
-                        owner: "security-owner",
-                        approver: "legal-owner",
-                        reviewReference: "review-1",
+                        owner: "owner",
+                        approver: "legal",
+                        reviewReference: "review",
                         obligationsComplete: true,
+                        obligationEvidence: "fixture OR selection",
                     },
                 ],
             },
         }
     );
-    const exception = {
-        id: "EX-1",
-        findingId: "GHSA-fixture",
-        aliases: [],
-        component: "fixture-package",
-        version: "1.0.0",
-        path: "fixture-root",
-        scope: "resolved-dependency",
-        severity: "high",
-        subjectCommit: commit,
-        owner: "owner",
-        securityApprover: "security-owner",
-        reviewReference: "review-1",
-        remediationTracker: "issue-1",
-        riskRationale: "bounded fixture risk",
-        compensatingControls: "fixture isolation",
-        createdAt: new Date(now - 60_000).toISOString(),
-        expiresAt: new Date(now + 24 * 60 * 60 * 1000).toISOString(),
-    };
-    expectPass("valid-exception", (fixture) => addDependencyFinding(fixture), {
-        exceptions: { schemaVersion: 1, exceptions: [exception] },
-    });
     expectFail(
-        "unapproved-exception",
-        (fixture) => addDependencyFinding(fixture),
+        "unavailable-or-selection",
+        (fixture) => {
+            fixture.reports[
+                "license-inventory"
+            ].payload.components[0].spdxExpression =
+                "(GPL-3.0-only OR AGPL-3.0-only)";
+        },
         {
-            exceptions: {
-                schemaVersion: 1,
-                exceptions: [{ ...exception, securityApprover: "" }],
+            licenses: {
+                ...licensePolicy,
+                reviewedExpressions: [
+                    {
+                        expression: "(GPL-3.0-only OR AGPL-3.0-only)",
+                        selected: "MIT",
+                        owner: "owner",
+                        approver: "legal",
+                        reviewReference: "review",
+                        obligationsComplete: true,
+                        obligationEvidence: "bad",
+                    },
+                ],
             },
         }
     );
+    expectPass("valid-exception", (fixture) => addFinding(fixture), {
+        exceptions: { schemaVersion: 1, exceptions: [validException()] },
+    });
+    expectPass(
+        "valid-image-exception",
+        (fixture) => addFinding(fixture, "High", "image"),
+        {
+            exceptions: {
+                schemaVersion: 1,
+                exceptions: [validException("image")],
+            },
+        }
+    );
+    expectFail("duplicate-exception-id", undefined, {
+        exceptions: {
+            schemaVersion: 1,
+            exceptions: [validException(), validException()],
+        },
+    });
+    expectFail("expired-unrelated-exception", undefined, {
+        exceptions: {
+            schemaVersion: 1,
+            exceptions: [
+                {
+                    ...validException(),
+                    expiresAt: new Date(now - 1).toISOString(),
+                },
+            ],
+        },
+    });
+    expectFail("wildcard-unrelated-exception", undefined, {
+        exceptions: {
+            schemaVersion: 1,
+            exceptions: [{ ...validException(), path: "node_modules/*" }],
+        },
+    });
     expectFail(
-        "expired-exception",
-        (fixture) => addDependencyFinding(fixture),
+        "wrong-image-exception",
+        (fixture) => addFinding(fixture, "High", "image"),
         {
             exceptions: {
                 schemaVersion: 1,
                 exceptions: [
                     {
-                        ...exception,
-                        createdAt: new Date(
-                            now - 2 * 24 * 60 * 60 * 1000
-                        ).toISOString(),
-                        expiresAt: new Date(now - 60_000).toISOString(),
+                        ...validException("image"),
+                        imageDigest: `sha256:${"f".repeat(64)}`,
                     },
                 ],
             },
         }
     );
-    expectFail(
-        "wrong-subject-exception",
-        (fixture) => addDependencyFinding(fixture),
-        {
-            exceptions: {
-                schemaVersion: 1,
-                exceptions: [{ ...exception, subjectCommit: "f".repeat(40) }],
+    expectFail("bad-policy-schema", undefined, {
+        exceptions: { schemaVersion: 2, exceptions: [] },
+    });
+
+    const semgrepMarker = "SENSITIVE-MARKER";
+    const semgrepRaw = JSON.stringify({
+        results: [
+            {
+                check_id: "rule",
+                path: "src/a.ts",
+                start: { line: 1, col: 1 },
+                end: { line: 1, col: 2 },
+                extra: {
+                    severity: "ERROR",
+                    lines: semgrepMarker,
+                    metavars: { X: { abstract_content: semgrepMarker } },
+                },
             },
-        }
+        ],
+        errors: [],
+    });
+    const semgrepRecord = runRecord("semgrep", "sast", semgrepRaw);
+    assert.equal(semgrepRecord.result.status, 0, semgrepRecord.result.stderr);
+    assert.ok(
+        !fs.readFileSync(semgrepRecord.output, "utf8").includes(semgrepMarker)
     );
-    expectFail(
-        "wildcard-exception",
-        (fixture) => addDependencyFinding(fixture),
-        {
-            exceptions: {
-                schemaVersion: 1,
-                exceptions: [{ ...exception, path: "*" }],
+    assert.notEqual(
+        runRecord(
+            "semgrep-errors",
+            "sast",
+            JSON.stringify({
+                results: [],
+                errors: [{ message: "parse failed" }],
+            })
+        ).result.status,
+        0
+    );
+    assert.notEqual(
+        runRecord("empty-grype", "dependency-vulnerabilities", "", {}).result
+            .status,
+        0
+    );
+    assert.notEqual(
+        runRecord(
+            "operational-grype",
+            "dependency-vulnerabilities",
+            JSON.stringify({ source: { target: {} }, matches: [] }),
+            { SCANNER_EXIT_CODE: "1" }
+        ).result.status,
+        0
+    );
+    const grypeRaw = JSON.stringify({
+        source: { target: { userInput: "sbom.json" } },
+        matches: [
+            {
+                vulnerability: { id: "GHSA-fixture", severity: "High" },
+                relatedVulnerabilities: [{ id: "CVE-2026-0001" }],
+                artifact: {
+                    name: "fixture",
+                    version: "1.0.0",
+                    locations: [{ path: "node_modules/fixture/package.json" }],
+                },
             },
-        }
+        ],
+    });
+    const grypeRecord = runRecord(
+        "grype",
+        "dependency-vulnerabilities",
+        grypeRaw
     );
-    console.log("Security-policy fixture and negative tests passed.");
+    assert.equal(grypeRecord.result.status, 0, grypeRecord.result.stderr);
+    assert.deepEqual(
+        JSON.parse(fs.readFileSync(grypeRecord.output)).payload.matches[0]
+            .aliases,
+        ["CVE-2026-0001"]
+    );
+    console.log("Security-policy record/evaluation and negative tests passed.");
 } finally {
     fs.rmSync(temp, { recursive: true, force: true });
 }

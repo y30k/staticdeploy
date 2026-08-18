@@ -2697,6 +2697,7 @@ __metadata:
     minipass: "npm:3.1.6"
     nyc: "npm:18.0.0"
     prettier: "npm:3.6.2"
+    spdx-expression-parse: "npm:5.0.0"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.67.0"
   dependenciesMeta:
@@ -12317,6 +12318,16 @@ __metadata:
   version: 2.3.0
   resolution: "spdx-exceptions@npm:2.3.0"
   checksum: 10c0/83089e77d2a91cb6805a5c910a2bedb9e50799da091f532c2ba4150efdef6e53f121523d3e2dc2573a340dc0189e648b03157097f65465b3a0c06da1f18d7e8a
+  languageName: node
+  linkType: hard
+
+"spdx-expression-parse@npm:5.0.0":
+  version: 5.0.0
+  resolution: "spdx-expression-parse@npm:5.0.0"
+  dependencies:
+    spdx-exceptions: "npm:^2.1.0"
+    spdx-license-ids: "npm:^3.0.0"
+  checksum: 10c0/26d0e79e1fda50301ba99c294788c4efb1aded6b8206dada2749d497c7772cfd6ee8ed43c9a0095dc77a3fcf2a39f421643381ec009a8b84bb95a5bb1a623510
   languageName: node
   linkType: hard
 
