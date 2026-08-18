@@ -87,6 +87,7 @@ try {
         "usr/local/lib/node_modules/npm",
         "usr/local/lib/node_modules/corepack",
         "opt/staticdeploy/yarn.lock",
+        "opt/staticdeploy/sdk",
     ])
         assert.equal(
             has(forbidden),
@@ -131,7 +132,8 @@ try {
         "no-new-privileges:true",
         "--tmpfs",
         "/tmp:rw,noexec,nosuid,size=16m",
-        "-P",
+        "-p",
+        "127.0.0.1::80",
         "-e",
         "MANAGEMENT_HOSTNAME=localhost",
         "-e",
@@ -149,8 +151,18 @@ try {
     assert.ok(
         container.HostConfig.SecurityOpt.includes("no-new-privileges:true")
     );
+    assert.equal(
+        container.HostConfig.Tmpfs["/tmp"],
+        "rw,noexec,nosuid,size=16m",
+        "runtime smoke must use the reviewed bounded tmpfs"
+    );
     const binding = container.NetworkSettings.Ports["80/tcp"]?.[0];
     assert.ok(binding?.HostPort, "container must publish its test port");
+    assert.equal(
+        binding.HostIp,
+        "127.0.0.1",
+        "auth-disabled test port must bind only to loopback"
+    );
 
     const deadline = Date.now() + 90_000;
     while (
