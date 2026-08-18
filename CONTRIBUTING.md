@@ -1,12 +1,22 @@
 ## System requirements
 
-- [nodejs >= 8](https://nodejs.org/en/)
-- [yarn](https://yarnpkg.org) (used for managing dependencies)
+- [Node.js 24.19.0](https://nodejs.org/en/) (exactly; see `.nvmrc` and
+  `.node-version`)
+- Yarn 4.18.0 through Corepack (pinned by the root `packageManager` field)
 
 ## Setup
 
-After cloning the repository, from the project's root directory run `yarn` to
-install packages.
+After cloning the repository, enable Corepack and run an immutable install from
+the project root:
+
+```sh
+corepack enable
+yarn install --immutable
+```
+
+Dependency lifecycle scripts are globally disabled. See
+[`docs/toolchain.md`](docs/toolchain.md) before changing a resolved dependency
+that declares an install script.
 
 From the project's root directory, you can run the following npm scripts:
 
@@ -22,8 +32,8 @@ which scripts are available.
 
 ## Installing dependencies
 
-This project uses [yarn](https://yarnpkg.org) and [lerna](https://lernajs.io/)
-to manage dependencies.
+This project uses pinned Yarn 4.18.0 with the `node-modules` linker and pinned
+Lerna 10.0.0 to manage dependencies.
 
 To install a dependency for a subproject, `cd` into the subproject's directory
 and run:
@@ -33,12 +43,13 @@ and run:
 yarn add my-dependency
 ```
 
-To install a subproject as a dependency of another subproject, `cd` into the
-project's root directory and run:
+To install one workspace as a dependency of another, run Yarn's supported
+workspace command from the project root:
 
 ```sh
-# use the --dev flag for dev dependencies
-yarn lerna add dependency-subproject --scope=dependant-subproject
+# use --dev for a development dependency
+yarn workspace @staticdeploy/dependant-subproject add \
+  @staticdeploy/dependency-subproject@workspace:^
 ```
 
 ## Conventions
@@ -53,6 +64,6 @@ yarn lerna add dependency-subproject --scope=dependant-subproject
 
 ## Releasing
 
-This fork has no package, image, website, or deployment publication workflow.
-Do not create or push release tags until an approved GitHub Actions release
+This fork has no package, image, website, or deployment publication workflow. Do
+not create or push release tags until an approved GitHub Actions release
 workflow and GitHub-hosted artifact contract are implemented.

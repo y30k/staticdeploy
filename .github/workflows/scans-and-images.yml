@@ -1,48 +1,65 @@
 name: Scans and image builds
 
 on:
-  pull_request:
+    pull_request:
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  scans-and-images:
-    name: scans-and-images
-    runs-on: ubuntu-22.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 14.21.3
-          cache: yarn
-      - name: Scan tracked content for verified secrets
-        uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318 # v3.97.0
-        with:
-          path: ./
-          extra_args: --json
-      - name: Install frozen dependencies
-        run: yarn install --frozen-lockfile
-      - name: Write dependency and license reports
-        run: |
-          mkdir -p reports
-          yarn audit --json > reports/yarn-audit.json || true
-          yarn licenses list --json > reports/yarn-licenses.json
-      - name: Scan source code
-        run: |
-          mkdir -p reports
-          docker run --rm --volume "$PWD:/src" \
-            returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700 \
-            semgrep scan --config p/default --json --output /src/reports/semgrep.json /src
-      - name: Build service image without publishing
-        run: docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
-      - name: Upload scan reports
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: legacy-scan-reports
-          path: reports/
-          if-no-files-found: warn
+    scans-and-images:
+        name: scans-and-images
+        runs-on: ubuntu-22.04
+        timeout-minutes: 20
+        steps:
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+              with:
+                  fetch-depth: 0
+                  persist-credentials: false
+            - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+              with:
+                  node-version: 24.19.0
+                  cache: yarn
+            - name: Scan tracked content for verified secrets
+              uses: trufflesecurity/trufflehog@bcfcf73aaf4759d4dadc2783177c245a02792318 # v3.97.0
+              with:
+                  path: ./
+                  extra_args: --json
+            - name: Enable pinned Yarn
+              run: |
+                  corepack enable
+                  test "$(yarn --version)" = "4.18.0"
+            - name: Verify pre-install policy and negative cases
+              run: |
+                  node scripts/check-install-policy.mjs
+                  node scripts/test-install-policy.mjs
+            - name: Install immutable dependencies
+              run: yarn install --immutable
+            - name: Verify install-script inventory
+              run: yarn check:install-scripts
+            - name: Write dependency and license reports
+              run: |
+                  mkdir -p reports
+                  set +e
+                  yarn npm audit --all --recursive --json > reports/yarn-audit.json
+                  audit_exit=$?
+                  set -e
+                  printf '%s\n' "$audit_exit" > reports/yarn-audit.exit-code
+                  yarn info --all --recursive --manifest --json > reports/yarn-licenses.json
+            - name: Scan source code
+              run: |
+                  mkdir -p reports
+                  docker run --rm --volume "$PWD:/src" \
+                    returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700 \
+                    semgrep scan --config p/default --json --output /src/reports/semgrep.json /src
+            - name: Build service image without publishing
+              run:
+                  docker build --file staticdeploy/Dockerfile --tag
+                  staticdeploy-service:ci .
+            - name: Upload scan reports
+              if: always()
+              uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+              with:
+                  name: legacy-scan-reports
+                  path: reports/
+                  if-no-files-found: warn

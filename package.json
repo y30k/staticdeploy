@@ -1,8 +1,12 @@
 {
-  "name": "@staticdeploy/staticdeploy",
+  "name": "@staticdeploy/monorepo",
   "description": "An open-source platform for deploying static apps",
   "version": "0.0.0",
   "private": true,
+  "packageManager": "yarn@4.18.0",
+  "engines": {
+    "node": "24.19.0"
+  },
   "workspaces": [
     "management-console",
     "cli",
@@ -28,11 +32,50 @@
   "bugs": {
     "url": "https://github.com/staticdeploy/staticdeploy/issues"
   },
+  "dependenciesMeta": {
+    "core-js@2.6.12": {
+      "built": false
+    },
+    "core-js@3.19.3": {
+      "built": false
+    },
+    "core-js-pure@3.19.3": {
+      "built": false
+    },
+    "dtrace-provider@0.8.8": {
+      "built": false
+    },
+    "ejs@2.7.4": {
+      "built": false
+    },
+    "gifsicle@4.0.1": {
+      "built": false
+    },
+    "highlight.js@9.18.5": {
+      "built": false
+    },
+    "husky@4.3.8": {
+      "built": false
+    },
+    "jpegtran-bin@4.0.0": {
+      "built": false
+    },
+    "nx@23.1.1": {
+      "built": false
+    },
+    "optipng-bin@5.1.0": {
+      "built": false
+    }
+  },
   "scripts": {
     "compile": "lerna run compile --stream --concurrency 1",
     "lint": "lerna run lint --stream --concurrency 1",
     "test": "lerna run test --stream --concurrency 1",
-    "coverage": "nyc --all npm test",
+    "coverage": "nyc --all yarn test",
+    "check:install-policy": "node scripts/check-install-policy.mjs",
+    "test:install-policy": "node scripts/test-install-policy.mjs",
+    "check:install-scripts": "node scripts/check-install-scripts.mjs",
+    "provision:optipng": "node scripts/provision-optipng.mjs",
     "lerna": "lerna"
   },
   "devDependencies": {
@@ -40,7 +83,8 @@
     "@commitlint/config-conventional": "^15.0.0",
     "@commitlint/config-lerna-scopes": "^15.0.0",
     "husky": "^4.3.5",
-    "lerna": "^4.0.0",
+    "lerna": "10.0.0",
+    "minipass": "3.1.6",
     "nyc": "^15.1.0",
     "prettier": "^2.5.1"
   }

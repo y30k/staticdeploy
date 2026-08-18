@@ -9,6 +9,12 @@ coverage
 
 # Npm + yarn files
 node_modules
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 npm-debug.log*
 npm-error.log*
 package-lock.json
@@ -17,7 +23,8 @@ yarn-error.log*
 lerna-debug.log*
 lerna-error.log*
 
-# Eslint
+# Task-runner and lint caches
+.cache
 .eslintcache
 
 # Ignore dotenv files

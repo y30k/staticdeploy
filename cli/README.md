@@ -8,7 +8,8 @@ The CLI is retained for legacy characterization only and is not published by
 this fork. Build and run it from a frozen workspace checkout:
 
 ```sh
-yarn install --frozen-lockfile
+corepack enable
+yarn install --immutable
 yarn lerna run compile \
   --scope=@staticdeploy/cli \
   --include-dependencies \
