@@ -23,9 +23,9 @@
   "dependencies": {
     "@staticdeploy/core": "^0.15.5",
     "bluebird": "^3.7.2",
-    "fs-extra": "^10.0.0",
-    "recursive-readdir": "^2.2.2",
-    "tar": "^6.1.11"
+    "fs-extra": "11.4.0",
+    "recursive-readdir": "2.2.3",
+    "tar": "7.5.22"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.36",
@@ -35,7 +35,6 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "24.13.3",
     "@types/recursive-readdir": "^2.2.0",
-    "@types/tar": "^6.1.1",
     "chai": "^4.3.4",
     "create-fs-tree": "^1.0.0",
     "deep-equal-in-any-order": "^1.1.15",

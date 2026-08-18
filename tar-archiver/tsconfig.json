@@ -8,8 +8,7 @@
             "@types/deep-equal-in-any-order",
             "@types/fs-extra",
             "@types/mocha",
-            "@types/recursive-readdir",
-            "@types/tar"
+            "@types/recursive-readdir"
         ],
         "outDir": "lib",
         "declaration": true
