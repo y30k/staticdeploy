@@ -50,7 +50,7 @@
     "format:check": "prettier --check \"eslint.config.mjs\" \"prettier.config.js\" \"scripts/**/*.mjs\" \"cli/bin/**/*.js\" \"{cli,core,http-adapters,jwt-authentication-strategy,management-console,memory-storages,oidc-authentication-strategy,pg-s3-storages,sdk,serve-static,staticdeploy,storages-test-suite,tar-archiver}/{src,test,typings,mock-server}/**/*.{ts,tsx,css}\" \"website/**/*.js\" \"website/docs/**/*.md\"",
     "lint": "eslint \"eslint.config.mjs\" \"prettier.config.js\" \"scripts/**/*.mjs\" \"cli/bin/**/*.js\" \"{cli,core,http-adapters,jwt-authentication-strategy,management-console,memory-storages,oidc-authentication-strategy,pg-s3-storages,sdk,serve-static,staticdeploy,storages-test-suite,tar-archiver}/{src,test,typings,mock-server}/**/*.{ts,tsx}\" \"website/**/*.js\"",
     "typecheck": "node scripts/typecheck-workspaces.mjs",
-    "unit": "node scripts/test-workspace-checks.mjs && yarn test:runtime-notices && yarn test:multiarch-workflow && yarn test:multiarch-evidence && yarn test:multiarch-inventory && yarn test:tooling-compatibility && lerna run test --stream --concurrency 1",
+    "unit": "node scripts/test-workspace-checks.mjs && yarn test:runtime-notices && yarn test:multiarch-workflow && yarn test:multiarch-evidence && yarn test:multiarch-inventory && yarn test:m2-gate && yarn test:tooling-compatibility && lerna run test --stream --concurrency 1",
     "test:tooling-compatibility": "yarn workspace @staticdeploy/core exec mocha --parallel --jobs 2 'test-fixtures/mocha-parallel-*.cjs'",
     "test": "yarn unit",
     "coverage": "nyc --all yarn unit && yarn workspace @staticdeploy/management-console test:coverage",
@@ -61,6 +61,7 @@
     "test:multiarch-workflow": "node scripts/test-multiarch-workflow.mjs",
     "test:multiarch-evidence": "node scripts/test-multiarch-image-evidence.mjs",
     "test:multiarch-inventory": "node scripts/test-multiarch-image-inventory.mjs",
+    "test:m2-gate": "node scripts/test-m2-gate.mjs",
     "test:image": "node scripts/test-image-conformance.mjs",
     "check:install-scripts": "node scripts/check-install-scripts.mjs",
     "lerna": "lerna"
