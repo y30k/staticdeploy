@@ -194,5 +194,55 @@
                 "missingReason": null
             }
         }
+    ],
+    "evidenceArtifacts": [
+        {
+            "path": "docs/security/license-evidence/m2-license-review-decision.md",
+            "digest": "sha256:6e384a748d9fcc8ced46857ca1f459ff250464b23c322faef4aa6be866bf1969"
+        },
+        {
+            "path": "docs/security/license-evidence/m2-runtime-third-party-notices.txt",
+            "digest": "sha256:37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-runtime-compliance.md",
+            "digest": "sha256:ef6d3255d1529ecf781d9e19036990e588fd7fbd2cfea1652f5b8c903c7645a2"
+        },
+        {
+            "path": "docs/security/license-evidence/base-runtime-license-texts/GCC-exception-3.1.txt",
+            "digest": "sha256:7103d4f7f7e2f8ce10d282a05e0689637f8d6d9ef7b399d808d1da313e69b960"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/ca-certificates-bundle-20260413-r1.spdx.json",
+            "digest": "sha256:048e54383819dc88c3e7015bed9f671b51ba3c649fff590b9ca1b8124c4fb0dd"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/glibc-2.43-r13.spdx.json",
+            "digest": "sha256:1f4233fd035591b1dd4f23537a6ff7c09ddd928482908067baba07dc8e19610e"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/glibc-locale-posix-2.43-r13.spdx.json",
+            "digest": "sha256:68fa41c5f5c8b02e3a91c983dd8efa4a0316db7d4b3f711eadfdb4a7cef76220"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/ld-linux-2.43-r13.spdx.json",
+            "digest": "sha256:3af9e0b1cf6cd659bb027d4b7aedf8673eee96f39a102377958095b3f697d685"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/libgcc-16.1.0-r4.spdx.json",
+            "digest": "sha256:d9ca803e39b73744a8f9cb348d41bf7b3ed537da634d7c8166f5d0e15cde4bf2"
+        },
+        {
+            "path": "docs/security/license-evidence/chainguard-base-sboms/libstdc++-16.1.0-r4.spdx.json",
+            "digest": "sha256:9c09f88a89cb340798aeb14dd8008307b5652ba4fd9e91b597d3d7dec843969b"
+        },
+        {
+            "path": "docs/security/license-evidence/npm-fallbacks/aws-sdk-js-v3-LICENSE",
+            "digest": "sha256:edea91454b811f127fbdea3d86f378f6719bd372ed440abf82b232f6fca06c3d"
+        },
+        {
+            "path": "docs/security/license-evidence/npm-fallbacks/boolbase-1.0.0-LICENSE",
+            "digest": "sha256:cdf4d87ae0a6c160227263bf4e39a0a10e30e89ae7256e0f7ac7bde0836552c6"
+        }
     ]
 }

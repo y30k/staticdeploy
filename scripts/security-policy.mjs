@@ -1028,6 +1028,7 @@ function validateLicensePolicy(policy) {
             "obligationEvidence",
             "reviewedExpressions",
             "componentAssertions",
+            "evidenceArtifacts",
         ],
         "license policy"
     );
@@ -1146,6 +1147,28 @@ function validateLicensePolicy(policy) {
             assertion.obligationEvidence,
             `component license assertion ${key}`
         );
+    }
+    const evidenceArtifacts = asArray(
+        policy.evidenceArtifacts,
+        "license evidence artifacts"
+    );
+    const evidencePaths = new Set();
+    for (const artifact of evidenceArtifacts) {
+        exactKeys(artifact, ["path", "digest"], "license evidence artifact");
+        if (
+            typeof artifact.path !== "string" ||
+            !artifact.path.startsWith("docs/security/license-evidence/") ||
+            path.isAbsolute(artifact.path) ||
+            path.normalize(artifact.path) !== artifact.path ||
+            evidencePaths.has(artifact.path) ||
+            !DIGEST.test(artifact.digest || "") ||
+            !fs.existsSync(artifact.path) ||
+            sha256File(artifact.path) !== artifact.digest
+        )
+            fail(
+                "License evidence artifact is missing, unsafe, duplicate, or stale"
+            );
+        evidencePaths.add(artifact.path);
     }
     return policy;
 }

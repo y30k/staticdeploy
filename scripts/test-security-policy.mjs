@@ -242,6 +242,7 @@ const licensePolicy = {
     },
     reviewedExpressions: [],
     componentAssertions: [],
+    evidenceArtifacts: [],
 };
 function writeCase(name, mutate = () => {}, policies = {}) {
     const directory = path.join(temp, name);
@@ -570,6 +571,28 @@ try {
         ),
         "missing obligation artifacts must be reported in evaluation evidence"
     );
+    expectPass("retained-license-evidence-artifact", undefined, {
+        licenses: {
+            ...licensePolicy,
+            evidenceArtifacts: [
+                {
+                    path: obligationArtifact,
+                    digest: digest(fs.readFileSync(obligationArtifact)),
+                },
+            ],
+        },
+    });
+    expectFail("stale-license-evidence-artifact", undefined, {
+        licenses: {
+            ...licensePolicy,
+            evidenceArtifacts: [
+                {
+                    path: obligationArtifact,
+                    digest: `sha256:${"f".repeat(64)}`,
+                },
+            ],
+        },
+    });
     expectFail("wrong-obligation-artifact-digest", undefined, {
         licenses: {
             ...licensePolicy,
