@@ -37,6 +37,7 @@ jobs:
               run: |
                   mkdir -p reports
                   docker build --file staticdeploy/Dockerfile --tag staticdeploy-service:ci .
+                  node scripts/test-image-conformance.mjs staticdeploy-service:ci
                   docker image inspect staticdeploy-service:ci --format '{{.Id}}' > reports-image-config-digest.txt
                   grep -Eq '^sha256:[a-f0-9]{64}$' reports-image-config-digest.txt
                   node scripts/security-policy.mjs subject reports/subject.json "$(cat reports-image-config-digest.txt)"

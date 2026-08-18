@@ -1,5 +1,5 @@
 # This Dockerfile is executed with the monorepo root as its build context.
-FROM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS builder
+FROM node:24.19.0-bookworm-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03 AS builder
 
 WORKDIR /opt/staticdeploy
 
@@ -61,12 +61,9 @@ RUN corepack enable && \
     find node_modules -type d \( -name test -o -name tests -o -name __tests__ -o -name spec -o -name specs -o -name examples \) -prune -exec rm -rf '{}' + && \
     find . -type f \( -name '*.map' -o -name '*.ts' -o -name '*.tsx' \) -delete
 
-FROM scratch AS runtime
+FROM cgr.dev/chainguard/glibc-dynamic@sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303 AS runtime
 
-COPY --from=builder /lib/ld-musl-*.so.1 /lib/
-COPY --from=builder /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
-COPY --from=builder /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /usr/local/LICENSE /usr/local/LICENSE
 COPY --from=builder /usr/local/bin/node /nodejs/bin/node
 WORKDIR /opt/staticdeploy/staticdeploy
 COPY --from=builder /opt/staticdeploy/package.json /opt/staticdeploy/package.json
