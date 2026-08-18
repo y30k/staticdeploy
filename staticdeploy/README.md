@@ -24,9 +24,9 @@ The following environment variables can be used to configure the server:
 #### General service configurations
 
 - `LOG_LEVEL`: validated minimum local structured-log level (`trace`, `debug`,
-  `info`, `warn`, `error`, or `fatal`; defaults to `info`). Any other value stops
-  startup with a structured error. In non-test environments the service writes
-  newline-delimited JSON to standard output with its application name and
+  `info`, `warn`, `error`, or `fatal`; defaults to `info`). Any other value
+  stops startup with a structured error. In non-test environments the service
+  writes newline-delimited JSON to standard output with its application name and
   version. Test runs are silent. Each request receives a server-generated UUID;
   caller `X-Request-Id` values are ignored. Terminal request records use `info`
   for completed responses (including 4xx), `warn` for aborted requests, and
@@ -57,9 +57,12 @@ The following environment variables can be used to configure the server:
   performing the request must have the appropriate roles). Defaults to `true`
 - `CREATE_ROOT_USER`: on startup, create (if they don't already exist) a `root`
   user and group with the `root` role. Defaults to `true`
-- `JWT_SECRET_OR_PUBLIC_KEY`: by setting this config the JWT authentication
-  strategy will be enabled. The config is the secret or public key (base64
-  encoded) to validate authorization JWT-s
+- `JWT_SECRET_OR_PUBLIC_KEY`: the secret or public key (base64 encoded) used to
+  validate authorization JWTs. JWT authentication is enabled only when this and
+  `JWT_ALGORITHM` are both set
+- `JWT_ALGORITHM`: required with `JWT_SECRET_OR_PUBLIC_KEY`; must be exactly
+  `HS256` for a shared secret or `RS256` for an RSA public key. Startup fails
+  closed when a key is configured without an explicit algorithm
 - `OIDC_CONFIGURATION_URL`: by setting this config (and the following one) the
   OpenID Connect authentication strategy will be enabled. The config is the
   configuration url of the OpenID Connect provider (e.g.

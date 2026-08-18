@@ -206,7 +206,7 @@
         },
         {
             "path": "docs/security/license-evidence/chainguard-runtime-compliance.md",
-            "digest": "sha256:ef6d3255d1529ecf781d9e19036990e588fd7fbd2cfea1652f5b8c903c7645a2"
+            "digest": "sha256:6ae13823b79c81639b9420350bac816ef6bd1360b2c35e4d8d6576ff92743607"
         },
         {
             "path": "docs/security/license-evidence/base-runtime-license-texts/GCC-exception-3.1.txt",

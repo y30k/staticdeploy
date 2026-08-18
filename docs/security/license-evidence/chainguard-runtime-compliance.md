@@ -1,8 +1,9 @@
 # Chainguard runtime component compliance evidence
 
-**Status:** Technical evidence candidate; named security/license and
-release-owner review is still required. This document does not declare
-obligations complete.
+**Status:** Approved on 2026-08-18 by Mike Davies (`LoganAvatar`) as project,
+security/license, and release owner. The exact approval and publication gate are
+recorded in `m2-license-review-decision.md`; any component or evidence drift
+requires a new review.
 
 ## Exact subject
 
@@ -103,8 +104,9 @@ The image ships:
   Apache, CC0, and GCC Runtime Library Exception texts and the exact production
   npm notices.
 
-Technical evidence now identifies exact package versions, inherited SBOM bytes,
+Technical evidence identifies exact package versions, inherited SBOM bytes,
 source revisions/locations, dynamic linking, binary hashes, and shipped texts.
-The remaining decision is owner review of source-retention duration, LGPL
-recipient/relinking sufficiency, GCC exception applicability, CA attribution,
-and the Node scanner assertion.
+Owner approval covers LGPL recipient/relinking sufficiency, GCC exception
+applicability, CA attribution, and the exact Node scanner assertion for this
+candidate. Later publication remains fail closed until the approved release
+process retains the exact source archives as co-versioned release artifacts.
