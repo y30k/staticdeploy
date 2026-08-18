@@ -213,7 +213,7 @@ implementing the modern API routes.
 
 ## Hardened baseline service image
 
-`staticdeploy/Dockerfile` uses a digest-pinned exact Node `24.19.0` Alpine
+`staticdeploy/Dockerfile` uses a digest-pinned exact Node `24.19.0` Bookworm
 builder and a digest-pinned package-manager-free Chainguard glibc runtime. The
 builder performs the immutable full install and compilation, deletes every
 installed dependency, and recreates a clean production-only StaticDeploy focus

@@ -63,7 +63,8 @@ RUN corepack enable && \
 
 FROM cgr.dev/chainguard/glibc-dynamic@sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303 AS runtime
 
-COPY --from=builder /usr/local/LICENSE /usr/local/LICENSE
+COPY --from=builder /usr/local/LICENSE /licenses/node/LICENSE
+COPY LICENSE /licenses/staticdeploy/LICENSE
 COPY --from=builder /usr/local/bin/node /nodejs/bin/node
 WORKDIR /opt/staticdeploy/staticdeploy
 COPY --from=builder /opt/staticdeploy/package.json /opt/staticdeploy/package.json
@@ -97,7 +98,7 @@ EXPOSE 80
 
 USER 65532:65532
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["/nodejs/bin/node", "-e", "const net=require('net');const socket=net.connect({host:'127.0.0.1',port:Number(process.env.PORT)},()=>{socket.destroy();process.exit(0)});socket.setTimeout(4000,()=>socket.destroy());socket.on('error',()=>process.exit(1));"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["/nodejs/bin/node", "-e", "const net=require('net');const socket=net.connect({host:'127.0.0.1',port:Number(process.env.PORT)},()=>{socket.destroy();process.exit(0)});socket.setTimeout(4000,()=>{socket.destroy();process.exit(1)});socket.on('error',()=>process.exit(1));"]
 
 ENTRYPOINT ["/nodejs/bin/node"]
 CMD ["build/server.js"]

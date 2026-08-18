@@ -1295,6 +1295,24 @@ function evaluate(directory) {
         !imageSbom.payload.packages.length
     )
         fail("Image SBOM is not a non-empty SPDX document");
+    const imagePackageIds = imageSbom.payload.packages.map(
+        (component) => component.SPDXID
+    );
+    if (new Set(imagePackageIds).size !== imagePackageIds.length)
+        fail("Image SPDX document contains duplicate package IDs");
+    const requiredImageComponents = new Map([
+        ["node", "24.19.0"],
+        ["@staticdeploy/staticdeploy", "0.15.5"],
+    ]);
+    for (const [name, version] of requiredImageComponents) {
+        if (
+            !imageSbom.payload.packages.some(
+                (component) =>
+                    component.name === name && component.versionInfo === version
+            )
+        )
+            fail(`Image SPDX document omits ${name}@${version}`);
+    }
     const imageHex = subjectReport.imageConfigDigest.slice("sha256:".length);
     const rootId = imageSbom.payload.documentDescribes[0];
     const imagePackage = imageSbom.payload.packages.find(

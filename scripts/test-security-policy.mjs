@@ -177,6 +177,22 @@ const payloads = {
                 ],
             },
             {
+                name: "node",
+                SPDXID: "SPDXRef-Package-node",
+                versionInfo: "24.19.0",
+                licenseDeclared: "MIT",
+                licenseConcluded: "NOASSERTION",
+                externalRefs: [],
+            },
+            {
+                name: "@staticdeploy/staticdeploy",
+                SPDXID: "SPDXRef-Package-staticdeploy",
+                versionInfo: "0.15.5",
+                licenseDeclared: "MIT",
+                licenseConcluded: "NOASSERTION",
+                externalRefs: [],
+            },
+            {
                 name: "sha256",
                 SPDXID: "SPDXRef-DocumentRoot-Image-sha256",
                 versionInfo: imageConfigDigest.slice("sha256:".length),
@@ -492,6 +508,15 @@ try {
         fixture.reports["image-sbom"].payload.packages.find(
             (item) => item.SPDXID === "SPDXRef-DocumentRoot-Image-sha256"
         ).versionInfo = "not-the-image-config-digest";
+    });
+    expectFail("duplicate-image-package-id", (fixture) => {
+        fixture.reports["image-sbom"].payload.packages[0].SPDXID =
+            "SPDXRef-DocumentRoot-Image-sha256";
+    });
+    expectFail("missing-node-component", (fixture) => {
+        fixture.reports["image-sbom"].payload.packages = fixture.reports[
+            "image-sbom"
+        ].payload.packages.filter((item) => item.name !== "node");
     });
     expectFail("license-omission", (fixture) => {
         fixture.reports["license-inventory"].payload.components.pop();

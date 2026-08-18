@@ -12,13 +12,27 @@ if (!image) throw new Error("usage: test-image-conformance.mjs IMAGE");
 const docker = (...args) =>
     execFileSync("docker", args, { encoding: "utf8" }).trim();
 const inspect = JSON.parse(docker("image", "inspect", image))[0];
-assert.notEqual(inspect.Config.User, "", "runtime user must be explicit");
-assert.notEqual(inspect.Config.User, "0", "runtime user must be non-root");
-assert.notEqual(inspect.Config.User, "root", "runtime user must be non-root");
+assert.equal(
+    inspect.Config.User,
+    "65532:65532",
+    "runtime must use the reviewed numeric non-root identity"
+);
 assert.match(inspect.Id, /^sha256:[a-f0-9]{64}$/);
 assert.deepEqual(inspect.Config.Entrypoint, ["/nodejs/bin/node"]);
 assert.deepEqual(inspect.Config.Cmd, ["build/server.js"]);
 assert.ok(inspect.Config.Healthcheck, "runtime image must define healthcheck");
+assert.equal(
+    docker(
+        "run",
+        "--rm",
+        "--entrypoint",
+        "/nodejs/bin/node",
+        image,
+        "--version"
+    ),
+    "v24.19.0",
+    "runtime must execute the exact supported Node version"
+);
 
 const history = docker(
     "history",
@@ -50,6 +64,25 @@ try {
         has("opt/staticdeploy/management-console/build/index.html"),
         true
     );
+    assert.equal(has("licenses/node/LICENSE"), true);
+    assert.equal(has("licenses/staticdeploy/LICENSE"), true);
+    const verboseEntries = execFileSync(
+        "tar",
+        ["--numeric-owner", "-tvf", archive],
+        { encoding: "utf8" }
+    ).split("\n");
+    for (const required of [
+        "nodejs/bin/node",
+        "opt/staticdeploy/staticdeploy/build/server.js",
+        "licenses/node/LICENSE",
+        "licenses/staticdeploy/LICENSE",
+    ]) {
+        const line = verboseEntries.find((entry) =>
+            entry.endsWith(` ${required}`)
+        );
+        assert.ok(line, `missing runtime ownership entry: ${required}`);
+        assert.match(line, /^\S+\s+0\/0\s+/, `${required} must be root-owned`);
+    }
     for (const forbidden of [
         "usr/local/lib/node_modules/npm",
         "usr/local/lib/node_modules/corepack",
