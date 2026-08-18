@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@staticdeploy/core": "^0.15.5",
-    "axios": "^0.24.0",
+    "axios": "1.19.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {

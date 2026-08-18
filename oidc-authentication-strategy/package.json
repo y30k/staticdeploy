@@ -24,7 +24,7 @@
   "dependencies": {
     "@panva/jose": "^1.9.3",
     "@staticdeploy/core": "^0.15.5",
-    "axios": "^0.24.0",
+    "axios": "1.19.0",
     "bunyan": "^1.8.15",
     "mem": "^8.0.0"
   },

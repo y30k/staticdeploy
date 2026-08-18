@@ -36,6 +36,23 @@ describe("interceptor addAuthorizationHeader", () => {
             await axios.get("/");
             scope.done();
         });
+        it("preserves existing request headers", async () => {
+            const scope = nock(baseUrl, {
+                reqheaders: {
+                    authorization: `Bearer ${apiToken}`,
+                    "x-existing-header": "existing-value",
+                },
+            })
+                .get("/")
+                .reply(200);
+            const axios = Axios.create({
+                baseURL: baseUrl,
+                headers: { "X-Existing-Header": "existing-value" },
+            });
+            axios.interceptors.request.use(addAuthorizationHeader(apiToken));
+            await axios.get("/");
+            scope.done();
+        });
     });
 
     describe("when there is no apiToken, doesn't add the authorization header to the request", async () => {
