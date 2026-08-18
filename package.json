@@ -53,7 +53,7 @@
     "unit": "node scripts/test-workspace-checks.mjs && yarn test:tooling-compatibility && lerna run test --stream --concurrency 1",
     "test:tooling-compatibility": "yarn workspace @staticdeploy/core exec mocha --parallel --jobs 2 'test-fixtures/mocha-parallel-*.cjs'",
     "test": "yarn unit",
-    "coverage": "nyc --all yarn unit",
+    "coverage": "nyc --all yarn unit && yarn workspace @staticdeploy/management-console test:coverage",
     "check:install-policy": "node scripts/check-install-policy.mjs",
     "test:install-policy": "node scripts/test-install-policy.mjs",
     "check:install-scripts": "node scripts/check-install-scripts.mjs",

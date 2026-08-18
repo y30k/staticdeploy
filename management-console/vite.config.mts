@@ -40,5 +40,12 @@ export default defineConfig({
         exclude: ["test/setup.ts"],
         css: true,
         clearMocks: true,
+        coverage: {
+            provider: "v8",
+            include: ["src/**/*.{ts,tsx}"],
+            exclude: ["src/**/*.d.ts"],
+            reportsDirectory: "coverage",
+            reporter: ["text-summary", "json", "lcov"],
+        },
     },
 });

@@ -71,6 +71,11 @@ and do not emit, but retained workspace package entrypoints resolve through
 compiled `lib/` artifacts; the supported execution order is therefore
 `yarn compile` followed by `yarn unit` or `yarn coverage`, as encoded in CI.
 `tsconfig.test.json` supplies the shared no-emit test-project contract. Root
+coverage emits two honest, complementary reports: NYC instruments every retained
+backend source (including zero-hit TypeScript), while Vitest's V8 provider
+instruments every management-console source file. The backend denominator
+excludes the console only because it is covered by the separate frontend report;
+the root command runs both and neither report substitutes for the other. Root
 tooling scripts, the CLI executable, and all owned website JavaScript are
 included in the centralized lint/format paths.
 

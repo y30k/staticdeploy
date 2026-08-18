@@ -18,6 +18,7 @@
   },
   "scripts": {
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "dev:mock-server": "tsx watch mock-server/index.ts",
     "dev:server": "vite --host 127.0.0.1 --port 5173 --strictPort",
     "dev": "vite --host 127.0.0.1 --port 5173 --strictPort",
@@ -60,6 +61,7 @@
     "@types/sinon": "17.0.4",
     "@types/sinon-chai": "3.2.12",
     "@vitejs/plugin-react": "6.0.5",
+    "@vitest/coverage-v8": "4.1.10",
     "chai": "4.5.0",
     "express": "4.22.2",
     "faker": "5.5.3",

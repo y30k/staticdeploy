@@ -1,34 +1,26 @@
 {
-  "include": [
-    "**/src/**/*.js",
-    "**/src/**/*.jsx",
-    "**/src/**/*.ts",
-    "**/src/**/*.tsx"
-  ],
-  "parserPlugins": [
-    "asyncGenerators",
-    "bigInt",
-    "classProperties",
-    "classPrivateProperties",
-    "classPrivateMethods",
-    "dynamicImport",
-    "importMeta",
-    "numericSeparator",
-    "objectRestSpread",
-    "optionalCatchBinding",
-    "topLevelAwait",
-    "typescript",
-    "jsx"
-  ],
-  "reporter": [
-    "lcov",
-    "text-summary",
-    "html"
-  ],
-  "extension": [
-    ".js",
-    ".jsx",
-    ".ts",
-    ".tsx"
-  ]
+    "include": [
+        "**/src/**/*.js",
+        "**/src/**/*.jsx",
+        "**/src/**/*.ts",
+        "**/src/**/*.tsx"
+    ],
+    "exclude": ["management-console/src/**"],
+    "parserPlugins": [
+        "asyncGenerators",
+        "bigInt",
+        "classProperties",
+        "classPrivateProperties",
+        "classPrivateMethods",
+        "dynamicImport",
+        "importMeta",
+        "numericSeparator",
+        "objectRestSpread",
+        "optionalCatchBinding",
+        "topLevelAwait",
+        "typescript",
+        "jsx"
+    ],
+    "reporter": ["lcov", "text-summary", "html", "json"],
+    "extension": [".js", ".jsx", ".ts", ".tsx"]
 }
