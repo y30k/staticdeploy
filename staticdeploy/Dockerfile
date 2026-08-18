@@ -1,5 +1,5 @@
 # This Dockerfile is executed with the monorepo root as its build context.
-FROM node:24.19.0-alpine AS builder
+FROM node:24.19.0-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS builder
 
 WORKDIR /opt/staticdeploy
 
@@ -58,22 +58,49 @@ RUN corepack enable && \
     rm -rf storages-test-suite && \
     rm -rf tar-archiver/tsconfig.json tar-archiver/src && \
     rm -rf staticdeploy/tsconfig.json staticdeploy/src staticdeploy/typings && \
-    find node_modules -type d \( -name test -o -name tests -o -name __tests__ \) -prune -exec rm -rf '{}' +
+    find node_modules -type d \( -name test -o -name tests -o -name __tests__ -o -name spec -o -name specs -o -name examples \) -prune -exec rm -rf '{}' + && \
+    find . -type f \( -name '*.map' -o -name '*.ts' -o -name '*.tsx' \) -delete
 
-FROM node:24.19.0-alpine AS runtime
+FROM scratch AS runtime
 
-RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack && \
-    rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg
-
+COPY --from=builder /lib/ld-musl-*.so.1 /lib/
+COPY --from=builder /usr/lib/libstdc++.so.6 /usr/lib/libstdc++.so.6
+COPY --from=builder /usr/lib/libgcc_s.so.1 /usr/lib/libgcc_s.so.1
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /usr/local/bin/node /nodejs/bin/node
 WORKDIR /opt/staticdeploy/staticdeploy
-COPY --from=builder --chown=node:node /opt/staticdeploy /opt/staticdeploy
+COPY --from=builder /opt/staticdeploy/package.json /opt/staticdeploy/package.json
+COPY --from=builder /opt/staticdeploy/node_modules /opt/staticdeploy/node_modules
+COPY --from=builder /opt/staticdeploy/core/package.json /opt/staticdeploy/core/package.json
+COPY --from=builder /opt/staticdeploy/core/lib /opt/staticdeploy/core/lib
+COPY --from=builder /opt/staticdeploy/http-adapters/package.json /opt/staticdeploy/http-adapters/package.json
+COPY --from=builder /opt/staticdeploy/http-adapters/lib /opt/staticdeploy/http-adapters/lib
+COPY --from=builder /opt/staticdeploy/jwt-authentication-strategy/package.json /opt/staticdeploy/jwt-authentication-strategy/package.json
+COPY --from=builder /opt/staticdeploy/jwt-authentication-strategy/lib /opt/staticdeploy/jwt-authentication-strategy/lib
+COPY --from=builder /opt/staticdeploy/management-console/package.json /opt/staticdeploy/management-console/package.json
+COPY --from=builder /opt/staticdeploy/management-console/build /opt/staticdeploy/management-console/build
+COPY --from=builder /opt/staticdeploy/memory-storages/package.json /opt/staticdeploy/memory-storages/package.json
+COPY --from=builder /opt/staticdeploy/memory-storages/lib /opt/staticdeploy/memory-storages/lib
+COPY --from=builder /opt/staticdeploy/oidc-authentication-strategy/package.json /opt/staticdeploy/oidc-authentication-strategy/package.json
+COPY --from=builder /opt/staticdeploy/oidc-authentication-strategy/lib /opt/staticdeploy/oidc-authentication-strategy/lib
+COPY --from=builder /opt/staticdeploy/pg-s3-storages/package.json /opt/staticdeploy/pg-s3-storages/package.json
+COPY --from=builder /opt/staticdeploy/pg-s3-storages/lib /opt/staticdeploy/pg-s3-storages/lib
+COPY --from=builder /opt/staticdeploy/sdk/package.json /opt/staticdeploy/sdk/package.json
+COPY --from=builder /opt/staticdeploy/sdk/lib /opt/staticdeploy/sdk/lib
+COPY --from=builder /opt/staticdeploy/serve-static/package.json /opt/staticdeploy/serve-static/package.json
+COPY --from=builder /opt/staticdeploy/serve-static/lib /opt/staticdeploy/serve-static/lib
+COPY --from=builder /opt/staticdeploy/tar-archiver/package.json /opt/staticdeploy/tar-archiver/package.json
+COPY --from=builder /opt/staticdeploy/tar-archiver/lib /opt/staticdeploy/tar-archiver/lib
+COPY --from=builder /opt/staticdeploy/staticdeploy/package.json /opt/staticdeploy/staticdeploy/package.json
+COPY --from=builder /opt/staticdeploy/staticdeploy/build /opt/staticdeploy/staticdeploy/build
 
 ENV NODE_ENV=production
 ENV PORT=80
 EXPOSE 80
 
-USER node
+USER 65532:65532
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["node", "-e", "const http=require('http');const request=http.get({host:'127.0.0.1',port:process.env.PORT,path:'/api/health',headers:{host:process.env.MANAGEMENT_HOSTNAME}},response=>{response.resume();process.exit(response.statusCode===200?0:1)});request.setTimeout(4000,()=>request.destroy());request.on('error',()=>process.exit(1));"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["/nodejs/bin/node", "-e", "const net=require('net');const socket=net.connect({host:'127.0.0.1',port:Number(process.env.PORT)},()=>{socket.destroy();process.exit(0)});socket.setTimeout(4000,()=>socket.destroy());socket.on('error',()=>process.exit(1));"]
 
-CMD ["node", "build/server.js"]
+ENTRYPOINT ["/nodejs/bin/node"]
+CMD ["build/server.js"]

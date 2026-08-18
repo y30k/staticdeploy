@@ -213,13 +213,17 @@ implementing the modern API routes.
 
 ## Hardened baseline service image
 
-`staticdeploy/Dockerfile` uses an exact Node `24.19.0` Alpine builder and a
-separate runtime stage. The builder performs the immutable full install and
-compilation, deletes every installed dependency, and recreates a clean
-production-only StaticDeploy focus before copying the result. The runtime
-removes npm, Corepack, and Yarn, contains no TypeScript source or dependency
-test fixtures, and runs as the existing unprivileged `node` user. Its health
-check uses Node itself, so no package manager or extra HTTP client is installed.
+`staticdeploy/Dockerfile` uses a digest-pinned exact Node `24.19.0` Alpine
+builder and a `scratch` runtime. The builder performs the immutable full install
+and compilation, deletes every installed dependency, and recreates a clean
+production-only StaticDeploy focus before copying an explicit runtime closure.
+Only the exact Node binary, its required musl/C++ runtime libraries, CA bundle,
+production dependencies, compiled CommonJS, and compiled console are copied;
+npm, Corepack, Yarn, shells, build layers, TypeScript/declarations/source maps,
+and dependency tests/examples never enter a runtime layer. Files stay root-owned
+and the process runs as numeric unprivileged user `65532:65532`. The TCP health
+check uses the exact copied Node binary and remains valid when management
+endpoints are disabled.
 
 `scripts/test-image-conformance.mjs` verifies the runtime user, command,
 healthcheck, layer history, absence of build tooling/source/tests, and a live
