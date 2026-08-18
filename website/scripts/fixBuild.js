@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const { load } = require("cheerio");
 const fs = require("fs-extra");
 const { join } = require("path");
@@ -12,7 +11,7 @@ fs.removeSync(join(buildDirPath, "/notFound"));
 fs.removeSync(join(buildDirPath, "/privacyPolicy"));
 fs.removeSync(join(buildDirPath, "/en"));
 fs.removeSync(join(buildDirPath, "/img"));
-fs.readdirSync(buildDocsDirPath).forEach(docFileName => {
+fs.readdirSync(buildDocsDirPath).forEach((docFileName) => {
     // Remove the doc if it's a directory
     const docPath = join(buildDocsDirPath, docFileName);
     if (fs.statSync(docPath).isDirectory()) {
@@ -23,7 +22,7 @@ console.log("Extra files removed");
 
 // Fix links in each doc in the docs folder
 console.log("Fixing links in docs...");
-fs.readdirSync(buildDocsDirPath).forEach(docFileName => {
+fs.readdirSync(buildDocsDirPath).forEach((docFileName) => {
     // Load and parse the doc
     const docPath = join(buildDocsDirPath, docFileName);
     const doc = fs.readFileSync(docPath, "utf8");
@@ -32,9 +31,8 @@ fs.readdirSync(buildDocsDirPath).forEach(docFileName => {
     // Fix relative links in header and sidebar. They should have the parent
     // directory (i.e. the site's root directory) as base instead of the current
     // directory (i.e. $root/docs). Example: ./foo becomes ../foo
-    $(".fixedHeaderContainer a, #docsNav a").attr(
-        "href",
-        (_, href) => (/^\./.test(href) ? `.${href}` : href)
+    $(".fixedHeaderContainer a, #docsNav a").attr("href", (_, href) =>
+        /^\./.test(href) ? `.${href}` : href
     );
 
     // Write the changes

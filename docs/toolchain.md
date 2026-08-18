@@ -21,11 +21,13 @@ yarn check:install-scripts
 yarn provision:optipng
 ```
 
-Immutable installs must not change `yarn.lock`. The root's exact
-`minipass@3.1.6` development dependency preserves the TypeScript 4-era
-`@types/tar` resolution when Lerna 10 introduces modern transitive Minipass
-versions. Remove this narrow compatibility pin when the tar/TypeScript
-dependency slice is upgraded. A toolchain pin change requires updating every pin
+Immutable installs must not change `yarn.lock`. TypeScript `5.9.3` is
+centralized at the root so every retained TypeScript project uses the same
+version supported by `typescript-eslint`. The exact `minipass@3.1.6` pin and
+`skipLibCheck` remain narrow compatibility requirements for the legacy
+`@types/tar`/Minipass declarations: application source is still checked
+strictly, while incompatible third-party declaration internals are deferred to
+the tar dependency slice. A toolchain pin change requires updating every pin
 together and rerunning the complete M2 checks.
 
 ## Dependency install scripts
@@ -60,13 +62,47 @@ execute, and fails on unsupported platforms or digest mismatch. This narrow
 bridge is for retained compile evidence only and must not be reused for release
 artifacts.
 
+## Central quality checks
+
+The root owns the supported ESLint flat config, Prettier config, TypeScript
+version, and CI entry points. `yarn format:check`, `yarn lint`,
+`yarn typecheck`, `yarn compile`, and `yarn unit` are intentionally separate:
+standalone typechecking enforces 28 source/test projects across all 13
+TypeScript workspaces and always passes `--noEmit`, while compile remains the
+only quality phase that emits workspace builds. `tsconfig.test.json` supplies
+the shared no-emit test-project contract. Root tooling scripts, the CLI
+executable, and all owned website JavaScript are included in the centralized
+lint/format paths.
+
+ESLint covers retained TypeScript/TSX and the website's JavaScript/React. Narrow
+exceptions are documented beside their rules in `eslint.config.mjs`: only the
+exact inventoried v1 serialization, adapter, form, callback, test, and typing
+boundary files may retain explicit `any` until M2-04/M4 replaces those
+contracts; new files remain prohibited. TypeScript owns unused-symbol
+correctness, typed console props do not duplicate runtime PropTypes, and
+Docusaurus v1 receives dynamic props. The configuration still applies ESLint,
+typescript-eslint, and React recommended correctness rules and rejects unused
+disable comments. Add exceptions only for an exact rule and file scope with a
+rationale; do not add blanket file or project disables.
+
+Prettier `3.6.2` centralizes the supported formatting contract. Its one-time,
+mechanical output update is included with this migration and does not alter
+application behavior. Formatting paths are centralized in the root commands;
+forwarding workspace configs and copies of formatter dependencies are forbidden
+by the workspace-contract test. Dependency-managed Git hooks were removed
+because GitHub Actions required checks are authoritative.
+
 ## Legacy console build bridge
 
 Only `@staticdeploy/management-console`'s `compile` command sets
-`NODE_OPTIONS=--openssl-legacy-provider`. This is a build-only compatibility
-bridge for CRA 4/Webpack 4; it is not set globally, in tests, or in service
-runtime configuration. Work item M4-10 must remove the bridge when CRA/Webpack 4
-is replaced.
+`NODE_OPTIONS=--openssl-legacy-provider`, `SKIP_PREFLIGHT_CHECK=true`, and
+`DISABLE_ESLINT_PLUGIN=true`. All three are build-only compatibility bridges for
+CRA 4/Webpack 4: the OpenSSL bridge permits Webpack 4 hashing, the preflight
+bridge permits the centralized supported TypeScript/ESLint versions, and the
+ESLint-plugin bridge prevents CRA from invoking its obsolete embedded lint
+toolchain after the root ESLint phase has passed. None is set globally, in
+tests, or in service runtime configuration. Work item M4-10 must remove all
+three bridges when CRA/Webpack 4 is replaced.
 
 ## Distribution
 

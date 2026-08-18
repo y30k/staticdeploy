@@ -176,7 +176,10 @@ export class ConflictingUserError extends Error {
 
 // Storages errors
 export class StoragesSetupError extends Error {
-    constructor(message: string, public originalError: any) {
+    constructor(
+        message: string,
+        public originalError: any
+    ) {
         super(message);
     }
 }

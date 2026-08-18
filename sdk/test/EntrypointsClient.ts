@@ -39,9 +39,8 @@ describe("EntrypointsClient", () => {
         });
         it("returns the entrypoint with the specified id", async () => {
             nock(baseUrl).get("/entrypoints/id").reply(200, {});
-            const entrypoint = await staticdeployClient.entrypoints.getOne(
-                "id"
-            );
+            const entrypoint =
+                await staticdeployClient.entrypoints.getOne("id");
             expect(entrypoint).to.deep.equal({});
         });
     });

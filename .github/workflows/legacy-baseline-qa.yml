@@ -55,11 +55,15 @@ jobs:
               run: yarn check:install-scripts
             - name: Provision checksum-verified build tool
               run: yarn provision:optipng
+            - name: Check formatting
+              run: yarn format:check
+            - name: Lint retained source
+              run: yarn lint
+            - name: Typecheck all workspaces without emit
+              run: yarn typecheck
             - name: Compile workspaces
               run: yarn compile
-            - name: Lint workspaces
-              run: yarn lint
-            - name: Run tests and collect coverage
+            - name: Run centralized unit and integration tests with coverage
               run: yarn coverage
             - name: Upload coverage report
               if: always()

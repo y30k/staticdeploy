@@ -36,9 +36,8 @@ describe("OperationLogsClient", () => {
         });
         it("returns the operationLog with the specified id", async () => {
             nock(baseUrl).get("/operationLogs/id").reply(200, {});
-            const operationLog = await staticdeployClient.operationLogs.getOne(
-                "id"
-            );
+            const operationLog =
+                await staticdeployClient.operationLogs.getOne("id");
             expect(operationLog).to.deep.equal({});
         });
     });

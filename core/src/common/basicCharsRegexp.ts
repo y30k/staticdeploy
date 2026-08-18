@@ -8,4 +8,4 @@
  *  - easy to type in a shell
  *  - easy to display in a url
  */
-export default /^[\w-\.\/]{1,255}$/;
+export default /^[\w./-]{1,255}$/;

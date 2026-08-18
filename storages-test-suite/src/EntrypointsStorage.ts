@@ -156,9 +156,8 @@ export default (storages: IStorages) => {
                 updatedAt: new Date(),
             };
             await storages.entrypoints.createOne(entrypoint);
-            const foundEntrypoints = await storages.entrypoints.findManyByAppId(
-                "id"
-            );
+            const foundEntrypoints =
+                await storages.entrypoints.findManyByAppId("id");
             expect(foundEntrypoints).to.deep.equal([entrypoint]);
         });
 
@@ -194,9 +193,8 @@ export default (storages: IStorages) => {
                     updatedAt: new Date(),
                 };
                 await storages.entrypoints.createOne(entrypoint);
-                const foundEntrypoint = await storages.entrypoints.findOne(
-                    "id"
-                );
+                const foundEntrypoint =
+                    await storages.entrypoints.findOne("id");
                 expect(foundEntrypoint).to.deep.equal(entrypoint);
             });
 
@@ -212,9 +210,8 @@ export default (storages: IStorages) => {
                     updatedAt: new Date(),
                 };
                 await storages.entrypoints.createOne(entrypoint);
-                const foundEntrypoint = await storages.entrypoints.findOne(
-                    "id"
-                );
+                const foundEntrypoint =
+                    await storages.entrypoints.findOne("id");
                 expect(foundEntrypoint).to.deep.equal(entrypoint);
             });
 
@@ -230,9 +227,8 @@ export default (storages: IStorages) => {
                     updatedAt: new Date(),
                 };
                 await storages.entrypoints.createOne(entrypoint);
-                const foundEntrypoint = await storages.entrypoints.findOne(
-                    "id"
-                );
+                const foundEntrypoint =
+                    await storages.entrypoints.findOne("id");
                 expect(foundEntrypoint).to.deep.equal(entrypoint);
             });
 
@@ -248,9 +244,8 @@ export default (storages: IStorages) => {
                     updatedAt: new Date(),
                 };
                 await storages.entrypoints.createOne(entrypoint);
-                const foundEntrypoint = await storages.entrypoints.findOne(
-                    "id"
-                );
+                const foundEntrypoint =
+                    await storages.entrypoints.findOne("id");
                 expect(foundEntrypoint).to.deep.equal(entrypoint);
             });
 
@@ -266,9 +261,8 @@ export default (storages: IStorages) => {
                     updatedAt: new Date(),
                 };
                 await storages.entrypoints.createOne(entrypoint);
-                const foundEntrypoint = await storages.entrypoints.findOne(
-                    "id"
-                );
+                const foundEntrypoint =
+                    await storages.entrypoints.findOne("id");
                 expect(foundEntrypoint).to.deep.equal(entrypoint);
             });
         });

@@ -48,8 +48,7 @@ class UserForm extends React.Component<
     }
 }
 
-export interface IUserFormInstance
-    extends IConverterForm<IExternalFormValues> {}
+export type IUserFormInstance = IConverterForm<IExternalFormValues>;
 
 export default reduxForm<IExternalFormValues, IInternalFormValues, IProps>({
     form: "UserForm",

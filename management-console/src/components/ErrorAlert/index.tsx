@@ -16,12 +16,10 @@ export default class ErrorAlert extends React.Component<IProps> {
             <div className="c-ErrorAlert-actions">
                 {onRetry ? (
                     <>
-                        {/* eslint-disable-next-line */}
                         <a onClick={() => onRetry()}>{"Retry"}</a>
                         <Divider type="vertical" />
                     </>
                 ) : null}
-                {/* eslint-disable-next-line */}
                 <a onClick={() => window.location.reload()}>
                     {"Reload the page"}
                 </a>

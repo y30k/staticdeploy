@@ -46,9 +46,8 @@ describe("BundlesClient", () => {
         });
         it("returns a list of bundles tags", async () => {
             nock(baseUrl).get("/bundleNames/0/bundleTags").reply(200, []);
-            const bundleTags = await staticdeployClient.bundles.getTagsByName(
-                "0"
-            );
+            const bundleTags =
+                await staticdeployClient.bundles.getTagsByName("0");
             expect(bundleTags).to.deep.equal([]);
         });
     });
