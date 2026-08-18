@@ -33,7 +33,7 @@ component or version authorization:
   runtime base digest
   `sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303`, and
   inventory artifact SHA-256
-  `fe03730cd8939eed72771ccd15bdd1e90c058518ef0d6499cf18703166df9786`;
+  `2fb3563a09534a3e70683e10126fd1e85e5905336d32b29f515f9cfe7092c1ce`;
 - the deterministic runtime notice artifact with SHA-256
   `37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3`;
 - the component/version-bound Chainguard evidence and analysis in

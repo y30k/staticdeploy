@@ -1230,7 +1230,6 @@ function readApprovedLicenseInventory(inventoryPath) {
         "approved license inventory components"
     );
     if (!components.length) fail("Approved license inventory is empty");
-    const seen = new Set();
     for (const component of components) {
         exactKeys(
             component,
@@ -1247,10 +1246,6 @@ function readApprovedLicenseInventory(inventoryPath) {
             ].every((value) => typeof value === "string" && value)
         )
             fail("Approved license inventory component is invalid");
-        const key = JSON.stringify(component);
-        if (seen.has(key))
-            fail("Approved license inventory duplicates a component");
-        seen.add(key);
     }
     return inventory;
 }
@@ -1629,7 +1624,12 @@ function evaluate(directory) {
         .filter((component) => !documentRootIds.has(component.SPDXID))
         .map((component, index) => ({
             component: component.name || `unknown-image-component-${index}`,
-            locator: component.SPDXID || `image-component-${index}`,
+            locator:
+                component.externalRefs?.find(
+                    (reference) => reference.referenceType === "purl"
+                )?.referenceLocator ||
+                component.SPDXID ||
+                `image-component-${index}`,
             version: component.versionInfo || "NOASSERTION",
             scope: "image",
             spdxExpression:

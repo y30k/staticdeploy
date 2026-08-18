@@ -258,7 +258,12 @@ function normalizedFixtureLicenseComponents(fixture) {
             .filter((component) => !documentRoots.has(component.SPDXID))
             .map((component, index) => ({
                 component: component.name || `unknown-image-component-${index}`,
-                locator: component.SPDXID || `image-component-${index}`,
+                locator:
+                    component.externalRefs?.find(
+                        (reference) => reference.referenceType === "purl"
+                    )?.referenceLocator ||
+                    component.SPDXID ||
+                    `image-component-${index}`,
                 version: component.versionInfo || "NOASSERTION",
                 scope: "image",
                 spdxExpression:

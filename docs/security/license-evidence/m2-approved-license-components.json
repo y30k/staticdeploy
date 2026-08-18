@@ -2,1869 +2,1869 @@
     "components": [
         {
             "component": "@aws-sdk/checksums",
-            "locator": "SPDXRef-Package-npm--aws-sdk-checksums-69a4337293261958",
+            "locator": "pkg:npm/%40aws-sdk/checksums@3.1000.28",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.1000.28"
         },
         {
             "component": "@aws-sdk/client-s3",
-            "locator": "SPDXRef-Package-npm--aws-sdk-client-s3-23a378b43e3539a9",
+            "locator": "pkg:npm/%40aws-sdk/client-s3@3.1112.0",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.1112.0"
         },
         {
             "component": "@aws-sdk/core",
-            "locator": "SPDXRef-Package-npm--aws-sdk-core-729d19a657222840",
+            "locator": "pkg:npm/%40aws-sdk/core@3.977.8",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.977.8"
         },
         {
             "component": "@aws-sdk/credential-provider-env",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-env-8f15f28224b33a61",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-env@3.972.69",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.69"
         },
         {
             "component": "@aws-sdk/credential-provider-http",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-http-485040caefb33e6c",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-http@3.972.71",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.71"
         },
         {
             "component": "@aws-sdk/credential-provider-ini",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-ini-75550ec5937f9fae",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-ini@3.973.14",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.973.14"
         },
         {
             "component": "@aws-sdk/credential-provider-login",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-login-04ad25656d12093a",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-login@3.972.76",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.76"
         },
         {
             "component": "@aws-sdk/credential-provider-node",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-node-52584f288060f198",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-node@3.972.80",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.80"
         },
         {
             "component": "@aws-sdk/credential-provider-process",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-process-0162ba79dd0ac608",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-process@3.972.69",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.69"
         },
         {
             "component": "@aws-sdk/credential-provider-sso",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-sso-f208a739c2953c61",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-sso@3.973.13",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.973.13"
         },
         {
             "component": "@aws-sdk/credential-provider-web-identity",
-            "locator": "SPDXRef-Package-npm--aws-sdk-credential-provider-web-identity-88615a7f340b437e",
+            "locator": "pkg:npm/%40aws-sdk/credential-provider-web-identity@3.972.75",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.75"
         },
         {
             "component": "@aws-sdk/middleware-sdk-s3",
-            "locator": "SPDXRef-Package-npm--aws-sdk-middleware-sdk-s3-b92a1ae257c1c3c0",
+            "locator": "pkg:npm/%40aws-sdk/middleware-sdk-s3@3.972.74",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.74"
         },
         {
             "component": "@aws-sdk/nested-clients",
-            "locator": "SPDXRef-Package-npm--aws-sdk-nested-clients-a14696431a9e631c",
+            "locator": "pkg:npm/%40aws-sdk/nested-clients@3.997.43",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.997.43"
         },
         {
             "component": "@aws-sdk/signature-v4-multi-region",
-            "locator": "SPDXRef-Package-npm--aws-sdk-signature-v4-multi-region-03b376a8dd242c94",
+            "locator": "pkg:npm/%40aws-sdk/signature-v4-multi-region@3.996.45",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.996.45"
         },
         {
             "component": "@aws-sdk/token-providers",
-            "locator": "SPDXRef-Package-npm--aws-sdk-token-providers-7faccd30e39441f6",
+            "locator": "pkg:npm/%40aws-sdk/token-providers@3.1111.0",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.1111.0"
         },
         {
             "component": "@aws-sdk/types",
-            "locator": "SPDXRef-Package-npm--aws-sdk-types-6d064ea905b13179",
+            "locator": "pkg:npm/%40aws-sdk/types@3.974.4",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.974.4"
         },
         {
             "component": "@aws-sdk/xml-builder",
-            "locator": "SPDXRef-Package-npm--aws-sdk-xml-builder-e9b112dcf5947db1",
+            "locator": "pkg:npm/%40aws-sdk/xml-builder@3.972.39",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.972.39"
         },
         {
             "component": "@aws/lambda-invoke-store",
-            "locator": "SPDXRef-Package-npm--aws-lambda-invoke-store-90e025ac9d176e63",
+            "locator": "pkg:npm/%40aws/lambda-invoke-store@0.3.0",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "0.3.0"
         },
         {
             "component": "@isaacs/fs-minipass",
-            "locator": "SPDXRef-Package-npm--isaacs-fs-minipass-d2e408951bac90bd",
+            "locator": "pkg:npm/%40isaacs/fs-minipass@4.0.1",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "4.0.1"
         },
         {
             "component": "@mondora/env",
-            "locator": "SPDXRef-Package-npm--mondora-env-80dafd67bf8a8243",
+            "locator": "pkg:npm/%40mondora/env@1.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.0"
         },
         {
             "component": "@pinojs/redact",
-            "locator": "SPDXRef-Package-npm--pinojs-redact-34485a1d0f7de13b",
+            "locator": "pkg:npm/%40pinojs/redact@0.4.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.4.0"
         },
         {
             "component": "@smithy/core",
-            "locator": "SPDXRef-Package-npm--smithy-core-bc35a4b173cc67eb",
+            "locator": "pkg:npm/%40smithy/core@3.33.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "3.33.2"
         },
         {
             "component": "@smithy/credential-provider-imds",
-            "locator": "SPDXRef-Package-npm--smithy-credential-provider-imds-96b878f934f825ef",
+            "locator": "pkg:npm/%40smithy/credential-provider-imds@4.5.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "4.5.2"
         },
         {
             "component": "@smithy/fetch-http-handler",
-            "locator": "SPDXRef-Package-npm--smithy-fetch-http-handler-51b9e361786c70be",
+            "locator": "pkg:npm/%40smithy/fetch-http-handler@5.7.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "5.7.2"
         },
         {
             "component": "@smithy/node-http-handler",
-            "locator": "SPDXRef-Package-npm--smithy-node-http-handler-51214598c9e171c0",
+            "locator": "pkg:npm/%40smithy/node-http-handler@4.11.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "4.11.2"
         },
         {
             "component": "@smithy/signature-v4",
-            "locator": "SPDXRef-Package-npm--smithy-signature-v4-221b3f97e3fea4f9",
+            "locator": "pkg:npm/%40smithy/signature-v4@5.7.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "5.7.2"
         },
         {
             "component": "@smithy/types",
-            "locator": "SPDXRef-Package-npm--smithy-types-47da2b99e378cad0",
+            "locator": "pkg:npm/%40smithy/types@4.17.2",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "4.17.2"
         },
         {
             "component": "@staticdeploy/core",
-            "locator": "SPDXRef-Package-npm--staticdeploy-core-04d20c271e818176",
+            "locator": "pkg:npm/%40staticdeploy/core@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/http-adapters",
-            "locator": "SPDXRef-Package-npm--staticdeploy-http-adapters-df878e5013a4a419",
+            "locator": "pkg:npm/%40staticdeploy/http-adapters@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/jwt-authentication-strategy",
-            "locator": "SPDXRef-Package-npm--staticdeploy-jwt-authentication-strategy-3ca7d2f8718c6ba8",
+            "locator": "pkg:npm/%40staticdeploy/jwt-authentication-strategy@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/management-console",
-            "locator": "SPDXRef-Package-npm--staticdeploy-management-console-f08b6751dfe26daf",
+            "locator": "pkg:npm/%40staticdeploy/management-console@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/memory-storages",
-            "locator": "SPDXRef-Package-npm--staticdeploy-memory-storages-9467eda6907fc442",
+            "locator": "pkg:npm/%40staticdeploy/memory-storages@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/monorepo",
-            "locator": "SPDXRef-Package-npm--staticdeploy-monorepo-4748e1c588099b3e",
+            "locator": "pkg:npm/%40staticdeploy/monorepo@0.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.0.0"
         },
         {
             "component": "@staticdeploy/oidc-authentication-strategy",
-            "locator": "SPDXRef-Package-npm--staticdeploy-oidc-authentication-strategy-b94a1b3a171411cf",
+            "locator": "pkg:npm/%40staticdeploy/oidc-authentication-strategy@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/pg-s3-storages",
-            "locator": "SPDXRef-Package-npm--staticdeploy-pg-s3-storages-e51b90465688e6dc",
+            "locator": "pkg:npm/%40staticdeploy/pg-s3-storages@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/serve-static",
-            "locator": "SPDXRef-Package-npm--staticdeploy-serve-static-811c613dfb19d28e",
+            "locator": "pkg:npm/%40staticdeploy/serve-static@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/staticdeploy",
-            "locator": "SPDXRef-Package-npm--staticdeploy-staticdeploy-5b70e850ea1ab407",
+            "locator": "pkg:npm/%40staticdeploy/staticdeploy@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@staticdeploy/tar-archiver",
-            "locator": "SPDXRef-Package-npm--staticdeploy-tar-archiver-632d7d0737ff0c2f",
+            "locator": "pkg:npm/%40staticdeploy/tar-archiver@0.15.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.15.5"
         },
         {
             "component": "@types/body-parser",
-            "locator": "SPDXRef-Package-npm--types-body-parser-ee4a13a0645c08cb",
+            "locator": "pkg:npm/%40types/body-parser@1.19.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.19.2"
         },
         {
             "component": "@types/connect",
-            "locator": "SPDXRef-Package-npm--types-connect-60e1c59170c4f8fe",
+            "locator": "pkg:npm/%40types/connect@3.4.35",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.4.35"
         },
         {
             "component": "@types/express",
-            "locator": "SPDXRef-Package-npm--types-express-31875b83e628fe97",
+            "locator": "pkg:npm/%40types/express@4.17.25",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.17.25"
         },
         {
             "component": "@types/express-serve-static-core",
-            "locator": "SPDXRef-Package-npm--types-express-serve-static-core-898d0f362d9b45c5",
+            "locator": "pkg:npm/%40types/express-serve-static-core@4.19.9",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.19.9"
         },
         {
             "component": "@types/http-errors",
-            "locator": "SPDXRef-Package-npm--types-http-errors-81dc42ef42cf84f0",
+            "locator": "pkg:npm/%40types/http-errors@2.0.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.5"
         },
         {
             "component": "@types/mime",
-            "locator": "SPDXRef-Package-npm--types-mime-4353743fd7fccf72",
+            "locator": "pkg:npm/%40types/mime@1.3.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.2"
         },
         {
             "component": "@types/node",
-            "locator": "SPDXRef-Package-npm--types-node-05717fad32bf798a",
+            "locator": "pkg:npm/%40types/node@16.11.12",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "16.11.12"
         },
         {
             "component": "@types/qs",
-            "locator": "SPDXRef-Package-npm--types-qs-5514683b9691de00",
+            "locator": "pkg:npm/%40types/qs@6.9.7",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "6.9.7"
         },
         {
             "component": "@types/range-parser",
-            "locator": "SPDXRef-Package-npm--types-range-parser-f7ee5ec2166872df",
+            "locator": "pkg:npm/%40types/range-parser@1.2.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.4"
         },
         {
             "component": "@types/send",
-            "locator": "SPDXRef-Package-npm--types-send-47b29bc738997064",
+            "locator": "pkg:npm/%40types/send@0.17.6",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.17.6"
         },
         {
             "component": "@types/send",
-            "locator": "SPDXRef-Package-npm--types-send-27c81f5636342852",
+            "locator": "pkg:npm/%40types/send@1.2.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.1"
         },
         {
             "component": "@types/serve-static",
-            "locator": "SPDXRef-Package-npm--types-serve-static-e922fd16df899d85",
+            "locator": "pkg:npm/%40types/serve-static@1.15.10",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.15.10"
         },
         {
             "component": "accepts",
-            "locator": "SPDXRef-Package-npm-accepts-10c283aeb4bf440b",
+            "locator": "pkg:npm/accepts@1.3.8",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.8"
         },
         {
             "component": "agent-base",
-            "locator": "SPDXRef-Package-npm-agent-base-507adfbcab4792ca",
+            "locator": "pkg:npm/agent-base@6.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "6.0.2"
         },
         {
             "component": "ajv",
-            "locator": "SPDXRef-Package-npm-ajv-fc14e37e7c4106ea",
+            "locator": "pkg:npm/ajv@6.15.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "6.15.0"
         },
         {
             "component": "array-flatten",
-            "locator": "SPDXRef-Package-npm-array-flatten-2d38b2a9d6764af4",
+            "locator": "pkg:npm/array-flatten@1.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.1"
         },
         {
             "component": "async-function",
-            "locator": "SPDXRef-Package-npm-async-function-5bd2fe5ef7dd2c41",
+            "locator": "pkg:npm/async-function@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "async-generator-function",
-            "locator": "SPDXRef-Package-npm-async-generator-function-30b11cd96c1c6b6e",
+            "locator": "pkg:npm/async-generator-function@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "asynckit",
-            "locator": "SPDXRef-Package-npm-asynckit-aea93e7a7503db07",
+            "locator": "pkg:npm/asynckit@0.4.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.4.0"
         },
         {
             "component": "atomic-sleep",
-            "locator": "SPDXRef-Package-npm-atomic-sleep-05bc4078b98ee36b",
+            "locator": "pkg:npm/atomic-sleep@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "axios",
-            "locator": "SPDXRef-Package-npm-axios-9173946ff3800760",
+            "locator": "pkg:npm/axios@1.19.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.19.0"
         },
         {
             "component": "balanced-match",
-            "locator": "SPDXRef-Package-npm-balanced-match-14fb339de66ffb10",
+            "locator": "pkg:npm/balanced-match@1.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.2"
         },
         {
             "component": "bluebird",
-            "locator": "SPDXRef-Package-npm-bluebird-8c0014548ef0dc9d",
+            "locator": "pkg:npm/bluebird@3.7.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.7.2"
         },
         {
             "component": "body-parser",
-            "locator": "SPDXRef-Package-npm-body-parser-dac0e34f108695ec",
+            "locator": "pkg:npm/body-parser@1.20.6",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.20.6"
         },
         {
             "component": "boolbase",
-            "locator": "SPDXRef-Package-npm-boolbase-56f441789265a2b9",
+            "locator": "pkg:npm/boolbase@1.0.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.0.0"
         },
         {
             "component": "bowser",
-            "locator": "SPDXRef-Package-npm-bowser-0859ecea707e30e6",
+            "locator": "pkg:npm/bowser@2.14.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.14.1"
         },
         {
             "component": "brace-expansion",
-            "locator": "SPDXRef-Package-npm-brace-expansion-8ba38a96636ec9d5",
+            "locator": "pkg:npm/brace-expansion@1.1.18",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.18"
         },
         {
             "component": "braces",
-            "locator": "SPDXRef-Package-npm-braces-3af86f75590084ce",
+            "locator": "pkg:npm/braces@3.0.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.0.3"
         },
         {
             "component": "bytes",
-            "locator": "SPDXRef-Package-npm-bytes-84a44b6205f10a35",
+            "locator": "pkg:npm/bytes@3.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.2"
         },
         {
             "component": "ca-certificates-bundle",
-            "locator": "SPDXRef-Package-apk-ca-certificates-bundle-849ef81e99220037",
+            "locator": "pkg:apk/wolfi/ca-certificates-bundle@20260413-r1?arch=x86_64&distro=wolfi-20230201&upstream=ca-certificates",
             "scope": "image",
             "spdxExpression": "(MPL-2.0 AND MIT)",
             "version": "20260413-r1"
         },
         {
             "component": "call-bind-apply-helpers",
-            "locator": "SPDXRef-Package-npm-call-bind-apply-helpers-7193ffd906d4961e",
+            "locator": "pkg:npm/call-bind-apply-helpers@1.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.2"
         },
         {
             "component": "call-bound",
-            "locator": "SPDXRef-Package-npm-call-bound-681effd6ea07b9c6",
+            "locator": "pkg:npm/call-bound@1.0.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.4"
         },
         {
             "component": "charenc",
-            "locator": "SPDXRef-Package-npm-charenc-60f4f25352fcac8f",
+            "locator": "pkg:npm/charenc@0.0.2",
             "scope": "image",
             "spdxExpression": "BSD-3-Clause",
             "version": "0.0.2"
         },
         {
             "component": "cheerio",
-            "locator": "SPDXRef-Package-npm-cheerio-ac2bdbbd499ac850",
+            "locator": "pkg:npm/cheerio@1.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.0"
         },
         {
             "component": "cheerio-select",
-            "locator": "SPDXRef-Package-npm-cheerio-select-62ef90b1fef14c6f",
+            "locator": "pkg:npm/cheerio-select@2.1.0",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "2.1.0"
         },
         {
             "component": "chownr",
-            "locator": "SPDXRef-Package-npm-chownr-4f016f81dc28546c",
+            "locator": "pkg:npm/chownr@3.0.0",
             "scope": "image",
             "spdxExpression": "BlueOak-1.0.0",
             "version": "3.0.0"
         },
         {
             "component": "colorette",
-            "locator": "SPDXRef-Package-npm-colorette-161cbdb10c7f5c9d",
+            "locator": "pkg:npm/colorette@2.0.19",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.19"
         },
         {
             "component": "combined-stream",
-            "locator": "SPDXRef-Package-npm-combined-stream-e5c8940297b3ed91",
+            "locator": "pkg:npm/combined-stream@1.0.8",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.8"
         },
         {
             "component": "commander",
-            "locator": "SPDXRef-Package-npm-commander-2933c7b25265042a",
+            "locator": "pkg:npm/commander@10.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "10.0.1"
         },
         {
             "component": "concat-map",
-            "locator": "SPDXRef-Package-npm-concat-map-cc1842529535975c",
+            "locator": "pkg:npm/concat-map@0.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.0.1"
         },
         {
             "component": "content-disposition",
-            "locator": "SPDXRef-Package-npm-content-disposition-34d2f6674c05630d",
+            "locator": "pkg:npm/content-disposition@0.5.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.5.4"
         },
         {
             "component": "content-security-policy-builder",
-            "locator": "SPDXRef-Package-npm-content-security-policy-builder-95f4c2e2979f60cd",
+            "locator": "pkg:npm/content-security-policy-builder@2.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.3.0"
         },
         {
             "component": "content-security-policy-parser",
-            "locator": "SPDXRef-Package-npm-content-security-policy-parser-cb887dc762598c54",
+            "locator": "pkg:npm/content-security-policy-parser@0.6.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.6.0"
         },
         {
             "component": "content-type",
-            "locator": "SPDXRef-Package-npm-content-type-785bfa72e4a32b08",
+            "locator": "pkg:npm/content-type@1.0.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.4"
         },
         {
             "component": "content-type",
-            "locator": "SPDXRef-Package-npm-content-type-32d206b8e82230a4",
+            "locator": "pkg:npm/content-type@1.0.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.5"
         },
         {
             "component": "convexpress",
-            "locator": "SPDXRef-Package-npm-convexpress-6f60bc362dec776a",
+            "locator": "pkg:npm/convexpress@2.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.3.0"
         },
         {
             "component": "cookie",
-            "locator": "SPDXRef-Package-npm-cookie-3e8213698234aee4",
+            "locator": "pkg:npm/cookie@0.7.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.7.2"
         },
         {
             "component": "cookie-signature",
-            "locator": "SPDXRef-Package-npm-cookie-signature-36d91de3c0ebddb0",
+            "locator": "pkg:npm/cookie-signature@1.0.7",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.7"
         },
         {
             "component": "crypt",
-            "locator": "SPDXRef-Package-npm-crypt-99b2a0dd1e940ca9",
+            "locator": "pkg:npm/crypt@0.0.2",
             "scope": "image",
             "spdxExpression": "BSD-3-Clause",
             "version": "0.0.2"
         },
         {
             "component": "css-select",
-            "locator": "SPDXRef-Package-npm-css-select-553529134b7826ca",
+            "locator": "pkg:npm/css-select@5.2.2",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "5.2.2"
         },
         {
             "component": "css-what",
-            "locator": "SPDXRef-Package-npm-css-what-14b7c6bdf57fc651",
+            "locator": "pkg:npm/css-what@6.2.2",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "6.2.2"
         },
         {
             "component": "debug",
-            "locator": "SPDXRef-Package-npm-debug-46830bdd34fba84f",
+            "locator": "pkg:npm/debug@2.6.9",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.6.9"
         },
         {
             "component": "debug",
-            "locator": "SPDXRef-Package-npm-debug-d26cbb34cf3f1400",
+            "locator": "pkg:npm/debug@4.3.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.3.3"
         },
         {
             "component": "debug",
-            "locator": "SPDXRef-Package-npm-debug-e4b656356e1bc2ec",
+            "locator": "pkg:npm/debug@4.3.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.3.3"
         },
         {
             "component": "debug",
-            "locator": "SPDXRef-Package-npm-debug-71af4898466bc285",
+            "locator": "pkg:npm/debug@4.3.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.3.4"
         },
         {
             "component": "delayed-stream",
-            "locator": "SPDXRef-Package-npm-delayed-stream-06539573d84e96ae",
+            "locator": "pkg:npm/delayed-stream@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "depd",
-            "locator": "SPDXRef-Package-npm-depd-d9b09def8a6c7fa3",
+            "locator": "pkg:npm/depd@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "destroy",
-            "locator": "SPDXRef-Package-npm-destroy-d515d090cac841f2",
+            "locator": "pkg:npm/destroy@1.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.0"
         },
         {
             "component": "dom-serializer",
-            "locator": "SPDXRef-Package-npm-dom-serializer-3f7d427aff2b4e12",
+            "locator": "pkg:npm/dom-serializer@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "domelementtype",
-            "locator": "SPDXRef-Package-npm-domelementtype-c895394855af21f4",
+            "locator": "pkg:npm/domelementtype@2.3.0",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "2.3.0"
         },
         {
             "component": "domhandler",
-            "locator": "SPDXRef-Package-npm-domhandler-f081b6f454568471",
+            "locator": "pkg:npm/domhandler@5.0.3",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "5.0.3"
         },
         {
             "component": "domutils",
-            "locator": "SPDXRef-Package-npm-domutils-059ac0c28dd8a4af",
+            "locator": "pkg:npm/domutils@3.2.2",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "3.2.2"
         },
         {
             "component": "dunder-proto",
-            "locator": "SPDXRef-Package-npm-dunder-proto-bc91af32045c6ab6",
+            "locator": "pkg:npm/dunder-proto@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "ee-first",
-            "locator": "SPDXRef-Package-npm-ee-first-f52c08134666a454",
+            "locator": "pkg:npm/ee-first@1.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.1"
         },
         {
             "component": "encodeurl",
-            "locator": "SPDXRef-Package-npm-encodeurl-478c7e273a622040",
+            "locator": "pkg:npm/encodeurl@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "encoding-sniffer",
-            "locator": "SPDXRef-Package-npm-encoding-sniffer-7d97a21ede05b6f8",
+            "locator": "pkg:npm/encoding-sniffer@0.2.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.2.1"
         },
         {
             "component": "entities",
-            "locator": "SPDXRef-Package-npm-entities-2f6c549d4b4cab56",
+            "locator": "pkg:npm/entities@4.5.0",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "4.5.0"
         },
         {
             "component": "entities",
-            "locator": "SPDXRef-Package-npm-entities-97dc76523a07f2f7",
+            "locator": "pkg:npm/entities@6.0.1",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "6.0.1"
         },
         {
             "component": "entities",
-            "locator": "SPDXRef-Package-npm-entities-4e066f6a617d6c69",
+            "locator": "pkg:npm/entities@7.0.1",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "7.0.1"
         },
         {
             "component": "es-define-property",
-            "locator": "SPDXRef-Package-npm-es-define-property-f27ca0072ae613fe",
+            "locator": "pkg:npm/es-define-property@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "es-errors",
-            "locator": "SPDXRef-Package-npm-es-errors-23be0249ef2ab182",
+            "locator": "pkg:npm/es-errors@1.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.0"
         },
         {
             "component": "es-object-atoms",
-            "locator": "SPDXRef-Package-npm-es-object-atoms-2dff19d78cd4c206",
+            "locator": "pkg:npm/es-object-atoms@1.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.2"
         },
         {
             "component": "es-set-tostringtag",
-            "locator": "SPDXRef-Package-npm-es-set-tostringtag-ebd94eac33067281",
+            "locator": "pkg:npm/es-set-tostringtag@2.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.0"
         },
         {
             "component": "escalade",
-            "locator": "SPDXRef-Package-npm-escalade-0a21e018dcd77c3a",
+            "locator": "pkg:npm/escalade@3.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.1"
         },
         {
             "component": "escape-html",
-            "locator": "SPDXRef-Package-npm-escape-html-470f9cf069bf832c",
+            "locator": "pkg:npm/escape-html@1.0.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.3"
         },
         {
             "component": "escape-string-regexp",
-            "locator": "SPDXRef-Package-npm-escape-string-regexp-f988d81f9c8ccd7f",
+            "locator": "pkg:npm/escape-string-regexp@4.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.0"
         },
         {
             "component": "esm",
-            "locator": "SPDXRef-Package-npm-esm-c3f08cd20d776baf",
+            "locator": "pkg:npm/esm@3.2.25",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.2.25"
         },
         {
             "component": "etag",
-            "locator": "SPDXRef-Package-npm-etag-28766487efb793ba",
+            "locator": "pkg:npm/etag@1.8.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.8.1"
         },
         {
             "component": "express",
-            "locator": "SPDXRef-Package-npm-express-103a1c26518629d9",
+            "locator": "pkg:npm/express@4.22.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.22.2"
         },
         {
             "component": "fast-deep-equal",
-            "locator": "SPDXRef-Package-npm-fast-deep-equal-8e3dd9ab4fbaa89c",
+            "locator": "pkg:npm/fast-deep-equal@3.1.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.3"
         },
         {
             "component": "fast-json-stable-stringify",
-            "locator": "SPDXRef-Package-npm-fast-json-stable-stringify-2fb52771e5336e4c",
+            "locator": "pkg:npm/fast-json-stable-stringify@2.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.0"
         },
         {
             "component": "fill-range",
-            "locator": "SPDXRef-Package-npm-fill-range-1b62cd84aa3febcc",
+            "locator": "pkg:npm/fill-range@7.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.1.1"
         },
         {
             "component": "finalhandler",
-            "locator": "SPDXRef-Package-npm-finalhandler-a31609c4b9b943c6",
+            "locator": "pkg:npm/finalhandler@1.3.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.2"
         },
         {
             "component": "follow-redirects",
-            "locator": "SPDXRef-Package-npm-follow-redirects-0d077f4a6a25e8e1",
+            "locator": "pkg:npm/follow-redirects@1.16.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.16.0"
         },
         {
             "component": "form-data",
-            "locator": "SPDXRef-Package-npm-form-data-d30fa3f9a21ce4c3",
+            "locator": "pkg:npm/form-data@4.0.6",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.6"
         },
         {
             "component": "forwarded",
-            "locator": "SPDXRef-Package-npm-forwarded-a378dfbed6a85b00",
+            "locator": "pkg:npm/forwarded@0.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.2.0"
         },
         {
             "component": "fresh",
-            "locator": "SPDXRef-Package-npm-fresh-ab734dd832960e8a",
+            "locator": "pkg:npm/fresh@0.5.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.5.2"
         },
         {
             "component": "fs-extra",
-            "locator": "SPDXRef-Package-npm-fs-extra-925d45acb8c241c9",
+            "locator": "pkg:npm/fs-extra@11.4.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "11.4.0"
         },
         {
             "component": "fs.realpath",
-            "locator": "SPDXRef-Package-npm-fs.realpath-851e8481ef8275c4",
+            "locator": "pkg:npm/fs.realpath@1.0.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.0.0"
         },
         {
             "component": "function-bind",
-            "locator": "SPDXRef-Package-npm-function-bind-e0fb42b45d68e045",
+            "locator": "pkg:npm/function-bind@1.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.1"
         },
         {
             "component": "function-bind",
-            "locator": "SPDXRef-Package-npm-function-bind-70b700a6c249177b",
+            "locator": "pkg:npm/function-bind@1.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.2"
         },
         {
             "component": "generator-function",
-            "locator": "SPDXRef-Package-npm-generator-function-7db5311b2ad244ca",
+            "locator": "pkg:npm/generator-function@2.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.1"
         },
         {
             "component": "get-caller-file",
-            "locator": "SPDXRef-Package-npm-get-caller-file-48bc16cdf5e7e646",
+            "locator": "pkg:npm/get-caller-file@2.0.5",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "2.0.5"
         },
         {
             "component": "get-intrinsic",
-            "locator": "SPDXRef-Package-npm-get-intrinsic-2f0bb16a3ecd12b6",
+            "locator": "pkg:npm/get-intrinsic@1.3.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.1"
         },
         {
             "component": "get-package-type",
-            "locator": "SPDXRef-Package-npm-get-package-type-8ea833b006bcf554",
+            "locator": "pkg:npm/get-package-type@0.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.1.0"
         },
         {
             "component": "get-proto",
-            "locator": "SPDXRef-Package-npm-get-proto-1b67542b0c0e4e93",
+            "locator": "pkg:npm/get-proto@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "getopts",
-            "locator": "SPDXRef-Package-npm-getopts-cf3d6d3a58742344",
+            "locator": "pkg:npm/getopts@2.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.3.0"
         },
         {
             "component": "glibc",
-            "locator": "SPDXRef-Package-apk-glibc-fc4d49bddd321485",
+            "locator": "pkg:apk/wolfi/glibc@2.43-r13?arch=x86_64&distro=wolfi-20230201",
             "scope": "image",
             "spdxExpression": "LGPL-2.1-or-later",
             "version": "2.43-r13"
         },
         {
             "component": "glibc-locale-posix",
-            "locator": "SPDXRef-Package-apk-glibc-locale-posix-97b2fa2aecda4970",
+            "locator": "pkg:apk/wolfi/glibc-locale-posix@2.43-r13?arch=x86_64&distro=wolfi-20230201&upstream=glibc",
             "scope": "image",
             "spdxExpression": "LGPL-2.1-or-later",
             "version": "2.43-r13"
         },
         {
             "component": "glob",
-            "locator": "SPDXRef-Package-npm-glob-e1c3ac31a3d4d2ee",
+            "locator": "pkg:npm/glob@7.2.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "7.2.0"
         },
         {
             "component": "gopd",
-            "locator": "SPDXRef-Package-npm-gopd-2c1c2c9d212da2ec",
+            "locator": "pkg:npm/gopd@1.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.0"
         },
         {
             "component": "graceful-fs",
-            "locator": "SPDXRef-Package-npm-graceful-fs-fd384cf0d0c110b3",
+            "locator": "pkg:npm/graceful-fs@4.2.8",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "4.2.8"
         },
         {
             "component": "has",
-            "locator": "SPDXRef-Package-npm-has-463f48862227d43f",
+            "locator": "pkg:npm/has@1.0.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.3"
         },
         {
             "component": "has-symbols",
-            "locator": "SPDXRef-Package-npm-has-symbols-7ee2e27299b1c2e8",
+            "locator": "pkg:npm/has-symbols@1.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.0"
         },
         {
             "component": "has-tostringtag",
-            "locator": "SPDXRef-Package-npm-has-tostringtag-778c11b89c40ab58",
+            "locator": "pkg:npm/has-tostringtag@1.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.2"
         },
         {
             "component": "hasown",
-            "locator": "SPDXRef-Package-npm-hasown-f7c99a9a2a89dfd8",
+            "locator": "pkg:npm/hasown@2.0.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.4"
         },
         {
             "component": "htmlparser2",
-            "locator": "SPDXRef-Package-npm-htmlparser2-7e142615c44768a1",
+            "locator": "pkg:npm/htmlparser2@10.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "10.1.0"
         },
         {
             "component": "http-errors",
-            "locator": "SPDXRef-Package-npm-http-errors-0c8d8dadfc975424",
+            "locator": "pkg:npm/http-errors@2.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.1"
         },
         {
             "component": "https-proxy-agent",
-            "locator": "SPDXRef-Package-npm-https-proxy-agent-5d91477cb41570b2",
+            "locator": "pkg:npm/https-proxy-agent@5.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.0.1"
         },
         {
             "component": "iconv-lite",
-            "locator": "SPDXRef-Package-npm-iconv-lite-9744ff9d63acc537",
+            "locator": "pkg:npm/iconv-lite@0.4.24",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.4.24"
         },
         {
             "component": "iconv-lite",
-            "locator": "SPDXRef-Package-npm-iconv-lite-9a50ebb3001df45d",
+            "locator": "pkg:npm/iconv-lite@0.4.24",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.4.24"
         },
         {
             "component": "iconv-lite",
-            "locator": "SPDXRef-Package-npm-iconv-lite-f9cbeecf5e735707",
+            "locator": "pkg:npm/iconv-lite@0.6.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.6.3"
         },
         {
             "component": "inflight",
-            "locator": "SPDXRef-Package-npm-inflight-51fd83b831f1caa3",
+            "locator": "pkg:npm/inflight@1.0.6",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.0.6"
         },
         {
             "component": "inherits",
-            "locator": "SPDXRef-Package-npm-inherits-a331ad86d89793eb",
+            "locator": "pkg:npm/inherits@2.0.4",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "2.0.4"
         },
         {
             "component": "interpret",
-            "locator": "SPDXRef-Package-npm-interpret-3ae125896321e4ac",
+            "locator": "pkg:npm/interpret@2.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.2.0"
         },
         {
             "component": "ipaddr.js",
-            "locator": "SPDXRef-Package-npm-ipaddr.js-44f2d58ee0d65a7c",
+            "locator": "pkg:npm/ipaddr.js@1.9.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.9.1"
         },
         {
             "component": "is-buffer",
-            "locator": "SPDXRef-Package-npm-is-buffer-57eacdb5cf82dd3e",
+            "locator": "pkg:npm/is-buffer@1.1.6",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.6"
         },
         {
             "component": "is-core-module",
-            "locator": "SPDXRef-Package-npm-is-core-module-f26365463b51c5c8",
+            "locator": "pkg:npm/is-core-module@2.8.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.8.0"
         },
         {
             "component": "is-number",
-            "locator": "SPDXRef-Package-npm-is-number-c9cbd62ffbdf02b0",
+            "locator": "pkg:npm/is-number@7.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.0.0"
         },
         {
             "component": "jose",
-            "locator": "SPDXRef-Package-npm-jose-75de5f14bcbc71f5",
+            "locator": "pkg:npm/jose@5.10.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.10.0"
         },
         {
             "component": "json-schema-traverse",
-            "locator": "SPDXRef-Package-npm-json-schema-traverse-81cddf49f0923931",
+            "locator": "pkg:npm/json-schema-traverse@0.4.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.4.1"
         },
         {
             "component": "jsonfile",
-            "locator": "SPDXRef-Package-npm-jsonfile-e239815be4c432b5",
+            "locator": "pkg:npm/jsonfile@6.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "6.1.0"
         },
         {
             "component": "knex",
-            "locator": "SPDXRef-Package-npm-knex-a4f01e221e9dc464",
+            "locator": "pkg:npm/knex@3.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.0"
         },
         {
             "component": "ld-linux",
-            "locator": "SPDXRef-Package-apk-ld-linux-acae3573c66645e5",
+            "locator": "pkg:apk/wolfi/ld-linux@2.43-r13?arch=x86_64&distro=wolfi-20230201&upstream=glibc",
             "scope": "image",
             "spdxExpression": "LGPL-2.1-or-later",
             "version": "2.43-r13"
         },
         {
             "component": "libgcc",
-            "locator": "SPDXRef-Package-apk-libgcc-1b256da1ffcb861b",
+            "locator": "pkg:apk/wolfi/libgcc@16.1.0-r4?arch=x86_64&distro=wolfi-20230201&upstream=gcc",
             "scope": "image",
             "spdxExpression": "(GPL-3.0-or-later WITH GCC-exception-3.1)",
             "version": "16.1.0-r4"
         },
         {
             "component": "libstdc++",
-            "locator": "SPDXRef-Package-apk-libstdc---6c8183dff10ca02d",
+            "locator": "pkg:apk/wolfi/libstdc%2B%2B@16.1.0-r4?arch=x86_64&distro=wolfi-20230201&upstream=gcc",
             "scope": "image",
             "spdxExpression": "(GPL-3.0-or-later WITH GCC-exception-3.1)",
             "version": "16.1.0-r4"
         },
         {
             "component": "lodash",
-            "locator": "SPDXRef-Package-npm-lodash-2abc2c08f4d5eea1",
+            "locator": "pkg:npm/lodash@4.18.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.18.1"
         },
         {
             "component": "math-intrinsics",
-            "locator": "SPDXRef-Package-npm-math-intrinsics-5df24edfe5f549d4",
+            "locator": "pkg:npm/math-intrinsics@1.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.0"
         },
         {
             "component": "md5",
-            "locator": "SPDXRef-Package-npm-md5-12bb50004fafbcb3",
+            "locator": "pkg:npm/md5@2.3.0",
             "scope": "image",
             "spdxExpression": "BSD-3-Clause",
             "version": "2.3.0"
         },
         {
             "component": "media-typer",
-            "locator": "SPDXRef-Package-npm-media-typer-519b6eb7f59832e6",
+            "locator": "pkg:npm/media-typer@0.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.3.0"
         },
         {
             "component": "merge-descriptors",
-            "locator": "SPDXRef-Package-npm-merge-descriptors-90413cae26a92a29",
+            "locator": "pkg:npm/merge-descriptors@1.0.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.3"
         },
         {
             "component": "methods",
-            "locator": "SPDXRef-Package-npm-methods-95e5d9d04c706873",
+            "locator": "pkg:npm/methods@1.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.2"
         },
         {
             "component": "micromatch",
-            "locator": "SPDXRef-Package-npm-micromatch-dd1647e37274b303",
+            "locator": "pkg:npm/micromatch@4.0.8",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.8"
         },
         {
             "component": "mime",
-            "locator": "SPDXRef-Package-npm-mime-727f3ad439cd59cd",
+            "locator": "pkg:npm/mime@1.6.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.6.0"
         },
         {
             "component": "mime",
-            "locator": "SPDXRef-Package-npm-mime-321b8a43b0731ab5",
+            "locator": "pkg:npm/mime@3.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.0.0"
         },
         {
             "component": "mime-db",
-            "locator": "SPDXRef-Package-npm-mime-db-53c2c6cb90a54eb5",
+            "locator": "pkg:npm/mime-db@1.51.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.51.0"
         },
         {
             "component": "mime-db",
-            "locator": "SPDXRef-Package-npm-mime-db-3f22c6eb98e9b925",
+            "locator": "pkg:npm/mime-db@1.52.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.52.0"
         },
         {
             "component": "mime-types",
-            "locator": "SPDXRef-Package-npm-mime-types-f02f6b1c8d8bd199",
+            "locator": "pkg:npm/mime-types@2.1.34",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.34"
         },
         {
             "component": "mime-types",
-            "locator": "SPDXRef-Package-npm-mime-types-9f2e04f03704e551",
+            "locator": "pkg:npm/mime-types@2.1.35",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.35"
         },
         {
             "component": "minimatch",
-            "locator": "SPDXRef-Package-npm-minimatch-504f4b0c538efe28",
+            "locator": "pkg:npm/minimatch@3.1.5",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "3.1.5"
         },
         {
             "component": "minipass",
-            "locator": "SPDXRef-Package-npm-minipass-6275ec0779924a7f",
+            "locator": "pkg:npm/minipass@7.1.3",
             "scope": "image",
             "spdxExpression": "BlueOak-1.0.0",
             "version": "7.1.3"
         },
         {
             "component": "minizlib",
-            "locator": "SPDXRef-Package-npm-minizlib-305eeb5abd512015",
+            "locator": "pkg:npm/minizlib@3.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.0"
         },
         {
             "component": "ms",
-            "locator": "SPDXRef-Package-npm-ms-9f5f735ddbf50077",
+            "locator": "pkg:npm/ms@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "ms",
-            "locator": "SPDXRef-Package-npm-ms-621f43b18519055d",
+            "locator": "pkg:npm/ms@2.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.2"
         },
         {
             "component": "ms",
-            "locator": "SPDXRef-Package-npm-ms-c6ec4076bb49852f",
+            "locator": "pkg:npm/ms@2.1.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.3"
         },
         {
             "component": "negotiator",
-            "locator": "SPDXRef-Package-npm-negotiator-bc81380488a7a5e4",
+            "locator": "pkg:npm/negotiator@0.6.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.6.3"
         },
         {
             "component": "node",
-            "locator": "SPDXRef-Package-binary-node-deaa623e2722824d",
+            "locator": "pkg:generic/node@24.19.0",
             "scope": "image",
             "spdxExpression": "NOASSERTION",
             "version": "24.19.0"
         },
         {
             "component": "nth-check",
-            "locator": "SPDXRef-Package-npm-nth-check-22765f0fb9795b4c",
+            "locator": "pkg:npm/nth-check@2.1.1",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "2.1.1"
         },
         {
             "component": "object-inspect",
-            "locator": "SPDXRef-Package-npm-object-inspect-68daea8a247d0c67",
+            "locator": "pkg:npm/object-inspect@1.13.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.13.4"
         },
         {
             "component": "on-exit-leak-free",
-            "locator": "SPDXRef-Package-npm-on-exit-leak-free-33050e3e85234abd",
+            "locator": "pkg:npm/on-exit-leak-free@2.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.2"
         },
         {
             "component": "on-finished",
-            "locator": "SPDXRef-Package-npm-on-finished-d7810f029a3ca7ca",
+            "locator": "pkg:npm/on-finished@2.4.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.4.1"
         },
         {
             "component": "once",
-            "locator": "SPDXRef-Package-npm-once-e4638ddeaf66e6a2",
+            "locator": "pkg:npm/once@1.4.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.4.0"
         },
         {
             "component": "parse5",
-            "locator": "SPDXRef-Package-npm-parse5-ab2a31d75802d5d2",
+            "locator": "pkg:npm/parse5@7.3.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.3.0"
         },
         {
             "component": "parse5-htmlparser2-tree-adapter",
-            "locator": "SPDXRef-Package-npm-parse5-htmlparser2-tree-adapter-609d4df96a363aaf",
+            "locator": "pkg:npm/parse5-htmlparser2-tree-adapter@7.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.1.0"
         },
         {
             "component": "parse5-parser-stream",
-            "locator": "SPDXRef-Package-npm-parse5-parser-stream-1e26b2bfb40a7805",
+            "locator": "pkg:npm/parse5-parser-stream@7.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.1.2"
         },
         {
             "component": "parseurl",
-            "locator": "SPDXRef-Package-npm-parseurl-13200e944da4fbe3",
+            "locator": "pkg:npm/parseurl@1.3.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.3.3"
         },
         {
             "component": "path-is-absolute",
-            "locator": "SPDXRef-Package-npm-path-is-absolute-71a32231c08c672c",
+            "locator": "pkg:npm/path-is-absolute@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "path-parse",
-            "locator": "SPDXRef-Package-npm-path-parse-2d64c5e77e2730fb",
+            "locator": "pkg:npm/path-parse@1.0.7",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.7"
         },
         {
             "component": "path-to-regexp",
-            "locator": "SPDXRef-Package-npm-path-to-regexp-056e1720beb92ea0",
+            "locator": "pkg:npm/path-to-regexp@0.1.13",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.1.13"
         },
         {
             "component": "pg",
-            "locator": "SPDXRef-Package-npm-pg-e89efbf716f3c191",
+            "locator": "pkg:npm/pg@8.16.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "8.16.3"
         },
         {
             "component": "pg-cloudflare",
-            "locator": "SPDXRef-Package-npm-pg-cloudflare-a5c727482dc8d54b",
+            "locator": "pkg:npm/pg-cloudflare@1.4.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.4.0"
         },
         {
             "component": "pg-connection-string",
-            "locator": "SPDXRef-Package-npm-pg-connection-string-9dbec7654fb2f339",
+            "locator": "pkg:npm/pg-connection-string@2.14.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.14.0"
         },
         {
             "component": "pg-connection-string",
-            "locator": "SPDXRef-Package-npm-pg-connection-string-a93efe3601e9a1c7",
+            "locator": "pkg:npm/pg-connection-string@2.6.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.6.2"
         },
         {
             "component": "pg-int8",
-            "locator": "SPDXRef-Package-npm-pg-int8-a06473f862828192",
+            "locator": "pkg:npm/pg-int8@1.0.1",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.0.1"
         },
         {
             "component": "pg-pool",
-            "locator": "SPDXRef-Package-npm-pg-pool-d6859642f69c68ed",
+            "locator": "pkg:npm/pg-pool@3.14.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.14.0"
         },
         {
             "component": "pg-protocol",
-            "locator": "SPDXRef-Package-npm-pg-protocol-2e1ed2f3c8804607",
+            "locator": "pkg:npm/pg-protocol@1.16.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.16.0"
         },
         {
             "component": "pg-types",
-            "locator": "SPDXRef-Package-npm-pg-types-143e14908a298272",
+            "locator": "pkg:npm/pg-types@2.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.2.0"
         },
         {
             "component": "pgpass",
-            "locator": "SPDXRef-Package-npm-pgpass-ec799e2ac711bc74",
+            "locator": "pkg:npm/pgpass@1.0.5",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.5"
         },
         {
             "component": "picomatch",
-            "locator": "SPDXRef-Package-npm-picomatch-755975c945b4c516",
+            "locator": "pkg:npm/picomatch@2.3.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.3.2"
         },
         {
             "component": "pino",
-            "locator": "SPDXRef-Package-npm-pino-dfcfaf4694f5ecb5",
+            "locator": "pkg:npm/pino@10.3.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "10.3.1"
         },
         {
             "component": "pino-abstract-transport",
-            "locator": "SPDXRef-Package-npm-pino-abstract-transport-4f89a045b5deb32f",
+            "locator": "pkg:npm/pino-abstract-transport@3.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.0.0"
         },
         {
             "component": "pino-http",
-            "locator": "SPDXRef-Package-npm-pino-http-d15d66298c2d8dce",
+            "locator": "pkg:npm/pino-http@11.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "11.0.0"
         },
         {
             "component": "pino-std-serializers",
-            "locator": "SPDXRef-Package-npm-pino-std-serializers-e58149986657887c",
+            "locator": "pkg:npm/pino-std-serializers@7.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.1.0"
         },
         {
             "component": "postgres-array",
-            "locator": "SPDXRef-Package-npm-postgres-array-60a2100c58742087",
+            "locator": "pkg:npm/postgres-array@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "postgres-bytea",
-            "locator": "SPDXRef-Package-npm-postgres-bytea-241d9919f3b626c0",
+            "locator": "pkg:npm/postgres-bytea@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "postgres-date",
-            "locator": "SPDXRef-Package-npm-postgres-date-620e1d2d680a063e",
+            "locator": "pkg:npm/postgres-date@1.0.7",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.7"
         },
         {
             "component": "postgres-interval",
-            "locator": "SPDXRef-Package-npm-postgres-interval-23d076f684987857",
+            "locator": "pkg:npm/postgres-interval@1.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.0"
         },
         {
             "component": "process-warning",
-            "locator": "SPDXRef-Package-npm-process-warning-e699cb824eb50495",
+            "locator": "pkg:npm/process-warning@5.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.1.0"
         },
         {
             "component": "proxy-addr",
-            "locator": "SPDXRef-Package-npm-proxy-addr-e61c05402d0b288c",
+            "locator": "pkg:npm/proxy-addr@2.0.7",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.7"
         },
         {
             "component": "proxy-from-env",
-            "locator": "SPDXRef-Package-npm-proxy-from-env-4c238426d01b172b",
+            "locator": "pkg:npm/proxy-from-env@2.1.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.0"
         },
         {
             "component": "punycode",
-            "locator": "SPDXRef-Package-npm-punycode-84b84b648d54111d",
+            "locator": "pkg:npm/punycode@2.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.1"
         },
         {
             "component": "qs",
-            "locator": "SPDXRef-Package-npm-qs-26b382e9dacb20cb",
+            "locator": "pkg:npm/qs@6.15.3",
             "scope": "image",
             "spdxExpression": "BSD-3-Clause",
             "version": "6.15.3"
         },
         {
             "component": "quick-format-unescaped",
-            "locator": "SPDXRef-Package-npm-quick-format-unescaped-99407e034a334a4a",
+            "locator": "pkg:npm/quick-format-unescaped@4.0.4",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.4"
         },
         {
             "component": "ramda",
-            "locator": "SPDXRef-Package-npm-ramda-5cd19bcc6f89ec65",
+            "locator": "pkg:npm/ramda@0.26.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.26.1"
         },
         {
             "component": "range-parser",
-            "locator": "SPDXRef-Package-npm-range-parser-872fafc856e5e32d",
+            "locator": "pkg:npm/range-parser@1.2.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.2.1"
         },
         {
             "component": "raw-body",
-            "locator": "SPDXRef-Package-npm-raw-body-40d881e5e035e7ee",
+            "locator": "pkg:npm/raw-body@2.5.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.5.3"
         },
         {
             "component": "real-require",
-            "locator": "SPDXRef-Package-npm-real-require-69b8d5744fe8e050",
+            "locator": "pkg:npm/real-require@0.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.2.0"
         },
         {
             "component": "real-require",
-            "locator": "SPDXRef-Package-npm-real-require-9586af23cc26383f",
+            "locator": "pkg:npm/real-require@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "rechoir",
-            "locator": "SPDXRef-Package-npm-rechoir-6bed1e4f2fb77727",
+            "locator": "pkg:npm/rechoir@0.8.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.8.0"
         },
         {
             "component": "recursive-readdir",
-            "locator": "SPDXRef-Package-npm-recursive-readdir-b5341cce76780684",
+            "locator": "pkg:npm/recursive-readdir@2.2.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.2.3"
         },
         {
             "component": "resolve",
-            "locator": "SPDXRef-Package-npm-resolve-e8b53081a6d66674",
+            "locator": "pkg:npm/resolve@1.20.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.20.0"
         },
         {
             "component": "resolve-from",
-            "locator": "SPDXRef-Package-npm-resolve-from-0ff47d19fbd1c1b5",
+            "locator": "pkg:npm/resolve-from@5.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.0.0"
         },
         {
             "component": "safe-buffer",
-            "locator": "SPDXRef-Package-npm-safe-buffer-46cfbba6459fad7d",
+            "locator": "pkg:npm/safe-buffer@5.2.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.2.1"
         },
         {
             "component": "safe-stable-stringify",
-            "locator": "SPDXRef-Package-npm-safe-stable-stringify-3d8b397933ec98c7",
+            "locator": "pkg:npm/safe-stable-stringify@2.5.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.5.0"
         },
         {
             "component": "safer-buffer",
-            "locator": "SPDXRef-Package-npm-safer-buffer-a46fcc2c6e209b58",
+            "locator": "pkg:npm/safer-buffer@2.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.1.2"
         },
         {
             "component": "send",
-            "locator": "SPDXRef-Package-npm-send-a695b350a84d784c",
+            "locator": "pkg:npm/send@0.19.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "0.19.2"
         },
         {
             "component": "serve-static",
-            "locator": "SPDXRef-Package-npm-serve-static-5a902a9692e377fe",
+            "locator": "pkg:npm/serve-static@1.16.3",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.16.3"
         },
         {
             "component": "setprototypeof",
-            "locator": "SPDXRef-Package-npm-setprototypeof-9e8aa02ffb50193f",
+            "locator": "pkg:npm/setprototypeof@1.2.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.2.0"
         },
         {
             "component": "side-channel",
-            "locator": "SPDXRef-Package-npm-side-channel-7b0c0310a8261737",
+            "locator": "pkg:npm/side-channel@1.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.1"
         },
         {
             "component": "side-channel-list",
-            "locator": "SPDXRef-Package-npm-side-channel-list-4e944d17eb488cb2",
+            "locator": "pkg:npm/side-channel-list@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "side-channel-map",
-            "locator": "SPDXRef-Package-npm-side-channel-map-ba111d56a40ec09f",
+            "locator": "pkg:npm/side-channel-map@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "side-channel-weakmap",
-            "locator": "SPDXRef-Package-npm-side-channel-weakmap-2643ee540d3c5764",
+            "locator": "pkg:npm/side-channel-weakmap@1.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.2"
         },
         {
             "component": "sonic-boom",
-            "locator": "SPDXRef-Package-npm-sonic-boom-119e7731d9067f9a",
+            "locator": "pkg:npm/sonic-boom@4.2.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.2.1"
         },
         {
             "component": "split2",
-            "locator": "SPDXRef-Package-npm-split2-2de58038f054b9af",
+            "locator": "pkg:npm/split2@4.2.0",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "4.2.0"
         },
         {
             "component": "statuses",
-            "locator": "SPDXRef-Package-npm-statuses-8886bf4abfd5db8e",
+            "locator": "pkg:npm/statuses@2.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.2"
         },
         {
             "component": "swagger-ui-dist",
-            "locator": "SPDXRef-Package-npm-swagger-ui-dist-0b5c9ceda7e68fb2",
+            "locator": "pkg:npm/swagger-ui-dist@4.1.3",
             "scope": "image",
             "spdxExpression": "Apache-2.0",
             "version": "4.1.3"
         },
         {
             "component": "swagger-ui-express",
-            "locator": "SPDXRef-Package-npm-swagger-ui-express-6ef3749f165b20d5",
+            "locator": "pkg:npm/swagger-ui-express@4.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.2.0"
         },
         {
             "component": "tar",
-            "locator": "SPDXRef-Package-npm-tar-9cdd08f2ba813bb4",
+            "locator": "pkg:npm/tar@7.5.22",
             "scope": "image",
             "spdxExpression": "BlueOak-1.0.0",
             "version": "7.5.22"
         },
         {
             "component": "tarn",
-            "locator": "SPDXRef-Package-npm-tarn-cc532063f81855d7",
+            "locator": "pkg:npm/tarn@3.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.2"
         },
         {
             "component": "thread-stream",
-            "locator": "SPDXRef-Package-npm-thread-stream-298f4120a9d34a2e",
+            "locator": "pkg:npm/thread-stream@4.2.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.2.0"
         },
         {
             "component": "tildify",
-            "locator": "SPDXRef-Package-npm-tildify-d080748707f526d4",
+            "locator": "pkg:npm/tildify@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "to-regex-range",
-            "locator": "SPDXRef-Package-npm-to-regex-range-1cf6d4e6e265492d",
+            "locator": "pkg:npm/to-regex-range@5.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "5.0.1"
         },
         {
             "component": "toidentifier",
-            "locator": "SPDXRef-Package-npm-toidentifier-7e8c6af13e04f126",
+            "locator": "pkg:npm/toidentifier@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "tslib",
-            "locator": "SPDXRef-Package-npm-tslib-57484d0d4dfbf4e1",
+            "locator": "pkg:npm/tslib@2.8.1",
             "scope": "image",
             "spdxExpression": "0BSD",
             "version": "2.8.1"
         },
         {
             "component": "type-is",
-            "locator": "SPDXRef-Package-npm-type-is-4fde4ef9bb887268",
+            "locator": "pkg:npm/type-is@1.6.18",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.6.18"
         },
         {
             "component": "undici",
-            "locator": "SPDXRef-Package-npm-undici-b2c6740e65cc0d40",
+            "locator": "pkg:npm/undici@7.29.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "7.29.0"
         },
         {
             "component": "universalify",
-            "locator": "SPDXRef-Package-npm-universalify-881deff228505076",
+            "locator": "pkg:npm/universalify@2.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "2.0.0"
         },
         {
             "component": "unpipe",
-            "locator": "SPDXRef-Package-npm-unpipe-95a31faf3593c07b",
+            "locator": "pkg:npm/unpipe@1.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.0"
         },
         {
             "component": "uri-js",
-            "locator": "SPDXRef-Package-npm-uri-js-a2735ebfef513109",
+            "locator": "pkg:npm/uri-js@4.4.1",
             "scope": "image",
             "spdxExpression": "BSD-2-Clause",
             "version": "4.4.1"
         },
         {
             "component": "utils-merge",
-            "locator": "SPDXRef-Package-npm-utils-merge-f588a31d6b591b19",
+            "locator": "pkg:npm/utils-merge@1.0.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.0.1"
         },
         {
             "component": "validator",
-            "locator": "SPDXRef-Package-npm-validator-abdcea6c081164a0",
+            "locator": "pkg:npm/validator@13.15.35",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "13.15.35"
         },
         {
             "component": "vary",
-            "locator": "SPDXRef-Package-npm-vary-b1e37b1b21065915",
+            "locator": "pkg:npm/vary@1.1.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "1.1.2"
         },
         {
             "component": "vhost",
-            "locator": "SPDXRef-Package-npm-vhost-a0fe7215baf059ba",
+            "locator": "pkg:npm/vhost@3.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.0.2"
         },
         {
             "component": "whatwg-encoding",
-            "locator": "SPDXRef-Package-npm-whatwg-encoding-1dd04be75e96fb12",
+            "locator": "pkg:npm/whatwg-encoding@3.1.1",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "3.1.1"
         },
         {
             "component": "whatwg-mimetype",
-            "locator": "SPDXRef-Package-npm-whatwg-mimetype-aa752c6808390297",
+            "locator": "pkg:npm/whatwg-mimetype@4.0.0",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.0"
         },
         {
             "component": "wolfi-baselayout",
-            "locator": "SPDXRef-Package-apk-wolfi-baselayout-f0c38f1ea1bb1c9f",
+            "locator": "pkg:apk/wolfi/wolfi-baselayout@20230201-r29?arch=x86_64&distro=wolfi-20230201",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "20230201-r29"
         },
         {
             "component": "wrappy",
-            "locator": "SPDXRef-Package-npm-wrappy-e2e2fb2c78fbe0f4",
+            "locator": "pkg:npm/wrappy@1.0.2",
             "scope": "image",
             "spdxExpression": "ISC",
             "version": "1.0.2"
         },
         {
             "component": "xtend",
-            "locator": "SPDXRef-Package-npm-xtend-9ba9b4dd7b615afe",
+            "locator": "pkg:npm/xtend@4.0.2",
             "scope": "image",
             "spdxExpression": "MIT",
             "version": "4.0.2"
         },
         {
             "component": "yallist",
-            "locator": "SPDXRef-Package-npm-yallist-7e8a3f2209aa9e9c",
+            "locator": "pkg:npm/yallist@5.0.0",
             "scope": "image",
             "spdxExpression": "BlueOak-1.0.0",
             "version": "5.0.0"
