@@ -1,7 +1,10 @@
 import { IAuthenticationStrategy, IIdpUser } from "@staticdeploy/core";
 import axios, { AxiosRequestConfig } from "axios";
-import Logger from "bunyan";
 import { createLocalJWKSet, JSONWebKeySet, jwtVerify } from "jose";
+
+export interface ILogger {
+    error(error: unknown, message: string): void;
+}
 
 interface IOpenidConfiguration {
     issuer: string;
@@ -53,7 +56,7 @@ export default class OidcAuthenticationStrategy
     constructor(
         private openidConfigurationUrl: string,
         private clientId: string,
-        private logger: Logger
+        private logger: ILogger
     ) {}
 
     async getIdpUserFromAuthToken(authToken: string): Promise<IIdpUser | null> {

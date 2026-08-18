@@ -23,7 +23,17 @@ The following environment variables can be used to configure the server:
 
 #### General service configurations
 
-- `LOG_LEVEL` (defaults to `info`)
+- `LOG_LEVEL`: validated minimum local structured-log level (`trace`, `debug`,
+  `info`, `warn`, `error`, or `fatal`; defaults to `info`). Any other value stops
+  startup with a structured error. In non-test environments the service writes
+  newline-delimited JSON to standard output with its application name and
+  version. Test runs are silent. Each request receives a server-generated UUID;
+  caller `X-Request-Id` values are ignored. Terminal request records use `info`
+  for completed responses (including 4xx), `warn` for aborted requests, and
+  `error` for errors or 5xx responses. Query strings, fragments, and sensitive
+  values are removed before output. `SIGINT`/`SIGTERM` close the HTTP server and
+  drain logs within bounded shutdown waits. Logging has no transport, remote
+  export, Eyes endpoint, or Eyes enablement; product ingestion remains gated.
 - `MANAGEMENT_HOSTNAME` _(required)_: the hostname at which the Management
   Console and API will be served
 - `ENABLE_MANAGEMENT_ENDPOINTS`: whether to enable or not the Management Console

@@ -4,7 +4,9 @@ import { expect } from "chai";
 
 import getAuthenticationStrategies from "../../src/components/authenticationStrategies";
 import getLogger from "../../src/components/logger";
-import config from "../../src/config";
+import { getConfig } from "../../src/config";
+
+const config = getConfig();
 
 describe("authenticationStrategies composition", () => {
     it("rejects an ambiguous JWT key without an explicit algorithm", () => {

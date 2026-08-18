@@ -6,7 +6,9 @@ import getExpressApp from "../../src/components/expressApp";
 import getLogger from "../../src/components/logger";
 import getManagementRouter from "../../src/components/managementRouter";
 import getStoragesModule from "../../src/components/storagesModule";
-import config from "../../src/config";
+import { getConfig } from "../../src/config";
+
+const config = getConfig();
 
 describe("staticdeploy expressApp", () => {
     describe("when config.enableManagementEndpoints === true", () => {

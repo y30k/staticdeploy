@@ -29,14 +29,13 @@
     "@staticdeploy/pg-s3-storages": "^0.15.5",
     "@staticdeploy/serve-static": "^0.15.5",
     "@staticdeploy/tar-archiver": "^0.15.5",
-    "bunyan": "^1.8.15",
-    "bunyan-middleware": "^1.0.1",
     "express": "4.21.2",
     "lodash": "^4.17.21",
+    "pino": "10.3.1",
+    "pino-http": "11.0.0",
     "vhost": "^3.0.2"
   },
   "devDependencies": {
-    "@types/bunyan": "^1.8.8",
     "@types/express": "4.17.25",
     "@types/lodash": "^4.14.178",
     "@types/mocha": "^9.0.0",

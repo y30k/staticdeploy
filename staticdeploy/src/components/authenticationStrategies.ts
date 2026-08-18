@@ -1,11 +1,14 @@
 import { IAuthenticationStrategy } from "@staticdeploy/core";
 import JwtAuthenticationStrategy from "@staticdeploy/jwt-authentication-strategy";
 import OidcAuthenticationStrategy from "@staticdeploy/oidc-authentication-strategy";
-import Logger from "bunyan";
 
 import IConfig from "../common/IConfig";
+import ILogger from "../common/ILogger";
 
-export default (config: IConfig, logger: Logger): IAuthenticationStrategy[] => {
+export default (
+    config: IConfig,
+    logger: ILogger
+): IAuthenticationStrategy[] => {
     const authenticationStrategies: IAuthenticationStrategy[] = [];
 
     if (config.jwtSecretOrPublicKey) {

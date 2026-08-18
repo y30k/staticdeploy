@@ -27,14 +27,6 @@
             }
         },
         {
-            "package": "dtrace-provider",
-            "version": "0.8.8",
-            "allowed": false,
-            "scripts": {
-                "install": "node-gyp rebuild || node suppress-error.js"
-            }
-        },
-        {
             "package": "ejs",
             "version": "2.7.4",
             "allowed": false,

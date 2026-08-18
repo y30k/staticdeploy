@@ -1,12 +1,12 @@
 import { IStoragesModule } from "@staticdeploy/core";
 import MemoryStorages from "@staticdeploy/memory-storages";
 import PgS3Storages from "@staticdeploy/pg-s3-storages";
-import Logger from "bunyan";
 import { isNil } from "lodash";
 
 import IConfig from "../common/IConfig";
+import ILogger from "../common/ILogger";
 
-export default (config: IConfig, logger: Logger): IStoragesModule => {
+export default (config: IConfig, logger: ILogger): IStoragesModule => {
     const useMemoryStorages =
         isNil(config.postgresUrl) ||
         isNil(config.s3Bucket) ||

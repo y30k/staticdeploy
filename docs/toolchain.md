@@ -107,6 +107,28 @@ toolchain after the root ESLint phase has passed. None is set globally, in
 tests, or in service runtime configuration. Work item M4-10 must remove all
 three bridges when CRA/Webpack 4 is replaced.
 
+## Local structured logging
+
+The backend uses exact `pino@10.3.1` and `pino-http@11.0.0` without transports
+or workers. Non-test service logs are newline-delimited JSON written only to
+standard output; test configuration is silent. `LOG_LEVEL` accepts only the six
+standard levels and fails startup otherwise. Records retain application
+name/version and serialize errors, causes, and aggregates while recursively
+redacting case-insensitive authorization, cookie, credential, token, password,
+API-key, proxy-auth, and secret/private-key variants. Logged request URLs omit
+query strings and fragments.
+
+Every request receives a server-generated UUID returned as `X-Request-Id`;
+caller values are neither trusted nor retained in request headers. Exactly one
+terminal record uses `request completed` at `info` for successful and 4xx
+responses, `request aborted` at `warn`, or `request failed` at `error` for
+errors/5xx. `SIGINT` and `SIGTERM` share an idempotent bounded close path and
+flush/drain standard output. Startup failures set a nonzero exit code only after
+the final structured error is drained. This local logging slice does not
+configure telemetry export, an endpoint, credentials, dashboards, analytics,
+or Eyes ingestion. Eyes product onboarding and application ingestion remain
+externally gated.
+
 ## Express 4 and convexpress compatibility bridge
 
 The legacy management API remains on exact `convexpress@2.3.0` and Express 4;

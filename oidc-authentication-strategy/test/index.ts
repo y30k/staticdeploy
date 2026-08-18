@@ -1,11 +1,10 @@
 import { generateKeyPairSync, KeyObject } from "crypto";
 import axios, { AxiosRequestConfig } from "axios";
-import Logger from "bunyan";
 import { expect } from "chai";
 import { SignJWT } from "jose";
 import nock from "nock";
 
-import OidcAuthenticationStrategy from "../src";
+import OidcAuthenticationStrategy, { ILogger } from "../src";
 
 type SigningKey = KeyObject | Uint8Array;
 
@@ -22,7 +21,7 @@ describe("OidcAuthenticationStrategy", () => {
         "http://openid-configuration.localhost/.well-known/openid-configuration";
     const jwksUrl = "http://jwks.localhost/keys";
     const clientId = "clientId";
-    const logger = Logger.createLogger({ name: "test", streams: [] });
+    const logger: ILogger = { error: () => undefined };
     const { publicKey, privateKey } = generateKeyPairSync("rsa", {
         modulusLength: 2048,
     });
@@ -355,7 +354,7 @@ describe("OidcAuthenticationStrategy", () => {
         const errors: unknown[][] = [];
         const recordingLogger = {
             error: (...args: unknown[]) => errors.push(args),
-        } as unknown as Logger;
+        } as ILogger;
         const strategy = createStrategy("not-a-valid-url", recordingLogger);
 
         expect(
@@ -371,7 +370,7 @@ describe("OidcAuthenticationStrategy", () => {
         const errors: unknown[][] = [];
         const recordingLogger = {
             error: (...args: unknown[]) => errors.push(args),
-        } as unknown as Logger;
+        } as ILogger;
         mockConfiguration();
         mockJwks();
 

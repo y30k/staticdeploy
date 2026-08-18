@@ -24,7 +24,6 @@
   "dependencies": {
     "@staticdeploy/core": "^0.15.5",
     "axios": "1.19.0",
-    "bunyan": "^1.8.15",
     "jose": "5.10.0"
   },
   "devDependencies": {

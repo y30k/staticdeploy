@@ -1,11 +1,11 @@
-import { LogLevelString } from "bunyan";
+export type LogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal";
 
 export default interface IConfig {
     // General service configurations
     appName: string;
     appVersion: string;
     nodeEnv: string;
-    logLevel: LogLevelString;
+    logLevel: LogLevel;
     port: string;
     managementHostname: string;
     enableManagementEndpoints: boolean;
