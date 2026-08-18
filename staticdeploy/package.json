@@ -29,8 +29,8 @@
     "@staticdeploy/pg-s3-storages": "^0.15.5",
     "@staticdeploy/serve-static": "^0.15.5",
     "@staticdeploy/tar-archiver": "^0.15.5",
-    "express": "4.21.2",
-    "lodash": "^4.17.21",
+    "express": "4.22.2",
+    "lodash": "4.18.1",
     "pino": "10.3.1",
     "pino-http": "11.0.0",
     "vhost": "^3.0.2"

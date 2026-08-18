@@ -29,7 +29,7 @@
   "dependencies": {
     "@staticdeploy/core": "^0.15.5",
     "axios": "1.19.0",
-    "lodash": "^4.17.21"
+    "lodash": "4.18.1"
   },
   "devDependencies": {
     "@types/chai": "4.3.20",

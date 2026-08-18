@@ -22,7 +22,7 @@
     "@staticdeploy/http-adapters": "^0.15.5",
     "@staticdeploy/memory-storages": "^0.15.5",
     "@staticdeploy/tar-archiver": "^0.15.5",
-    "express": "4.21.2"
+    "express": "4.22.2"
   },
   "devDependencies": {
     "@types/chai": "4.3.20",

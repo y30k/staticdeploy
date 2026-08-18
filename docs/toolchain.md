@@ -161,8 +161,8 @@ externally gated.
 The legacy management API remains on exact `convexpress@2.3.0` and Express 4;
 Express 5 is intentionally outside the M2 HTTP dependency slice because it would
 change routing and error semantics. The regenerated lock resolves convexpress's
-compatible ranges to `express@4.21.2`, `body-parser@1.20.3`,
-`path-to-regexp@0.1.12`, and `qs@6.13.0`. Focused adapter tests preserve the
+compatible ranges to `express@4.22.2`, `body-parser@1.20.6`,
+`path-to-regexp@0.1.13`, and `qs@6.15.3`. Focused adapter tests preserve the
 current malformed-body, content-type, query, encoded-parameter, not-found,
 asynchronous-error, route-schema, and Swagger contracts. The oversized-body 500
 response is recorded only as temporary legacy characterization; M4 must reassess
