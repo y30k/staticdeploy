@@ -10,9 +10,7 @@ export default (config: IConfig, logger: Logger): IStoragesModule => {
     const useMemoryStorages =
         isNil(config.postgresUrl) ||
         isNil(config.s3Bucket) ||
-        isNil(config.s3Endpoint) ||
-        isNil(config.s3AccessKeyId) ||
-        isNil(config.s3SecretAccessKey);
+        isNil(config.s3Endpoint);
 
     logger.info(
         `Using ${
@@ -27,9 +25,11 @@ export default (config: IConfig, logger: Logger): IStoragesModule => {
               s3Config: {
                   bucket: config.s3Bucket!,
                   endpoint: config.s3Endpoint!,
-                  accessKeyId: config.s3AccessKeyId!,
-                  secretAccessKey: config.s3SecretAccessKey!,
-                  enableGCSCompatibility: config.s3EnableGCSCompatibility!,
+                  region: config.s3Region,
+                  forcePathStyle: config.s3ForcePathStyle,
+                  accessKeyId: config.s3AccessKeyId,
+                  secretAccessKey: config.s3SecretAccessKey,
+                  enableGCSCompatibility: config.s3EnableGCSCompatibility,
               },
           });
 };

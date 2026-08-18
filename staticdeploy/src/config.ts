@@ -45,6 +45,11 @@ const config: IConfig = {
     postgresUrl: env("POSTGRES_URL"),
     s3Bucket: env("S3_BUCKET"),
     s3Endpoint: env("S3_ENDPOINT"),
+    s3Region: env("S3_REGION", { default: "us-east-1" }),
+    s3ForcePathStyle: env("S3_FORCE_PATH_STYLE", {
+        default: "true",
+        parse: (value) => value !== "false",
+    }),
     s3AccessKeyId: env("S3_ACCESS_KEY_ID"),
     s3SecretAccessKey: env("S3_SECRET_ACCESS_KEY"),
     s3EnableGCSCompatibility: env("S3_ENABLE_GCS_COMPATIBILITY", {
