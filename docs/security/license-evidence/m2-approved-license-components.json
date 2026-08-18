@@ -11222,7 +11222,7 @@
             "version": "0.15.5"
         }
     ],
-    "imageConfigDigest": "sha256:19e9d3e8eec1a3ca09f53b8283c99b4140fd47f3f0dfe50013288624df53c49f",
     "lockDigest": "sha256:1ddb2bfaa38c5b33c279d57e9fe0434fe4c1aa571558f5e25cfa3366936f06dc",
+    "runtimeBaseDigest": "sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303",
     "schemaVersion": 1
 }

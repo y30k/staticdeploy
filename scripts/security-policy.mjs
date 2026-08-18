@@ -1216,13 +1216,13 @@ function readApprovedLicenseInventory(inventoryPath) {
     const inventory = readJson(inventoryPath);
     exactKeys(
         inventory,
-        ["schemaVersion", "lockDigest", "imageConfigDigest", "components"],
+        ["schemaVersion", "lockDigest", "runtimeBaseDigest", "components"],
         "approved license inventory"
     );
     if (
         inventory.schemaVersion !== SCHEMA_VERSION ||
         !DIGEST.test(inventory.lockDigest || "") ||
-        !DIGEST.test(inventory.imageConfigDigest || "")
+        !DIGEST.test(inventory.runtimeBaseDigest || "")
     )
         fail("Approved license inventory subject is invalid");
     const components = asArray(
@@ -1642,11 +1642,15 @@ function evaluate(directory) {
     const approvedInventory = readApprovedLicenseInventory(
         licensePolicy.approvedInventory.path
     );
+    if (approvedInventory.lockDigest !== subjectReport.lockDigest)
+        fail("Approved license inventory identifies a different lockfile");
+    const runtimeBaseMatch = fs
+        .readFileSync("staticdeploy/Dockerfile", "utf8")
+        .match(/^FROM\s+\S+@(?<digest>sha256:[a-f0-9]{64})\s+AS\s+runtime$/m);
     if (
-        approvedInventory.lockDigest !== subjectReport.lockDigest ||
-        approvedInventory.imageConfigDigest !== subjectReport.imageConfigDigest
+        runtimeBaseMatch?.groups?.digest !== approvedInventory.runtimeBaseDigest
     )
-        fail("Approved license inventory identifies a different subject");
+        fail("Approved license inventory identifies a different runtime base");
     const componentKey = (component) =>
         JSON.stringify([
             component.scope,

@@ -30,10 +30,10 @@ component or version authorization:
 - the exact 1,603-component scoped license inventory retained in
   `m2-approved-license-components.json`, bound to lock digest
   `sha256:1ddb2bfaa38c5b33c279d57e9fe0434fe4c1aa571558f5e25cfa3366936f06dc`,
-  image configuration digest
-  `sha256:19e9d3e8eec1a3ca09f53b8283c99b4140fd47f3f0dfe50013288624df53c49f`, and
+  runtime base digest
+  `sha256:df4e22a4b5dcd8e15a51fe9b04e16717d411dd9f4fe4b3844c1bf425b14be303`, and
   inventory artifact SHA-256
-  `85bd3c99d037f7c60da486896d9ff57dfce1a5dbb8abfa8226e6355b465bd7ff`;
+  `fe03730cd8939eed72771ccd15bdd1e90c058518ef0d6499cf18703166df9786`;
 - the deterministic runtime notice artifact with SHA-256
   `37966c1aa67cf92abd7733ee2c71753dc8908a88f3df011974b9be61c8bc5bf3`;
 - the component/version-bound Chainguard evidence and analysis in

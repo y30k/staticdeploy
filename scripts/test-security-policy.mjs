@@ -19,6 +19,9 @@ const digest = (value) =>
     `sha256:${createHash("sha256").update(value).digest("hex")}`;
 const lockDigest = digest(fs.readFileSync("yarn.lock"));
 const imageConfigDigest = `sha256:${"a".repeat(64)}`;
+const runtimeBaseDigest = fs
+    .readFileSync("staticdeploy/Dockerfile", "utf8")
+    .match(/^FROM\s+\S+@(sha256:[a-f0-9]{64})\s+AS\s+runtime$/m)[1];
 const now = Date.now();
 const timestamp = new Date(now - 60_000).toISOString();
 const databaseTimestamp = new Date(now - 2 * 60 * 60 * 1000).toISOString();
@@ -310,7 +313,7 @@ function writeCase(name, mutate = () => {}, policies = {}) {
     const approvedInventory = {
         schemaVersion: 1,
         lockDigest,
-        imageConfigDigest,
+        runtimeBaseDigest: policies.runtimeBaseDigest || runtimeBaseDigest,
         components: approvedComponents,
     };
     fs.writeFileSync(
@@ -589,6 +592,9 @@ try {
         fixture.reports["image-sbom"].payload.packages = fixture.reports[
             "image-sbom"
         ].payload.packages.filter((item) => item.name !== "node");
+    });
+    expectFail("runtime-base-digest-drift", undefined, {
+        runtimeBaseDigest: `sha256:${"f".repeat(64)}`,
     });
     expectFail(
         "same-license-image-component-drift",
