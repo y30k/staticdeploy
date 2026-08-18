@@ -4,10 +4,11 @@ title: Configuring JWT identity providers
 ---
 
 StaticDeploy can authenticate users using [JWTs](https://jwt.io). In order to
-enable this authentication strategy, it's sufficient to pass a
-`JWT_SECRET_OR_PUBLIC_KEY` environment variable when starting the `staticdeploy`
-service. The variable has to contain the base64-encoded secret (for symmetric
-signatures) or public key (for asymmetric signatures) that is used to sign JWTs.
+enable this authentication strategy, pass both `JWT_SECRET_OR_PUBLIC_KEY` and
+`JWT_ALGORITHM` when starting the `staticdeploy` service. The key variable must
+contain the base64-encoded HMAC secret for `JWT_ALGORITHM=HS256`, or the base64
+encoding of an RSA public key PEM file/text for `JWT_ALGORITHM=RS256`. Other
+algorithms and ambiguous key configurations are rejected.
 
 JWTs **MUST** contain the `iss` and `sub` claims, used by StaticDeploy to find
 the user object corresponding to the token. (The user object is used to enforce

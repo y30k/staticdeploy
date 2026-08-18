@@ -64,10 +64,12 @@ passed in via environment variables.
   performing the request must have the appropriate roles). Defaults to `true`
 - `CREATE_ROOT_USER`: on startup, create (if they don't already exist) a `root`
   user and group with the `root` role. Defaults to `true`
-- `JWT_SECRET_OR_PUBLIC_KEY`: by setting this config the JWT authentication
-  strategy will be enabled (see [the guide](/docs/guides-jwt-providers) for
-  details). The config is the secret or public key (base64 encoded) to validate
-  authorization JWT-s
+- `JWT_SECRET_OR_PUBLIC_KEY`: together with `JWT_ALGORITHM`, enables the JWT
+  authentication strategy (see [the guide](/docs/guides-jwt-providers)). The
+  value is a base64-encoded HMAC secret, or the base64 encoding of the RSA
+  public key PEM file/text
+- `JWT_ALGORITHM`: required with `JWT_SECRET_OR_PUBLIC_KEY`; must be `HS256` for
+  an HMAC secret or `RS256` for an RSA public key
 - `OIDC_CONFIGURATION_URL`: by setting this config (and the following one) the
   OpenID Connect authentication strategy will be enabled (see
   [the guide](/docs/guides-openid-connect-providers) for details). The config is

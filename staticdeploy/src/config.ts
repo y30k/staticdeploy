@@ -37,6 +37,14 @@ const config: IConfig = {
     jwtSecretOrPublicKey: env("JWT_SECRET_OR_PUBLIC_KEY", {
         parse: (value) => Buffer.from(value, "base64"),
     }),
+    jwtAlgorithm: env("JWT_ALGORITHM", {
+        parse: (value) => {
+            if (value !== "HS256" && value !== "RS256") {
+                throw new Error("JWT_ALGORITHM must be HS256 or RS256");
+            }
+            return value;
+        },
+    }),
     oidcConfigurationUrl: env("OIDC_CONFIGURATION_URL"),
     oidcClientId: env("OIDC_CLIENT_ID"),
     oidcProviderName: env("OIDC_PROVIDER_NAME"),

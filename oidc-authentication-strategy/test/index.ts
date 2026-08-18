@@ -1,10 +1,21 @@
-import { JWK, JWKS, JWT } from "@panva/jose";
+import { generateKeyPairSync, KeyObject } from "crypto";
 import axios, { AxiosRequestConfig } from "axios";
 import Logger from "bunyan";
 import { expect } from "chai";
+import { SignJWT } from "jose";
 import nock from "nock";
 
 import OidcAuthenticationStrategy from "../src";
+
+type SigningKey = KeyObject | Uint8Array;
+
+interface ITokenOptions {
+    algorithm?: "HS256" | "PS256" | "RS256";
+    signingKey?: SigningKey;
+    kid?: string;
+    expirationTime?: number | false;
+    notBefore?: number;
+}
 
 describe("OidcAuthenticationStrategy", () => {
     const openidConfigurationUrl =
@@ -12,14 +23,44 @@ describe("OidcAuthenticationStrategy", () => {
     const jwksUrl = "http://jwks.localhost/keys";
     const clientId = "clientId";
     const logger = Logger.createLogger({ name: "test", streams: [] });
-    const signingKey = JWK.generateSync("RSA");
+    const { publicKey, privateKey } = generateKeyPairSync("rsa", {
+        modulusLength: 2048,
+    });
+    const signingKeyId = "signing-key";
+    const publicJwk = {
+        ...publicKey.export({ format: "jwk" }),
+        alg: "RS256",
+        kid: signingKeyId,
+        use: "sig",
+    };
+    const jwks = { keys: [publicJwk] };
     const issuer = "https://issuer.localhost";
     const sub = "sub";
 
-    const validToken = () =>
-        JWT.sign({ sub, iss: issuer, aud: clientId }, signingKey, {
-            expiresIn: "5 minutes",
+    const makeToken = async (
+        claims: Record<string, unknown> = {
+            sub,
+            iss: issuer,
+            aud: clientId,
+        },
+        options: ITokenOptions = {}
+    ): Promise<string> => {
+        const algorithm = options.algorithm ?? "RS256";
+        const signingKey = options.signingKey ?? privateKey;
+        let token = new SignJWT(claims).setProtectedHeader({
+            alg: algorithm,
+            kid: options.kid ?? signingKeyId,
         });
+        if (options.expirationTime !== false) {
+            token = token.setExpirationTime(
+                options.expirationTime ?? Math.floor(Date.now() / 1000) + 300
+            );
+        }
+        if (options.notBefore !== undefined) {
+            token = token.setNotBefore(options.notBefore);
+        }
+        return token.sign(signingKey);
+    };
 
     const mockConfiguration = () =>
         nock("http://openid-configuration.localhost")
@@ -27,9 +68,7 @@ describe("OidcAuthenticationStrategy", () => {
             .reply(200, { issuer, jwks_uri: jwksUrl });
 
     const mockJwks = () =>
-        nock("http://jwks.localhost")
-            .get("/keys")
-            .reply(200, new JWKS.KeyStore([signingKey]).toJWKS());
+        nock("http://jwks.localhost").get("/keys").reply(200, jwks);
 
     const createStrategy = (
         configurationUrl = openidConfigurationUrl,
@@ -61,13 +100,14 @@ describe("OidcAuthenticationStrategy", () => {
                 data:
                     url === openidConfigurationUrl
                         ? { issuer, jwks_uri: jwksUrl }
-                        : new JWKS.KeyStore([signingKey]).toJWKS(),
+                        : jwks,
             };
         }) as unknown as typeof axios.get;
 
         try {
-            const result =
-                await createStrategy().getIdpUserFromAuthToken(validToken());
+            const result = await createStrategy().getIdpUserFromAuthToken(
+                await makeToken()
+            );
             expect(result).to.deep.equal({ id: sub, idp: issuer });
         } finally {
             axios.get = originalGet;
@@ -91,14 +131,15 @@ describe("OidcAuthenticationStrategy", () => {
         }
     });
 
-    it("fetches and caches discovery and JWKS across concurrent authentication", async () => {
+    it("fetches and caches one successful configuration across concurrent authentication", async () => {
         const configurationScope = mockConfiguration();
         const jwksScope = mockJwks();
         const strategy = createStrategy();
+        const authToken = await makeToken();
 
         const users = await Promise.all(
             Array.from({ length: 5 }, () =>
-                strategy.getIdpUserFromAuthToken(validToken())
+                strategy.getIdpUserFromAuthToken(authToken)
             )
         );
 
@@ -109,7 +150,72 @@ describe("OidcAuthenticationStrategy", () => {
         jwksScope.done();
     });
 
-    it("retries configuration after a failed discovery request", async () => {
+    it("shares refreshes at expiry and retries after a shared failed refresh", async () => {
+        const originalGet = axios.get;
+        const originalDateNow = Date.now;
+        let now = originalDateNow();
+        let discoveryAttempts = 0;
+        let jwksAttempts = 0;
+        const authToken = await makeToken(undefined, {
+            expirationTime: Math.floor(now / 1000) + 60 * 60,
+        });
+        Date.now = () => now;
+        axios.get = (async (url: string) => {
+            if (url === openidConfigurationUrl) {
+                discoveryAttempts += 1;
+                if (discoveryAttempts === 3) {
+                    throw new Error("shared refresh failure");
+                }
+                return { data: { issuer, jwks_uri: jwksUrl } };
+            }
+            jwksAttempts += 1;
+            return { data: jwks };
+        }) as typeof axios.get;
+
+        try {
+            const strategy = createStrategy();
+            expect(
+                await strategy.getIdpUserFromAuthToken(authToken)
+            ).to.deep.equal({ id: sub, idp: issuer });
+            now += 5 * 60 * 1000 - 1;
+            expect(
+                await strategy.getIdpUserFromAuthToken(authToken)
+            ).to.deep.equal({ id: sub, idp: issuer });
+            expect([discoveryAttempts, jwksAttempts]).to.deep.equal([1, 1]);
+
+            now += 2;
+            expect(
+                await Promise.all(
+                    Array.from({ length: 5 }, () =>
+                        strategy.getIdpUserFromAuthToken(authToken)
+                    )
+                )
+            ).to.deep.equal(
+                Array.from({ length: 5 }, () => ({ id: sub, idp: issuer }))
+            );
+            expect([discoveryAttempts, jwksAttempts]).to.deep.equal([2, 2]);
+
+            now += 5 * 60 * 1000 + 1;
+            expect(
+                await Promise.all(
+                    Array.from({ length: 5 }, () =>
+                        strategy.getIdpUserFromAuthToken(authToken)
+                    )
+                )
+            ).to.deep.equal(Array.from({ length: 5 }, () => null));
+            expect([discoveryAttempts, jwksAttempts]).to.deep.equal([3, 2]);
+
+            expect(
+                await strategy.getIdpUserFromAuthToken(authToken)
+            ).to.deep.equal({ id: sub, idp: issuer });
+            expect([discoveryAttempts, jwksAttempts]).to.deep.equal([4, 3]);
+        } finally {
+            axios.get = originalGet;
+            Date.now = originalDateNow;
+        }
+    });
+
+    it("does not cache a failed configuration and retries discovery", async () => {
         const configurationScope = nock("http://openid-configuration.localhost")
             .get("/.well-known/openid-configuration")
             .reply(503)
@@ -117,13 +223,14 @@ describe("OidcAuthenticationStrategy", () => {
             .reply(200, { issuer, jwks_uri: jwksUrl });
         const jwksScope = mockJwks();
         const strategy = createStrategy();
+        const authToken = await makeToken();
 
-        expect(await strategy.getIdpUserFromAuthToken(validToken())).to.equal(
+        expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
             null
         );
-        expect(
-            await strategy.getIdpUserFromAuthToken(validToken())
-        ).to.deep.equal({ id: sub, idp: issuer });
+        expect(await strategy.getIdpUserFromAuthToken(authToken)).to.deep.equal(
+            { id: sub, idp: issuer }
+        );
         configurationScope.done();
         jwksScope.done();
     });
@@ -139,7 +246,7 @@ describe("OidcAuthenticationStrategy", () => {
             });
 
         expect(
-            await createStrategy().getIdpUserFromAuthToken(validToken())
+            await createStrategy().getIdpUserFromAuthToken(await makeToken())
         ).to.equal(null);
         discovery.done();
         expect(redirectTarget.isDone()).to.equal(false);
@@ -147,20 +254,20 @@ describe("OidcAuthenticationStrategy", () => {
 
     it("rejects JWKS redirects without following them", async () => {
         const discovery = mockConfiguration();
-        const jwks = nock("http://jwks.localhost")
+        const jwksScope = nock("http://jwks.localhost")
             .get("/keys")
             .reply(302, undefined, {
                 Location: "http://redirect.localhost/keys",
             });
         const redirectTarget = nock("http://redirect.localhost")
             .get("/keys")
-            .reply(200, new JWKS.KeyStore([signingKey]).toJWKS());
+            .reply(200, jwks);
 
         expect(
-            await createStrategy().getIdpUserFromAuthToken(validToken())
+            await createStrategy().getIdpUserFromAuthToken(await makeToken())
         ).to.equal(null);
         discovery.done();
-        jwks.done();
+        jwksScope.done();
         expect(redirectTarget.isDone()).to.equal(false);
     });
 
@@ -178,7 +285,7 @@ describe("OidcAuthenticationStrategy", () => {
             name: "oversized JWKS responses",
             discovery: { issuer, jwks_uri: jwksUrl },
             jwks: {
-                ...new JWKS.KeyStore([signingKey]).toJWKS(),
+                ...jwks,
                 padding: "x".repeat(1024 * 1024),
             },
         },
@@ -187,17 +294,19 @@ describe("OidcAuthenticationStrategy", () => {
             const discovery = nock("http://openid-configuration.localhost")
                 .get("/.well-known/openid-configuration")
                 .reply(200, testCase.discovery);
-            const jwks = testCase.jwks
+            const jwksScope = testCase.jwks
                 ? nock("http://jwks.localhost")
                       .get("/keys")
                       .reply(200, testCase.jwks)
                 : undefined;
 
             expect(
-                await createStrategy().getIdpUserFromAuthToken(validToken())
+                await createStrategy().getIdpUserFromAuthToken(
+                    await makeToken()
+                )
             ).to.equal(null);
             discovery.done();
-            jwks?.done();
+            jwksScope?.done();
         });
     }
 
@@ -207,36 +316,37 @@ describe("OidcAuthenticationStrategy", () => {
             .reply(200, "{", { "Content-Type": "application/json" });
 
         expect(
-            await createStrategy().getIdpUserFromAuthToken(validToken())
+            await createStrategy().getIdpUserFromAuthToken(await makeToken())
         ).to.equal(null);
         discovery.done();
     });
 
     it("rejects malformed JWKS responses", async () => {
         const discovery = mockConfiguration();
-        const jwks = nock("http://jwks.localhost")
+        const jwksScope = nock("http://jwks.localhost")
             .get("/keys")
             .reply(200, { keys: "not-an-array" });
 
         expect(
-            await createStrategy().getIdpUserFromAuthToken(validToken())
+            await createStrategy().getIdpUserFromAuthToken(await makeToken())
         ).to.equal(null);
         discovery.done();
-        jwks.done();
+        jwksScope.done();
     });
 
     it("rejects non-http(s) configured and discovered URLs", async () => {
+        const authToken = await makeToken();
         expect(
             await createStrategy(
                 "file:///tmp/openid-configuration"
-            ).getIdpUserFromAuthToken(validToken())
+            ).getIdpUserFromAuthToken(authToken)
         ).to.equal(null);
 
         const discovery = nock("http://openid-configuration.localhost")
             .get("/.well-known/openid-configuration")
             .reply(200, { issuer, jwks_uri: "file:///tmp/jwks" });
         expect(
-            await createStrategy().getIdpUserFromAuthToken(validToken())
+            await createStrategy().getIdpUserFromAuthToken(authToken)
         ).to.equal(null);
         discovery.done();
     });
@@ -248,9 +358,9 @@ describe("OidcAuthenticationStrategy", () => {
         } as unknown as Logger;
         const strategy = createStrategy("not-a-valid-url", recordingLogger);
 
-        expect(await strategy.getIdpUserFromAuthToken(validToken())).to.equal(
-            null
-        );
+        expect(
+            await strategy.getIdpUserFromAuthToken(await makeToken())
+        ).to.equal(null);
         expect(errors).to.have.length(1);
         expect(errors[0][1]).to.equal(
             "Error configuring OidcAuthenticationStrategy"
@@ -295,77 +405,116 @@ describe("OidcAuthenticationStrategy", () => {
         });
 
         it("returns null when header.kid has no signing key", async () => {
-            const authToken = JWT.sign(
-                { sub, iss: issuer, aud: clientId },
-                signingKey,
-                {
-                    expiresIn: "5 minutes",
-                    kid: false,
-                    header: { kid: "different-kid" },
-                }
-            );
+            const authToken = await makeToken(undefined, {
+                kid: "different-kid",
+            });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
         });
 
         it("returns null for the wrong issuer", async () => {
-            const authToken = JWT.sign(
-                {
-                    sub,
-                    iss: "https://different-issuer.localhost",
-                    aud: clientId,
-                },
-                signingKey,
-                { expiresIn: "5 minutes" }
+            const authToken = await makeToken({
+                sub,
+                iss: "https://different-issuer.localhost",
+                aud: clientId,
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
             );
+        });
+
+        it("returns null when the ID token has no issuer", async () => {
+            const authToken = await makeToken({ sub, aud: clientId });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
         });
 
         it("returns null for the wrong audience", async () => {
-            const authToken = JWT.sign(
-                { sub, iss: issuer, aud: "different-clientId" },
-                signingKey,
-                { expiresIn: "5 minutes" }
+            const authToken = await makeToken({
+                sub,
+                iss: issuer,
+                aud: "different-clientId",
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
             );
+        });
+
+        it("returns null when the ID token has no audience", async () => {
+            const authToken = await makeToken({ sub, iss: issuer });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
         });
 
         it("returns null for an invalid signature", async () => {
-            const authToken = JWT.sign(
-                { sub, iss: issuer, aud: clientId },
-                JWK.generateSync("RSA"),
-                {
-                    expiresIn: "5 minutes",
-                    kid: false,
-                    header: { kid: signingKey.kid },
-                }
-            );
+            const differentPrivateKey = generateKeyPairSync("rsa", {
+                modulusLength: 2048,
+            }).privateKey;
+            const authToken = await makeToken(undefined, {
+                signingKey: differentPrivateKey,
+            });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
         });
 
         it("returns null when the ID token has no subject", async () => {
-            const authToken = JWT.sign(
-                { iss: issuer, aud: clientId },
-                signingKey,
-                { expiresIn: "5 minutes" }
-            );
+            const authToken = await makeToken({
+                iss: issuer,
+                aud: clientId,
+            });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
         });
 
         it("returns null when the ID token has no expiration", async () => {
-            const authToken = JWT.sign(
-                { sub, iss: issuer, aud: clientId },
-                signingKey
+            const authToken = await makeToken(undefined, {
+                expirationTime: false,
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
             );
+        });
+
+        it("returns null when the ID token is expired", async () => {
+            const authToken = await makeToken(undefined, {
+                expirationTime: Math.floor(Date.now() / 1000) - 60,
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
+            );
+        });
+
+        it("returns null before the ID token not-before time", async () => {
+            const authToken = await makeToken(undefined, {
+                notBefore: Math.floor(Date.now() / 1000) + 300,
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
+            );
+        });
+
+        it("rejects an HS256 algorithm-confusion token", async () => {
+            const rsaPublicKey = Buffer.from(
+                publicKey.export({ type: "spki", format: "pem" })
+            );
+            const authToken = await makeToken(undefined, {
+                algorithm: "HS256",
+                signingKey: new Uint8Array(rsaPublicKey),
+            });
+            expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
+                null
+            );
+        });
+
+        it("rejects unsupported RSA algorithms", async () => {
+            const authToken = await makeToken(undefined, {
+                algorithm: "PS256",
+            });
             expect(await strategy.getIdpUserFromAuthToken(authToken)).to.equal(
                 null
             );
@@ -373,7 +522,7 @@ describe("OidcAuthenticationStrategy", () => {
 
         it("returns the idp user for a valid jwt", async () => {
             expect(
-                await strategy.getIdpUserFromAuthToken(validToken())
+                await strategy.getIdpUserFromAuthToken(await makeToken())
             ).to.deep.equal({ id: sub, idp: issuer });
         });
     });

@@ -18,6 +18,7 @@ export default interface IConfig {
     enforceAuth: boolean;
     createRootUser: boolean;
     jwtSecretOrPublicKey?: Buffer;
+    jwtAlgorithm?: "HS256" | "RS256";
     oidcConfigurationUrl?: string;
     oidcClientId?: string;
     oidcProviderName?: string;

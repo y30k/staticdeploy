@@ -22,8 +22,8 @@
     "test": "NODE_ENV=test NODE_PATH=src mocha --exit -t 20000 -r ts-node/register --extension ts 'test/**/*.ts'"
   },
   "dependencies": {
-    "@panva/jose": "^1.9.3",
     "@staticdeploy/core": "^0.15.5",
+    "jose": "5.10.0",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
