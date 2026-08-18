@@ -76,21 +76,26 @@ compatibility is not silently restored.
 
 ### ADR-002 — Select and pin the supported runtime through an evidence gate
 
-**Status:** Approved — initial pin Node `24.19.0` (Node 24 LTS).
+**Status:** Approved — Node `24.19.0`, Yarn `4.18.0`, Lerna `10.0.0`.
 
 The user’s full project authority approves Node `24.19.0`, verified against the
-official Node release index on 2026-08-17. Patch updates remain automated,
-reviewable changes gated by the complete required suite. The implementation PR:
+official Node release index on 2026-08-17. Isolated Yarn/Lerna and pnpm
+prototypes selected the supported Yarn/Lerna upgrade as the lower-complexity
+path. The evidence and rollback are recorded in
+`docs/decisions/2026.08.18-m2-toolchain-and-distribution.md`.
 
-1. compares the current workspace toolchain with an in-place supported upgrade
-   and, only if plausibly simpler, a pnpm workspace migration;
-2. records clean frozen-install/build/test duration, dependency graph impact,
-   lockfile churn, and maintainer support status;
-3. defaults to upgrading existing workspace tooling when pnpm does not
-   demonstrate lower migration/maintenance complexity;
-4. pins the exact Node patch and chosen package-manager version in repository
-   metadata, CI, developer setup, and container builders;
-5. uses a frozen lockfile in clean checkout and container builds; and
+The implementation PR:
+
+1. pins the exact Node, Yarn, and Lerna versions in repository metadata, CI,
+   developer setup, and container builders;
+2. uses Yarn's `node-modules` linker and immutable installs with an exact
+   reviewed package/version install-script inventory; global install-script
+   enablement is forbidden by M2-GATE;
+3. renames the duplicate private root package and removes obsolete/redundant
+   Lerna declarations;
+4. scopes the legacy Webpack OpenSSL bridge to the console build and assigns its
+   removal to M4-10;
+5. makes clean install/build/test and lockfile reproducibility required; and
 6. opens automated patch updates subject to all required checks.
 
 A forecasted future Node version, “latest,” or the current EOL Node 14 is not
