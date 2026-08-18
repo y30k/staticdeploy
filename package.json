@@ -56,6 +56,7 @@
     "coverage": "nyc --all yarn unit && yarn workspace @staticdeploy/management-console test:coverage",
     "check:install-policy": "node scripts/check-install-policy.mjs",
     "test:install-policy": "node scripts/test-install-policy.mjs",
+    "test:security-policy": "node scripts/test-security-policy.mjs",
     "check:install-scripts": "node scripts/check-install-scripts.mjs",
     "lerna": "lerna"
   },
