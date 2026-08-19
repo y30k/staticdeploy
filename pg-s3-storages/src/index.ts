@@ -23,6 +23,7 @@ import GroupsStorage from "./GroupsStorage";
 import OperationLogsStorage from "./OperationLogsStorage";
 import { createPostgresKnex } from "./postgres";
 import UsersStorage from "./UsersStorage";
+export * from "./V2ObjectStorage";
 
 export interface IS3Config {
     bucket: string;

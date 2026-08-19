@@ -64,10 +64,12 @@ function execStorageTests(options: {
     describe(options.name, () => {
         const savedEnvironment = saveEnvironment();
         const pgS3Storages = new PgS3Storages({
-            postgresUrl: "postgres://postgres:password@localhost/postgres",
+            postgresUrl:
+                process.env.POSTGRES_TEST_URL ??
+                "postgres://postgres:password@localhost/postgres",
             s3Config: {
                 bucket: options.bucket,
-                endpoint: "http://127.0.0.1:9000",
+                endpoint: process.env.MINIO_TEST_URL ?? "http://127.0.0.1:9000",
                 region: "us-east-1",
                 forcePathStyle: true,
                 enableGCSCompatibility: options.enableGCSCompatibility,
@@ -161,7 +163,8 @@ function execStorageTests(options: {
             it("keeps non-404 S3 failures distinct from not-found", async () => {
                 const invalidConfig: IS3Config = {
                     bucket: options.bucket,
-                    endpoint: "http://127.0.0.1:9000",
+                    endpoint:
+                        process.env.MINIO_TEST_URL ?? "http://127.0.0.1:9000",
                     region: "us-east-1",
                     forcePathStyle: true,
                     enableGCSCompatibility: options.enableGCSCompatibility,
@@ -174,6 +177,7 @@ function execStorageTests(options: {
                 };
                 const invalidStorages = new PgS3Storages({
                     postgresUrl:
+                        process.env.POSTGRES_TEST_URL ??
                         "postgres://postgres:password@localhost/postgres",
                     s3Config: invalidConfig,
                 });

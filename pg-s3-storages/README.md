@@ -11,6 +11,29 @@ addressing enabled by default for backward-compatible MinIO behavior. Set both
 use the AWS SDK default Node credential provider chain. `enableGCSCompatibility`
 continues to replace bulk deletes with individual object deletes for GCS.
 
+## V2 quarantine and immutable objects
+
+The v2 role factories construct separate control, worker, and content clients;
+production composition must inject only one role-specific S3/PostgreSQL identity
+into each command. Control can only create declared quarantine objects under
+`v2/quarantine/{release-id}/files/{safe-relative-path}`. The worker reads and
+deletes quarantine objects and promotes verified bytes with create-only writes
+under `v2/releases/{application-id}/{release-id}`. Content exposes only READY
+release content reads; partial prefixes remain unreferenced. Every write
+verifies the declared size and SHA-256 against a full-body read-back, and
+idempotent retries accept an existing object only after the same verification.
+
+Paths are NFC UTF-8 POSIX-relative names and reject traversal, ambiguous
+separators, invalid surrogate text, case/normalization collisions,
+file/directory collisions, and keys over S3's 1,024-byte UTF-8 limit. Disposable
+MinIO tests provision distinct control, worker, and content users and verify raw
+prefix/action denials; those local policies are evidence only. The pinned MinIO
+policy engine cannot require the `If-None-Match` request header, so application
+create-only behavior is tested locally but raw worker-credential overwrite
+rejection is explicitly not claimed. Production credential/prefix policy,
+conditional-header enforcement, retention, and provider acceptance remain
+blocked on B-S3.
+
 ## PostgreSQL migrations and connections
 
 This package uses the directly pinned and supported Knex `3.1.0` and PostgreSQL
