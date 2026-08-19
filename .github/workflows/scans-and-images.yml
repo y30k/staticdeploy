@@ -102,6 +102,13 @@ jobs:
                   EXPECTED_POSTGRES_MAJOR: "16"
                   POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
               run: ./scripts/gates/m3-foundation.sh authorization
+            - name: Run focused M3-08 projection evidence on supported PostgreSQL 16
+              env:
+                  EXPECTED_POSTGRES_MAJOR: "16"
+                  POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
+                  MINIO_TEST_URL: http://127.0.0.1:9000
+                  M3_EVIDENCE_PATH: reports/m3-08-projection-evidence.json
+              run: ./scripts/gates/m3-foundation.sh projection
             - name: Record exact supported-toolchain evidence
               run:
                   node scripts/write-m2-toolchain-evidence.mjs
@@ -116,6 +123,7 @@ jobs:
                       management-console/coverage/
                       reports/toolchain-evidence.json
                       reports/m3-foundation-evidence.json
+                      reports/m3-08-projection-evidence.json
                   if-no-files-found: error
 
     scans-evidence:

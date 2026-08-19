@@ -142,6 +142,51 @@ IDs, rename behavior, propagation, accepted stale interval, users, and group
 mapping remain **BLOCKED-EXTERNAL on B-OKTA**; production role provisioning and
 capability acceptance remain **B-PG**.
 
+## V2 publication routing projection
+
+Migration 08 turns the migration-04 publication outbox into the executable
+ADR-009 protocol. Control uses one `SECURITY DEFINER` request function that
+locks the application and atomically advances desired state, appends a bounded
+`*_REQUESTED` audit event, and inserts one immutable outbox identity. The outbox
+copies the issuer-scoped actor hash, canonical request digest, requested-audit
+identity, and an explicit normalized ASCII routing-host snapshot supplied by the
+authorized caller. No production suffix is invented here: B-DNS/M3-09 owns the
+external host-to-routing-ID derivation. A fenced worker then binds one routing
+`kid` before its first S3 side effect. Claims, renewal, retry, terminal failure,
+and acknowledgement require the exact row, owner, and monotonic lease version.
+Final acknowledgement atomically advances served state, records the opaque
+read-back ETag/optional object version, appends the final audit event, and
+completes the durable idempotency result.
+
+Routing generations are deterministic canonical Ed25519 envelopes with a closed
+protected `alg=EdDSA`/routing `typ`/single `kid` header and signed purpose,
+audience, context, normalized host, application, routing, generation, immutable
+request time, operation, release/prefix, and manifest digest. The worker-only
+signer validates matching Ed25519 key pairs and validity windows;
+content/reconciliation accept a separate public-only verifier. Active keys sign
+new rows; overlap keys may finish already-bound rows; unknown, expired, retired,
+revoked, or wrong-purpose keys fail closed. Generation objects are create-only.
+`current.json` is never written unconditionally: initial creation uses
+`If-None-Match: *`, replacement uses the opaque ETag of the last verified
+pointer, and acknowledgement requires an exact body/signature/digest/ETag
+read-back.
+
+`V2ContentRoutingCache` has only S3 and public verification keys. It requires
+`current.json` to equal its immutable generation and verifies the release
+manifest identity/digest before advancing a monotonic in-process watermark. Any
+refresh failure preserves the verified release or tombstone last-known-good; a
+cold process fails closed. `V2ProjectionReconciler` uses bounded database and S3
+reads to report desired/served/outbox/pointer/generation/manifest drift and
+valid-old/version-history ambiguity without editing immutable release content.
+
+Disposable PostgreSQL/MinIO PROJ-01 through PROJ-06, TM-PROJ-01, and TM-KEY-01
+prove the local protocol and narrow routing prefix actions only. MinIO does not
+prove production conditional-header enforcement, read-after-write/version/audit
+semantics, encryption, retention, or provider identities; these remain
+**BLOCKED-EXTERNAL on B-S3**. Production routing-key delivery, rotation,
+revocation, and emergency replacement remain **B-DEPLOY**. Actual command
+separation remains M3-09, so this focused evidence does not close full G-M3.
+
 ## PostgreSQL migrations and connections
 
 This package uses the directly pinned and supported Knex `3.1.0` and PostgreSQL

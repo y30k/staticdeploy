@@ -501,7 +501,9 @@ export class V2OidcSessions {
                         to_regprocedure('public.v2_initialize_authorization_policy(text[],bigint,text)'),
                         to_regprocedure('public.v2_authorization_policy_identity()'),
                         to_regprocedure('public.v2_authorize_operation(uuid,uuid,text[],bigint,uuid,text)'),
-                        to_regprocedure('public.v2_replace_bindings(uuid,uuid,text[],bigint,uuid,bigint,text,text,jsonb)')
+                        to_regprocedure('public.v2_replace_bindings(uuid,uuid,text[],bigint,uuid,bigint,text,text,jsonb)'),
+                        to_regprocedure('public.v2_request_publication(uuid,uuid,text,uuid,uuid,uuid,uuid,uuid,text[],bigint,text,text)'),
+                        to_regprocedure('public.v2_publication_operation(uuid)')
                       ]::oid[])
                 ) as unrelated_definer_execute,
                 has_function_privilege(current_user, 'public.v2_begin_oidc_login(uuid,text,text,text,bytea,bytea,text,text,text,integer)', 'EXECUTE') as begin_ok,

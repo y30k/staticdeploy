@@ -87,6 +87,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
             expect(await applicationTables(database)).to.deep.equal([
                 "apps",
@@ -121,6 +122,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
 
             const foreignKeys = await database(
@@ -166,6 +168,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
         });
     });
@@ -186,6 +189,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
             expect(await migrationNames(database)).to.deep.equal([
                 "00.js",
@@ -196,6 +200,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
             expect(after.rows).to.deep.equal(before.rows);
             expect(after.foreignKeys).to.deep.equal(before.foreignKeys);
@@ -242,6 +247,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
             expect((await database(tables.groups).first()).roles).to.deep.equal(
                 ["app-manager:application-one", "root"]
@@ -263,14 +269,22 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
         });
     });
 
-    it("SCH-01 reverses and reapplies additive migrations 06, 05, 04 and 03", async () => {
+    it("SCH-01 reverses and reapplies additive migrations 08 through 03", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
             await database(tables.apps).insert(appRow());
+
+            expect(await publicHasCreate(database)).to.equal(false);
+            const down08 = await database.migrate.down(
+                productionMigrationConfig
+            );
+            expect(down08[1]).to.deep.equal(["08.js"]);
+            expect(await publicHasCreate(database)).to.equal(false);
 
             const down07 = await database.migrate.down(
                 productionMigrationConfig
@@ -328,6 +342,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "05.js",
                 "06.js",
                 "07.js",
+                "08.js",
             ]);
             for (const table of [
                 ...v2TableNames(),
@@ -335,6 +350,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             ]) {
                 expect(await database.schema.hasTable(table)).to.equal(true);
             }
+            expect(await publicHasCreate(database)).to.equal(false);
         });
     });
 
@@ -355,6 +371,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 release_id: releaseId,
                 occurred_at: fixtureDate(),
             });
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
@@ -394,6 +413,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     it("SCH-01 serializes rollback against concurrent v2 writers", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
@@ -1036,6 +1058,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             await database.migrate.latest(productionMigrationConfig);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
@@ -1059,6 +1084,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
 
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
@@ -1118,6 +1146,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "select public.v2_initialize_authorization_policy(?, ?, ?)",
                 [["stable-admin-id"], 1, "a".repeat(64)]
             );
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
             await expectDatabaseError(
                 database.migrate.down(productionMigrationConfig),
                 "migration 07 has retained authorization state"
@@ -1146,6 +1177,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             );
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
             await expectDatabaseError(
                 database.migrate.down(productionMigrationConfig),
@@ -1158,6 +1192,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     it("M3-05 refuses lease-contract rollback with retained jobs", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["08.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["07.js"]);
@@ -2572,7 +2609,8 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 INSERT INTO public.${tables.v2PublicationOutbox}
                     (id, application_id, routing_id, release_id, generation,
                      operation, idempotency_id, payload_kind, manifest_digest,
-                     object_prefix, state, next_attempt_at, created_at, updated_at)
+                     object_prefix, routing_kid, state, next_attempt_at,
+                     created_at, updated_at)
                 SELECT
                     ('80000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
                     id, routing_id, desired_current_release_id, 1,
@@ -2581,6 +2619,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     'RELEASE', repeat('c', 64),
                     'v2/releases/' || id::text || '/' ||
                         desired_current_release_id::text,
+                    'routing-plan-' || (i % 20)::text,
                     'PENDING', transaction_timestamp() - i * interval '1 second',
                     transaction_timestamp(), transaction_timestamp()
                 FROM numbered;
@@ -2754,6 +2793,19 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                       limit 50`
                 )
             ).to.include("v2_publication_outbox_application_generation_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select count(*)
+                       from public.${tables.v2PublicationOutbox} outbox
+                       join public.${tables.v2Applications} application
+                         on application.id = outbox.application_id
+                      where outbox.routing_kid = 'routing-plan-7'
+                        and (outbox.state in ('PENDING', 'LEASED')
+                          or (outbox.state = 'ACKNOWLEDGED'
+                            and application.served_generation = outbox.generation))`
+                )
+            ).to.include("v2_outbox_routing_kid_active_idx");
         });
     });
 
@@ -3064,6 +3116,25 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     });
 });
 
+async function publicHasCreate(database: Knex): Promise<boolean> {
+    const result = await database.raw(`
+        SELECT EXISTS (
+            SELECT 1
+              FROM pg_catalog.pg_namespace AS namespace
+              CROSS JOIN LATERAL pg_catalog.aclexplode(
+                  COALESCE(
+                      namespace.nspacl,
+                      pg_catalog.acldefault('n', namespace.nspowner)
+                  )
+              ) AS privilege
+             WHERE namespace.nspname = 'public'
+               AND privilege.grantee = 0
+               AND privilege.privilege_type = 'CREATE'
+        ) AS public_has_create
+    `);
+    return result.rows[0].public_has_create;
+}
+
 async function withTemporaryDirectory(
     prefix: string,
     callback: (directory: string) => Promise<void>
@@ -3142,7 +3213,17 @@ async function prepareProductionMigrationConfig(): Promise<{
         const fallbackDirectory = await mkdtemp(
             join(tmpdir(), "staticdeploy-migration-wrappers-")
         );
-        for (const name of ["00", "01", "02", "03", "04", "05", "06", "07"]) {
+        for (const name of [
+            "00",
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+        ]) {
             const sourcePath = join(__dirname, `../src/migrations/${name}.ts`);
             await writeFile(
                 join(fallbackDirectory, `${name}.js`),
