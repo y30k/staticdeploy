@@ -25,6 +25,15 @@ jobs:
                     --health-timeout 5s --health-retries 5
                 ports:
                     - 5432:5432
+            postgres16:
+                image: postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+                env:
+                    POSTGRES_PASSWORD: password
+                options: >-
+                    --health-cmd "pg_isready -U postgres" --health-interval 10s
+                    --health-timeout 5s --health-retries 5
+                ports:
+                    - 5433:5432
         steps:
             - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
               with:
@@ -67,6 +76,10 @@ jobs:
               run: yarn compile
             - name: Run centralized unit and integration tests with coverage
               run: yarn coverage
+            - name: Run schema contracts on supported PostgreSQL 16
+              env:
+                  POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
+              run: yarn workspace @staticdeploy/pg-s3-storages test:postgres
             - name: Record exact supported-toolchain evidence
               run:
                   node scripts/write-m2-toolchain-evidence.mjs

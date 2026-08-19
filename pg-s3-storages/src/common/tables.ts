@@ -6,4 +6,10 @@ export default {
     operationLogs: "operationLogs",
     users: "users",
     usersAndGroups: "users_groups",
+    v2Applications: "v2_applications",
+    v2AuditEvents: "v2_audit_events",
+    v2Bindings: "v2_bindings",
+    v2PublicationGuards: "v2_publication_guards",
+    v2Releases: "v2_releases",
+    v2UploadFiles: "v2_upload_files",
 };

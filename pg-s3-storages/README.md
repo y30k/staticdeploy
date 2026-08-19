@@ -37,18 +37,19 @@ migration and the expand-backfill-contract convention:
    windows close.
 
 New additive migrations must include and rehearse a real inverse `down`
-operation. Do not run an all-history rollback: the legacy `down` functions in
-`00.ts`-`02.ts` intentionally do nothing and therefore cannot restore an empty
-schema. Application rollback across those historical migrations requires a
-verified database backup/restore procedure. This dependency upgrade introduces
-no production schema change; its rollback is an application/package rollback
-while leaving the accepted migration history intact.
+operation while their tables are empty. Once v2 data exists, migration 03
+refuses destructive rollback; application rollback leaves the additive schema
+and retained READY/audit history installed. Do not run an all-history rollback:
+the legacy `down` functions in `00.ts`-`02.ts` intentionally do nothing and
+therefore cannot restore an empty schema. Recovery across those historical
+migrations requires a verified database backup/restore procedure.
 
-Disposable PostgreSQL 13 coverage verifies the emitted production migrations
-against empty databases and checksum-pinned, captured pre/post-02 SQL fixtures,
-including data, foreign keys, and complete migration history. It also verifies
-transaction and migration atomicity, lock release/retry, connection and pool
-timeout recovery, and a reversible test-only additive migration. Production
-acceptance remains **BLOCKED-EXTERNAL on B-PG** until the production PostgreSQL
-roles, migration identity, backup destination, restore owner, and RPO/RTO are
+PostgreSQL 16 is the supported runtime target. The CI schema gate runs SCH-01
+through SCH-05 there and retains a PostgreSQL 13 compatibility lane for the
+checksum-pinned pre/post-02 production fixtures. Coverage verifies empty and
+legacy upgrades, data and foreign-key preservation, migration atomicity,
+non-destructive down/reapply, publication concurrency, immutable records,
+bounded query indexes, and connection/pool recovery. Production acceptance
+remains **BLOCKED-EXTERNAL on B-PG** until the production PostgreSQL roles,
+migration identity, backup destination, restore owner, and RPO/RTO are
 provisioned and the same acceptance is rehearsed there.
