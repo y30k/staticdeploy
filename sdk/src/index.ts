@@ -5,6 +5,7 @@ import BundlesClient from "./BundlesClient";
 import EntrypointsClient from "./EntrypointsClient";
 import GroupsClient from "./GroupsClient";
 import addAuthorizationHeader from "./interceptors/addAuthorizationHeader";
+import addCsrfHeader from "./interceptors/addCsrfHeader";
 import convertErrors from "./interceptors/convertErrors";
 import parseDates from "./interceptors/parseDates";
 import OperationLogsClient from "./OperationLogsClient";
@@ -21,6 +22,7 @@ export default class StaticdeployClient {
     public users: UsersClient;
     private axios: AxiosInstance;
     private addAuthorizationHeaderInterceptorId: number | null = null;
+    private addCsrfHeaderInterceptorId: number | null = null;
 
     constructor(options: {
         apiUrl: string;
@@ -46,6 +48,22 @@ export default class StaticdeployClient {
         this.users = new UsersClient(this.axios);
     }
 
+    setSessionCsrfToken(getToken: () => string | null): void {
+        if (this.addAuthorizationHeaderInterceptorId !== null) {
+            this.axios.interceptors.request.eject(
+                this.addAuthorizationHeaderInterceptorId
+            );
+            this.addAuthorizationHeaderInterceptorId = null;
+        }
+        if (this.addCsrfHeaderInterceptorId !== null)
+            this.axios.interceptors.request.eject(
+                this.addCsrfHeaderInterceptorId
+            );
+        this.addCsrfHeaderInterceptorId = this.axios.interceptors.request.use(
+            addCsrfHeader(getToken)
+        );
+    }
+
     setApiToken(
         apiToken: string | null | (() => Promise<string | null>)
     ): void {
@@ -53,6 +71,12 @@ export default class StaticdeployClient {
             this.axios.interceptors.request.eject(
                 this.addAuthorizationHeaderInterceptorId
             );
+        }
+        if (this.addCsrfHeaderInterceptorId !== null) {
+            this.axios.interceptors.request.eject(
+                this.addCsrfHeaderInterceptorId
+            );
+            this.addCsrfHeaderInterceptorId = null;
         }
         this.addAuthorizationHeaderInterceptorId =
             this.axios.interceptors.request.use(

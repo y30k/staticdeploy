@@ -16,6 +16,48 @@ const LOG_LEVELS: LogLevel[] = [
     "fatal",
 ];
 
+export const parseSessionEncryptionKeys = (
+    value: string
+): Array<{ id: string; key: Buffer }> => {
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(value);
+    } catch {
+        throw new Error("OIDC_SESSION_ENCRYPTION_KEYS must be valid JSON");
+    }
+    if (!Array.isArray(parsed) || parsed.length < 1 || parsed.length > 8)
+        throw new Error(
+            "OIDC_SESSION_ENCRYPTION_KEYS must contain one to eight keys"
+        );
+    return parsed.map((candidate) => {
+        if (
+            candidate === null ||
+            typeof candidate !== "object" ||
+            !("id" in candidate) ||
+            !("key" in candidate) ||
+            typeof candidate.id !== "string" ||
+            typeof candidate.key !== "string"
+        )
+            throw new Error(
+                "OIDC_SESSION_ENCRYPTION_KEYS contains an invalid key"
+            );
+        const key = Buffer.from(candidate.key, "base64");
+        if (key.length !== 32 || key.toString("base64") !== candidate.key)
+            throw new Error(
+                "OIDC session encryption keys must be canonical base64 32-byte values"
+            );
+        return { id: candidate.id, key };
+    });
+};
+
+export const parseTrustedProxyHops = (value: string): number => {
+    if (!/^(?:0|[1-8])$/.test(value))
+        throw new Error(
+            "OIDC_TRUSTED_PROXY_HOPS must be an integer from 0 to 8"
+        );
+    return Number(value);
+};
+
 export const parseLogLevel = (value: string): LogLevel => {
     const level = LOG_LEVELS.find((candidate) => candidate === value);
     if (level === undefined) {
@@ -67,6 +109,21 @@ export const getConfig = (): IConfig => ({
     oidcConfigurationUrl: env("OIDC_CONFIGURATION_URL"),
     oidcClientId: env("OIDC_CLIENT_ID"),
     oidcProviderName: env("OIDC_PROVIDER_NAME"),
+    oidcExpectedIssuer: env("OIDC_EXPECTED_ISSUER"),
+    oidcRedirectUri: env("OIDC_REDIRECT_URI"),
+    portalOrigin: env("PORTAL_ORIGIN"),
+    oidcSessionPrimaryKeyId: env("OIDC_SESSION_PRIMARY_KEY_ID"),
+    oidcSessionEncryptionKeys: env("OIDC_SESSION_ENCRYPTION_KEYS", {
+        parse: parseSessionEncryptionKeys,
+    }),
+    oidcPostgresUrl: env("OIDC_POSTGRES_URL"),
+    oidcTrustedProxyHops: env("OIDC_TRUSTED_PROXY_HOPS", {
+        parse: parseTrustedProxyHops,
+    }),
+    oidcAllowHttpLoopbackForTests: env("OIDC_ALLOW_HTTP_LOOPBACK_FOR_TESTS", {
+        default: "false",
+        parse: (value) => value === "true",
+    }),
 
     // pg-s3-storages configurations
     postgresUrl: env("POSTGRES_URL"),

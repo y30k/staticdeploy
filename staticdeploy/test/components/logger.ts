@@ -198,11 +198,18 @@ describe("structured logger", () => {
             "root-real-set-cookie",
             "root-real-query",
             "root-real-body",
+            "root-real-csrf",
+            "root-real-location-state",
+            "root-real-referer-query",
         ];
         const app = express()
             .use(express.json())
             .post("/root-real", (req, res) => {
                 res.setHeader("Set-Cookie", secrets[2]);
+                res.setHeader(
+                    "Location",
+                    `https://idp.example/authorize?state=${secrets[6]}`
+                );
                 logger.info({ req, res }, "root real HTTP objects");
                 res.status(204).end();
             });
@@ -211,6 +218,8 @@ describe("structured logger", () => {
             .post(`/root-real?token=${secrets[3]}`)
             .set("Authorization", secrets[0])
             .set("Cookie", secrets[1])
+            .set("X-StaticDeploy-CSRF", secrets[5])
+            .set("Referer", `https://portal.example/?q=${secrets[7]}`)
             .send({ password: secrets[4] })
             .expect(204);
 
@@ -219,9 +228,15 @@ describe("structured logger", () => {
         assert.equal(record.req.url, "/root-real");
         assert.equal(record.req.headers.authorization, REDACTED_VALUE);
         assert.equal(record.req.headers.cookie, REDACTED_VALUE);
+        assert.equal(record.req.headers["x-staticdeploy-csrf"], REDACTED_VALUE);
+        assert.equal(record.req.headers.referer, "https://portal.example/");
         assert.equal(record.req.body, undefined);
         assert.equal(record.req.rawHeaders, undefined);
         assert.equal(record.res.headers["set-cookie"], REDACTED_VALUE);
+        assert.equal(
+            record.res.headers.location,
+            "https://idp.example/authorize"
+        );
         assert.equal(record.res._header, undefined);
     });
 

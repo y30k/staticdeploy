@@ -10,6 +10,7 @@ export default {
     v2AuditEvents: "v2_audit_events",
     v2Bindings: "v2_bindings",
     v2Idempotency: "v2_idempotency",
+    v2LoginTransactions: "v2_login_transactions",
     v2OutboxTransitionGuards: "v2_outbox_transition_guards",
     v2ReleaseJobTransitionGuards: "v2_release_job_transition_guards",
     v2PublicationGuards: "v2_publication_guards",

@@ -5,4 +5,6 @@ export default interface IAuthStrategy {
     login(...params: any): Promise<void>;
     logout(): Promise<void>;
     getAuthToken(): Promise<string | null>;
+    usesServerSession?: boolean;
+    getCsrfToken?: () => string | null;
 }

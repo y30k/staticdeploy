@@ -11,6 +11,7 @@ import { BrowserRouter } from "react-router-dom";
 import AuthService from "./common/AuthService";
 import JwtAuthStrategy from "./common/AuthService/JwtAuthStrategy";
 import OidcAuthStrategy from "./common/AuthService/OidcAuthStrategy";
+import ServerSessionAuthStrategy from "./common/AuthService/ServerSessionAuthStrategy";
 import StaticdeployClientContext from "./common/StaticdeployClientContext";
 import InitSpinner from "./components/InitSpinner";
 import config from "./config";
@@ -29,6 +30,12 @@ async function start() {
         config.authEnforced,
         compact([
             config.jwtEnabled ? new JwtAuthStrategy() : null,
+            config.serverSessionEnabled
+                ? new ServerSessionAuthStrategy(
+                      config.serverSessionAuthUrl,
+                      config.serverSessionProviderName
+                  )
+                : null,
             config.oidcEnabled
                 ? new OidcAuthStrategy(
                       config.oidcConfigurationUrl,

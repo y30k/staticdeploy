@@ -16,6 +16,7 @@ const isSensitiveKey = (key: string): boolean => {
         normalized.includes("password") ||
         normalized.includes("passwd") ||
         normalized.includes("token") ||
+        normalized.includes("csrf") ||
         normalized.includes("apikey") ||
         normalized.includes("secret") ||
         normalized.includes("privatekey")
@@ -101,6 +102,22 @@ interface ISerializedResponseLike {
     headers?: Record<string, unknown>;
 }
 
+const sanitizeHeaders = (
+    headers: Record<string, unknown>
+): Record<string, unknown> =>
+    Object.fromEntries(
+        Object.entries(headers).map(([name, value]) => {
+            if (isSensitiveKey(name)) return [name, REDACTED_VALUE];
+            const normalized = normalizeKey(name);
+            if (
+                (normalized === "location" || normalized === "referer") &&
+                typeof value === "string"
+            )
+                return [name, stripUrlQueryAndHash(value)];
+            return [name, sanitizeLogValue(value)];
+        })
+    );
+
 export const serializeHttpRequest = (
     value: IncomingMessage | ISerializedRequestLike
 ): Record<string, unknown> => {
@@ -120,7 +137,7 @@ export const serializeHttpRequest = (
         id: serialized.id,
         method: raw?.method ?? serialized.method,
         url: stripUrlQueryAndHash(raw?.url ?? serialized.url ?? ""),
-        headers: sanitizeLogValue(headers),
+        headers: sanitizeHeaders(headers),
         remoteAddress: serialized.remoteAddress ?? raw?.socket.remoteAddress,
         remotePort: serialized.remotePort ?? raw?.socket.remotePort,
     };
@@ -141,9 +158,7 @@ export const serializeHttpResponse = (
             raw !== undefined && !raw.writableEnded
                 ? null
                 : (raw?.statusCode ?? serialized.statusCode ?? null),
-        headers: sanitizeLogValue(
-            raw?.getHeaders() ?? serialized.headers ?? {}
-        ),
+        headers: sanitizeHeaders(raw?.getHeaders() ?? serialized.headers ?? {}),
     };
 };
 

@@ -61,6 +61,47 @@ versioning/lifecycle purge behavior, credentials, and provider-policy acceptance
 remain **BLOCKED-EXTERNAL on B-S3**; a versioned production bucket cannot be
 accepted from the local current-version list/delete proof.
 
+## V2 server-side OIDC sessions
+
+Migration 06 adds short-lived, one-time login transactions and narrow
+`SECURITY DEFINER` functions for session creation, database-clock lookup/touch,
+revocation, and bounded cleanup. `V2OidcSessions` performs Authorization Code
+with S256 PKCE, burns the state transaction atomically before token exchange,
+and validates the configured issuer, audience, nonce, time claims, RS256
+signature, and exact `kid` against bounded discovery/JWKS responses. Production
+OIDC HTTPS resolves every endpoint, rejects any special/private answer, and pins
+the selected validated address through the TLS connection while preserving the
+original hostname for Host, SNI, and certificate verification; redirects and
+compressed responses fail closed. Login starts are bounded before provider or
+database work by direct-peer and process admission, with a cross-instance
+PostgreSQL ceiling retained. PKCE verifiers and the required synchronizer-CSRF
+value use row-bound, versioned AES-256-GCM envelopes with an explicit key ID and
+fresh nonce; provider tokens are not persisted. Callers supply a bounded keyring
+so old envelopes are re-encrypted during overlap and removed keys fail closed.
+
+The only browser credential is the high-entropy opaque
+`__Host-staticdeploy-session` cookie (`Secure; HttpOnly; Path=/; SameSite=Lax`).
+Control mutations require the exact configured HTTPS Origin, a session-bound
+synchronizer CSRF value, and the endpoint-specific media type before any session
+touch. Login replaces an existing session atomically, logout revokes server
+state and expires stale cookies, and idle renewal never exceeds absolute expiry.
+The callback consumes its independent transaction binding and redirects to a
+fixed clean portal URL; CSRF is bootstrapped separately and held in portal
+memory. Server-session API requests use the opaque cookie plus CSRF and never a
+browser OIDC bearer token.
+
+Server-side OIDC requires a separately provisioned `OIDC_POSTGRES_URL`, complete
+keyring, and grants for only the migration-06 entry functions. Startup verifies
+that the identity has no elevated role attributes or memberships, object
+ownership, schema/database creation, direct authentication/audit table access,
+or unrelated `SECURITY DEFINER` wrapper access, while every required wrapper is
+executable; schema migration remains a distinct command. The focused local mock
+AUTH component suites are not a real-provider or production IdP acceptance and
+do not claim the later M3 foundation gate. AUTH-06 and production
+issuer/client/redirect/logout/group/key-rotation acceptance remain
+**BLOCKED-EXTERNAL on B-OKTA**; final production identity/grant acceptance
+remains **B-PG**.
+
 ## PostgreSQL migrations and connections
 
 This package uses the directly pinned and supported Knex `3.1.0` and PostgreSQL
