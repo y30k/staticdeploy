@@ -120,6 +120,35 @@ omissions.
 - `AUTH-06` — configured Okta test tenant repeats AUTH-01/02/03 before
   production-like gate; unavailable provisioning is BLOCKED, not skipped.
 
+### Threat-model contract tests
+
+- `TM-SES-01` — pre-login `__Host-` transaction cookie attributes, atomic
+  state/PKCE consumption, exact Origin, synchronizer CSRF, endpoint-specific
+  JSON/octet-stream content types, callback exemption, and replay denial.
+- `TM-PRE-01` — compact asymmetric JWS with at least 192-bit random `jti`,
+  issuer, audience, normalized host, app/release IDs, `iat`/`nbf`, exact
+  `exchange_exp`/`session_exp`, same signed token in the exact preview cookie,
+  303 query stripping before subresources, app/proxy/CDN leakage canaries,
+  fail-closed denial when the embedded preview cookie is blocked, rejection
+  outside each window, and explicitly accepted in-window URL/cookie replay
+  residuals.
+- `TM-ISO-01` — minimum M4 CSP/header matrix for
+  preview/published/assets/errors; exact `allow-scripts allow-forms` preview
+  sandbox; popup, opener, top navigation, storage, service-worker,
+  connect/form/object/base/worker denial; fresh never-used published origin
+  evidence and permanent retirement of any origin that ever allowed workers.
+- `TM-PROJ-01` — routing signature/key/purpose/cross-field validation,
+  cross-application substitution, in-process generation rollback denial, and
+  detectable cold/new/lagging-replica valid-generation replay.
+- `TM-KEY-01` — purpose-separated preview/routing Ed25519 keys; protected
+  `alg=EdDSA`, expected purpose-specific `typ`/audience and exactly one known
+  `kid`; reject `none`, other algorithms, every duplicate protected-header
+  member, malformed/missing/unknown IDs, unsupported critical headers, wrong
+  workload/purpose, revoked keys, and rotation/compromise failures.
+- `TM-AUD-01` — M3 append-only audit update/delete denial; success and denial
+  rows with actor, effective role/source, action, object, result and UTC time;
+  token/cookie/query/PII canaries absent from bounded audit metadata.
+
 ### Storage, worker, and publication projection
 
 - `STO-01` — control/worker/content credentials pass allowed operations and fail
@@ -133,8 +162,9 @@ omissions.
   and no exposed partial prefix.
 - `JOB-03` — bounded retry/timeout/terminal reason/cleanup behavior survives
   restart.
-- `PROJ-01` — publish transaction atomically writes desired pointer, audit,
-  generation, and outbox or none.
+- `PROJ-01` — `control` atomically writes PostgreSQL desired pointer, audit and
+  outbox or none; only `worker` signs/writes/reads back routing object
+  generations and acknowledgement.
 - `PROJ-02` — duplicate/out-of-order workers and stale ETags cannot replace a
   newer `current.json`.
 - `PROJ-03` — read-back/digest failure leaves operation pending/failed and
@@ -192,6 +222,17 @@ omissions.
 - `REL-01` — PR/fork/tag spoof cannot publish; approved release verifies
   exact-commit checks, signature, provenance, SBOM, architectures, and
   destination digests.
+- `CMD-01` — `control`, `content`, `worker`, and `migrate` each boot with only
+  their exact schema/identity; missing, cross-command, all-privilege, forbidden
+  credential, or invalid configured-host state fails startup; an untrusted
+  request Host fails at runtime with 4xx and no routing/application lookup leak.
+- `CMP-01` — Compose proves four command identities, credential/prefix
+  separation, non-root/read-only/capability/mount boundaries, health ordering,
+  restart and teardown without an all-privilege service.
+- `HLM-01` — chart lint and schema validation plus Helm render/install prove
+  four service accounts, security contexts, NetworkPolicies, probes/resources,
+  migration isolation, optional provider annotations, disruption restart, and no
+  shared privileged identity.
 - `DEP-01` — Compose lifecycle passes twice from clean hosts with data/content
   retained across upgrade/rollback/restart.
 - `DEP-02` — Helm lifecycle passes on a conformant disposable cluster, including
@@ -200,6 +241,13 @@ omissions.
   incompatible migration, failed smoke, and failed promotion.
 - `DEP-04` — rollback records and redeploys a previously verified digest and
   reruns identical smoke checks.
+- `CUT-01` — rollback validates checkpoint integrity and approval, restores the
+  prior routing and DNS checkpoint where provisioned, records actor/approver/
+  target/from/to/result/UTC evidence, reruns smoke, and reports DNS as
+  `BLOCKED-EXTERNAL` or explicitly not applicable before provisioning.
+- `OP-AUD-01` — protected operator evidence covers break-glass issuance,
+  approval, expiry/revocation/use; actor/approver/target/from/to/result/UTC
+  completeness; rollback/promotion denial; and bounded secret-free metadata.
 - `REC-01` — restore seeded PostgreSQL backup into clean service, then verify
   release counts/pointers/audits.
 - `REC-02` — inject missing DB row/object, orphan, digest mismatch, and routing
@@ -247,18 +295,18 @@ artifact contract passes; M6 publication cannot pass without it.
 ### Milestone 3
 
 `G-M3` runs SCH-01 through SCH-05, AUTH-01 through AUTH-05, AUTHZ-01, STO-01/02,
-JOB-01/02/03, PROJ-01 through PROJ-06, command startup/configuration tests,
-Compose security inspection, and initial Helm render/install isolation. AUTH-06
-and real DNS/storage policy tests are mandatory for production-like exit but
-explicitly BLOCKED-EXTERNAL until provisioned.
+JOB-01/02/03, PROJ-01 through PROJ-06, TM-SES-01, TM-PROJ-01, TM-KEY-01,
+TM-AUD-01, CMD-01, CMP-01, and HLM-01. AUTH-06 and real DNS/storage policy tests
+are mandatory for production-like exit but explicitly BLOCKED-EXTERNAL until
+provisioned.
 
 ### Milestone 4
 
-`G-M4` runs API-01/02/03, STO-03, DIR-01, UI-01/03/04, the complete role matrix,
-audit query tests, hostile two-origin content checks, A11Y-01/02, and source
-archive verification. Manual accessibility evidence records reviewer,
-environment, assistive technology, result, and defects; it cannot be replaced by
-axe alone.
+`G-M4` runs API-01/02/03, STO-03, DIR-01, UI-01/03/04, TM-PRE-01, TM-ISO-01, the
+complete role matrix, audit query tests, hostile two-origin content checks,
+A11Y-01/02, and source archive verification. Manual accessibility evidence
+records reviewer, environment, assistive technology, result, and defects; it
+cannot be replaced by axe alone.
 
 ### Milestone 5
 
@@ -274,25 +322,27 @@ M6 requires all four commands:
 
 - G-M6-C proves Compose first on clean hosts.
 - G-M6-H then proves Helm parity on a disposable conformant cluster.
-- G-M6-R runs REC-01/02 against both profiles.
+- G-M6-R runs REC-01/02 and CUT-01 against both profiles.
 - G-M6-O runs OPS-01 and OBS-01 through OBS-04 plus every runbook exercise.
 
-REL-01 and DEP-03/04 execute through GitHub Actions with immutable digests.
+TM-KEY-01 repeats against protected key-delivery profiles. REL-01, DEP-03/04,
+CUT-01, and OP-AUD-01 execute through GitHub Actions with immutable digests.
 Production deployment and Eyes acceptance remain BLOCKED-EXTERNAL until
 provisioned. An Eyes-unavailable test is required both before and after
 enablement.
 
 ### Milestone 7
 
-`G-M7` validates the evidence index schema and all R1-R16 links, then runs the
-approved pilot corpus and resource inventory. It requires an approved greenfield
-record or executes the conditional migration suite:
+`G-M7` repeats CUT-01 and OP-AUD-01, validates the evidence index schema and all
+R1-R16 links, then runs the approved pilot corpus and resource inventory. It
+requires an approved greenfield record or executes the conditional migration
+suite:
 
 - two clean dry runs;
 - interruption/resume and idempotency;
 - counts/digests/URLs/selected source downloads;
 - final consistency mechanism;
-- production smoke and timed routing/platform rollback.
+- production smoke and timed routing/platform rollback through CUT-01.
 
 Retirement checks probe old routes/permissions/integrations only after the
 rollback window closes. Missing pilot users, Campaign Advisor rights, production
