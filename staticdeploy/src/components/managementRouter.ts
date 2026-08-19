@@ -66,7 +66,10 @@ export default async (
     if (sessions !== undefined) {
         if (sessionAuthentication === undefined)
             throw new Error("server sessions require request authentication");
-        router.use("/api/v2/auth", v2SessionRouter(sessions));
+        router.use(
+            "/api/v2/auth",
+            v2SessionRouter(sessions, config.oidcTrustedProxyHops!)
+        );
         router.use(
             "/api",
             requireV2ApiSession(

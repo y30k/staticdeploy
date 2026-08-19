@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 
 import IConfig from "../src/common/IConfig";
 import getV2Sessions from "../src/components/v2Sessions";
-import { parseLogLevel, parseSessionEncryptionKeys } from "../src/config";
+import {
+    parseLogLevel,
+    parseSessionEncryptionKeys,
+    parseTrustedProxyHops,
+} from "../src/config";
 
 describe("service config", () => {
     it("accepts every supported LOG_LEVEL", () => {
@@ -44,7 +48,15 @@ describe("service config", () => {
                 { id: "key-1", key: Buffer.alloc(32, 7) },
             ],
             oidcPostgresUrl: "postgres://runtime",
+            oidcTrustedProxyHops: 0,
         } as IConfig;
+        await assert.rejects(
+            getV2Sessions({
+                ...complete,
+                oidcTrustedProxyHops: undefined,
+            }),
+            /complete OIDC/
+        );
         await assert.rejects(
             getV2Sessions({ ...complete, enforceAuth: false }),
             /ENFORCE_AUTH=true/
@@ -56,6 +68,14 @@ describe("service config", () => {
             }),
             /restricted to NODE_ENV=test/
         );
+    });
+
+    it("requires a bounded explicit trusted-proxy hop contract", () => {
+        assert.equal(parseTrustedProxyHops("0"), 0);
+        assert.equal(parseTrustedProxyHops("1"), 1);
+        assert.equal(parseTrustedProxyHops("8"), 8);
+        for (const invalid of ["", "-1", "01", "9", "1.5", "true"])
+            assert.throws(() => parseTrustedProxyHops(invalid));
     });
 
     it("parses only canonical 32-byte OIDC session encryption keys", () => {

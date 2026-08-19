@@ -19,6 +19,7 @@ export default async function getV2Sessions(
         config.oidcSessionPrimaryKeyId,
         config.oidcSessionEncryptionKeys,
         config.oidcPostgresUrl,
+        config.oidcTrustedProxyHops,
     ];
     const requested =
         values.some((value) => value !== undefined) ||

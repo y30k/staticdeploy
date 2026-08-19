@@ -32,12 +32,20 @@ Configure all of the following together; partial configuration fails startup:
 - `OIDC_POSTGRES_URL`, a dedicated non-owner runtime identity with no direct
   table or schema-write privileges and execute access only to the documented v2
   authentication wrappers
+- `OIDC_TRUSTED_PROXY_HOPS`, set explicitly to `0` for direct client connections
+  or to the exact fixed ingress hop count from 1 through 8
 - optional `OIDC_PROVIDER_NAME`
 
 Schema migration uses the separately controlled migration identity. Production
 role/grant acceptance remains an operator handoff (B-PG); do not reuse the
-migration owner for `OIDC_POSTGRES_URL`. `OIDC_ALLOW_HTTP_LOOPBACK_FOR_TESTS` is
-accepted only with `NODE_ENV=test` and must never be used in production.
+migration owner for `OIDC_POSTGRES_URL`. At a positive trusted-proxy hop count,
+StaticDeploy accepts exactly one bounded `X-Forwarded-For` chain, validates
+every entry as an IP literal, and selects the configured hop from the right.
+Missing, duplicate, malformed, or shorter chains fail closed. At `0`, forwarded
+addresses are ignored and the direct socket peer is used. Configure the ingress
+to replace rather than append untrusted client-supplied forwarding headers.
+`OIDC_ALLOW_HTTP_LOOPBACK_FOR_TESTS` is accepted only with `NODE_ENV=test` and
+must never be used in production.
 
 Real issuer/client registration, provider key rotation, group identifiers, and
 provider logout behavior remain subject to B-OKTA acceptance. The historical

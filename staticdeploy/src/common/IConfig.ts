@@ -28,6 +28,7 @@ export default interface IConfig {
     oidcSessionPrimaryKeyId?: string;
     oidcSessionEncryptionKeys?: Array<{ id: string; key: Buffer }>;
     oidcPostgresUrl?: string;
+    oidcTrustedProxyHops?: number;
     oidcAllowHttpLoopbackForTests?: boolean;
 
     // pg-s3-storages configurations

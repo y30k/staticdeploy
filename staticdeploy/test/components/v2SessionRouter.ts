@@ -1,10 +1,13 @@
+import JwtAuthenticationStrategy from "@staticdeploy/jwt-authentication-strategy";
 import { V2OidcSessions } from "@staticdeploy/pg-s3-storages";
 import { expect } from "chai";
 import express from "express";
+import { createHmac } from "node:crypto";
 import request from "supertest";
 
 import V2SessionAuthenticationStrategy from "../../src/components/V2SessionAuthenticationStrategy";
 import v2SessionRouter, {
+    loginAdmissionSource,
     requireV2ApiSession,
 } from "../../src/components/v2SessionRouter";
 
@@ -25,6 +28,7 @@ describe("M3-06 v2 session control routes", () => {
     let logoutCalls: number;
     let databaseReads: number;
     let touches: number;
+    let loginSources: string[];
 
     const sessions = {
         portalRedirectUrl: "https://portal.example/",
@@ -32,12 +36,15 @@ describe("M3-06 v2 session control routes", () => {
             "__Host-staticdeploy-oidc-tx=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
         clearSessionCookie:
             "__Host-staticdeploy-session=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0",
-        beginLogin: async () => ({
-            authorizationUrl: "https://idp.example/authorize?safe=1",
-            state: "state-is-server-side",
-            loginCookie:
-                "__Host-staticdeploy-oidc-tx=10000000-0000-4000-8000-000000000099; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300",
-        }),
+        beginLogin: async (source: string) => {
+            loginSources.push(source);
+            return {
+                authorizationUrl: "https://idp.example/authorize?safe=1",
+                state: "state-is-server-side",
+                loginCookie:
+                    "__Host-staticdeploy-oidc-tx=10000000-0000-4000-8000-000000000099; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=300",
+            };
+        },
         finishLogin: async () => {
             finishCalls++;
             return {
@@ -90,7 +97,7 @@ describe("M3-06 v2 session control routes", () => {
     const app = () =>
         express()
             .disable("x-powered-by")
-            .use("/api/v2/auth", v2SessionRouter(sessions));
+            .use("/api/v2/auth", v2SessionRouter(sessions, 0));
 
     beforeEach(() => {
         finishCalls = 0;
@@ -98,6 +105,7 @@ describe("M3-06 v2 session control routes", () => {
         logoutCalls = 0;
         databaseReads = 0;
         touches = 0;
+        loginSources = [];
     });
 
     it("AUTH-01 redirects callbacks to a clean URL and bootstraps CSRF separately", async () => {
@@ -168,6 +176,122 @@ describe("M3-06 v2 session control routes", () => {
             idp: "https://idp.example",
         });
         expect(browserAuthorization).to.equal(undefined);
+    });
+
+    it("AUTH-01 preserves exactly one bearer for the existing machine authentication pipeline", async () => {
+        const authentication = new V2SessionAuthenticationStrategy();
+        const jwtSecret = Buffer.from("machine-automation-secret");
+        const jwt = new JwtAuthenticationStrategy(jwtSecret, "HS256");
+        const encodedHeader = Buffer.from(
+            JSON.stringify({ alg: "HS256", typ: "JWT" })
+        ).toString("base64url");
+        const encodedPayload = Buffer.from(
+            JSON.stringify({ iss: "machine-idp", sub: "ci-agent" })
+        ).toString("base64url");
+        const unsigned = `${encodedHeader}.${encodedPayload}`;
+        const validToken = `${unsigned}.${createHmac("sha256", jwtSecret)
+            .update(unsigned)
+            .digest("base64url")}`;
+        let downstreamCalls = 0;
+        const api = express().use(
+            "/api",
+            requireV2ApiSession(sessions, authentication, "1kb"),
+            async (req, res) => {
+                downstreamCalls++;
+                const authorization = req.headers.authorization;
+                const user =
+                    typeof authorization === "string" &&
+                    /^Bearer /i.test(authorization)
+                        ? await jwt.getIdpUserFromAuthToken(
+                              authorization.slice("Bearer ".length)
+                          )
+                        : null;
+                if (user === null) return res.status(401).end();
+                return res.status(200).json(user);
+            }
+        );
+        await request(api)
+            .get("/api/apps")
+            .set("authorization", `Bearer ${validToken}`)
+            .expect(200, { id: "ci-agent", idp: "machine-idp" });
+        await request(api)
+            .get("/api/apps")
+            .set("authorization", "not-a-bearer")
+            .expect(401);
+        await request(api)
+            .get("/api/apps")
+            .set("authorization", [
+                `Bearer ${validToken}`,
+                "Bearer duplicate",
+            ] as any)
+            .expect(401);
+        expect(downstreamCalls).to.equal(2);
+        expect(databaseReads).to.equal(0);
+        expect(touches).to.equal(0);
+    });
+
+    it("AUTH-01 derives admission identity only through the explicit proxy-hop contract", async () => {
+        const candidate = (
+            peer: string,
+            forwarded?: string,
+            duplicate = false
+        ) =>
+            ({
+                socket: { remoteAddress: peer },
+                headers:
+                    forwarded === undefined
+                        ? {}
+                        : { "x-forwarded-for": forwarded },
+                rawHeaders:
+                    forwarded === undefined
+                        ? []
+                        : duplicate
+                          ? [
+                                "X-Forwarded-For",
+                                forwarded,
+                                "X-Forwarded-For",
+                                "192.0.2.99",
+                            ]
+                          : ["X-Forwarded-For", forwarded],
+            }) as any;
+        expect(
+            loginAdmissionSource(candidate("10.0.0.8", "spoofed, not-an-ip"), 0)
+        ).to.equal("10.0.0.8");
+        expect(
+            loginAdmissionSource(candidate("10.0.0.8", "198.51.100.10"), 1)
+        ).to.equal("198.51.100.10");
+        expect(
+            loginAdmissionSource(
+                candidate("10.0.0.8", "203.0.113.7, 10.0.0.9"),
+                2
+            )
+        ).to.equal("203.0.113.7");
+        expect(() => loginAdmissionSource(candidate("10.0.0.8"), 1)).to.throw(
+            "missing or ambiguous"
+        );
+        expect(() =>
+            loginAdmissionSource(candidate("10.0.0.8", "not-an-ip"), 1)
+        ).to.throw("rejected");
+        expect(() =>
+            loginAdmissionSource(
+                candidate("10.0.0.8", "198.51.100.10", true),
+                1
+            )
+        ).to.throw("missing or ambiguous");
+
+        const proxied = express().use(
+            "/api/v2/auth",
+            v2SessionRouter(sessions, 1)
+        );
+        await request(proxied)
+            .get("/api/v2/auth/login")
+            .set("x-forwarded-for", "198.51.100.10")
+            .expect(302);
+        await request(proxied)
+            .get("/api/v2/auth/login")
+            .set("x-forwarded-for", "198.51.100.11")
+            .expect(302);
+        expect(loginSources).to.deep.equal(["198.51.100.10", "198.51.100.11"]);
     });
 
     it("AUTH-04 rejects request shape before database touch and clears stale cookies", async () => {

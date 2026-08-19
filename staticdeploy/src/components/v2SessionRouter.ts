@@ -3,6 +3,7 @@ import {
     V2OidcSessions,
 } from "@staticdeploy/pg-s3-storages";
 import express from "express";
+import { isIP } from "node:net";
 
 import IRequestWithAuthToken from "../common/IRequestWithAuthToken";
 import V2SessionAuthenticationStrategy from "./V2SessionAuthenticationStrategy";
@@ -22,14 +23,46 @@ const reject = (
     });
 };
 
-const duplicateRawHeader = (
-    request: express.Request,
+const rawHeaderCount = (
+    request: Pick<express.Request, "rawHeaders">,
     headerName: string
-): boolean => {
+): number => {
     let matches = 0;
     for (let index = 0; index < request.rawHeaders.length; index += 2)
         if (request.rawHeaders[index].toLowerCase() === headerName) matches++;
-    return matches !== 1;
+    return matches;
+};
+
+const duplicateRawHeader = (
+    request: Pick<express.Request, "rawHeaders">,
+    headerName: string
+): boolean => rawHeaderCount(request, headerName) !== 1;
+
+export const loginAdmissionSource = (
+    request: Pick<express.Request, "rawHeaders" | "headers" | "socket">,
+    trustedProxyHops: number
+): string => {
+    const peer = request.socket.remoteAddress;
+    if (peer === undefined || isIP(peer) === 0)
+        throw new Error("login peer address rejected");
+    if (trustedProxyHops === 0) return peer;
+    if (rawHeaderCount(request, "x-forwarded-for") !== 1)
+        throw new Error("trusted proxy chain is missing or ambiguous");
+    const forwarded = request.headers["x-forwarded-for"];
+    if (
+        typeof forwarded !== "string" ||
+        forwarded.length < 1 ||
+        forwarded.length > 1024
+    )
+        throw new Error("trusted proxy chain rejected");
+    const chain = forwarded.split(",").map((entry) => entry.trim());
+    if (
+        chain.length < trustedProxyHops ||
+        chain.length > 16 ||
+        chain.some((entry) => isIP(entry) === 0)
+    )
+        throw new Error("trusted proxy chain rejected");
+    return chain[chain.length - trustedProxyHops];
 };
 
 const isUnsafe = (method: string): boolean =>
@@ -61,6 +94,12 @@ export function requireV2ApiSession(
     const router = express.Router();
     router.use(async (request, response, next) => {
         try {
+            const authorizationHeaders = rawHeaderCount(
+                request,
+                "authorization"
+            );
+            if (authorizationHeaders > 1) return reject(response);
+            if (authorizationHeaders === 1) return next("router");
             if (!isUnsafe(request.method)) {
                 const accepted = await sessions.authenticate(
                     request.headers.cookie
@@ -124,15 +163,14 @@ export function requireV2ApiSession(
 }
 
 export default function v2SessionRouter(
-    sessions: V2OidcSessions
+    sessions: V2OidcSessions,
+    trustedProxyHops: number
 ): express.Router {
     const router = express.Router();
     router.get("/login", async (request, response) => {
         try {
-            // Express trust-proxy is disabled; only the direct peer socket is
-            // used for admission, never caller-controlled forwarded headers.
             const login = await sessions.beginLogin(
-                request.socket.remoteAddress ?? "unknown-peer"
+                loginAdmissionSource(request, trustedProxyHops)
             );
             response
                 .status(302)

@@ -50,6 +50,14 @@ export const parseSessionEncryptionKeys = (
     });
 };
 
+export const parseTrustedProxyHops = (value: string): number => {
+    if (!/^(?:0|[1-8])$/.test(value))
+        throw new Error(
+            "OIDC_TRUSTED_PROXY_HOPS must be an integer from 0 to 8"
+        );
+    return Number(value);
+};
+
 export const parseLogLevel = (value: string): LogLevel => {
     const level = LOG_LEVELS.find((candidate) => candidate === value);
     if (level === undefined) {
@@ -109,6 +117,9 @@ export const getConfig = (): IConfig => ({
         parse: parseSessionEncryptionKeys,
     }),
     oidcPostgresUrl: env("OIDC_POSTGRES_URL"),
+    oidcTrustedProxyHops: env("OIDC_TRUSTED_PROXY_HOPS", {
+        parse: parseTrustedProxyHops,
+    }),
     oidcAllowHttpLoopbackForTests: env("OIDC_ALLOW_HTTP_LOOPBACK_FOR_TESTS", {
         default: "false",
         parse: (value) => value === "true",
