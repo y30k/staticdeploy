@@ -62,6 +62,15 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
         }
     });
 
+    it("self-attests the configured PostgreSQL major", async () => {
+        const expectedMajor = process.env.EXPECTED_POSTGRES_MAJOR ?? "16";
+        expect(expectedMajor).to.match(/^(13|16)$/);
+        const result = await admin.raw(
+            "select current_setting('server_version_num')::integer / 10000 as major"
+        );
+        expect(String(result.rows[0].major)).to.equal(expectedMajor);
+    });
+
     it("SCH-01 migrates a truly empty schema and reruns idempotently", async () => {
         await withDisposableDatabase(admin, async (database) => {
             expect(await applicationTables(database)).to.deep.equal([]);
@@ -75,6 +84,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "02.js",
                 "03.js",
                 "04.js",
+                "05.js",
             ]);
             expect(await applicationTables(database)).to.deep.equal([
                 "apps",
@@ -103,6 +113,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "02.js",
                 "03.js",
                 "04.js",
+                "05.js",
             ]);
 
             const foreignKeys = await database(
@@ -144,6 +155,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "02.js",
                 "03.js",
                 "04.js",
+                "05.js",
             ]);
         });
     });
@@ -158,13 +170,14 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             );
             const after = await legacySnapshot(database);
 
-            expect(result[1]).to.deep.equal(["03.js", "04.js"]);
+            expect(result[1]).to.deep.equal(["03.js", "04.js", "05.js"]);
             expect(await migrationNames(database)).to.deep.equal([
                 "00.js",
                 "01.js",
                 "02.js",
                 "03.js",
                 "04.js",
+                "05.js",
             ]);
             expect(after.rows).to.deep.equal(before.rows);
             expect(after.foreignKeys).to.deep.equal(before.foreignKeys);
@@ -204,7 +217,12 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const first = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(first[1]).to.deep.equal(["02.js", "03.js", "04.js"]);
+            expect(first[1]).to.deep.equal([
+                "02.js",
+                "03.js",
+                "04.js",
+                "05.js",
+            ]);
             expect((await database(tables.groups).first()).roles).to.deep.equal(
                 ["app-manager:application-one", "root"]
             );
@@ -222,14 +240,26 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "02.js",
                 "03.js",
                 "04.js",
+                "05.js",
             ]);
         });
     });
 
-    it("SCH-01 reverses and reapplies additive migrations 04 and 03", async () => {
+    it("SCH-01 reverses and reapplies additive migrations 05, 04 and 03", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
             await database(tables.apps).insert(appRow());
+
+            const down05 = await database.migrate.down(
+                productionMigrationConfig
+            );
+            expect(down05[1]).to.deep.equal(["05.js"]);
+            for (const table of [
+                ...v2TableNames(),
+                ...v2OperationalTableNames(),
+            ]) {
+                expect(await database.schema.hasTable(table)).to.equal(true);
+            }
 
             const down04 = await database.migrate.down(
                 productionMigrationConfig
@@ -257,7 +287,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const reapply = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(reapply[1]).to.deep.equal(["03.js", "04.js"]);
+            expect(reapply[1]).to.deep.equal(["03.js", "04.js", "05.js"]);
             for (const table of [
                 ...v2TableNames(),
                 ...v2OperationalTableNames(),
@@ -284,6 +314,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 release_id: releaseId,
                 occurred_at: fixtureDate(),
             });
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["05.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["04.js"]);
@@ -314,6 +347,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     it("SCH-01 serializes rollback against concurrent v2 writers", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["05.js"]);
             expect(
                 (await database.migrate.down(productionMigrationConfig))[1]
             ).to.deep.equal(["04.js"]);
@@ -945,6 +981,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     it("M3-03 refuses operational rollback with retained data and concurrent writers", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["05.js"]);
             const now = new Date();
             await database(tables.v2Sessions).insert(
                 v2SessionRow("50000000-0000-4000-8000-000000000001", now)
@@ -961,6 +1000,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
 
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["05.js"]);
             const writer = await database.transaction();
             let writerCommitted = false;
             let downSettled = false;
@@ -1001,6 +1043,30 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             expect(
                 await database(tables.v2Idempotency).first("actor_id")
             ).to.deep.equal({ actor_id: "actor-1" });
+        });
+    });
+
+    it("M3-05 refuses lease-contract rollback with retained jobs", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000005";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert({
+                id: releaseId,
+                application_id: application.id,
+                state: "PROCESSING",
+            });
+            await database(tables.v2ReleaseJobs).insert({
+                id: "70000000-0000-4000-8000-000000000005",
+                release_id: releaseId,
+                kind: "PROCESS_RELEASE",
+            });
+            await expectDatabaseError(
+                database.migrate.down(productionMigrationConfig),
+                "migration 05 has retained release jobs"
+            );
+            expect(await migrationNames(database)).to.include("05.js");
         });
     });
 
@@ -1981,6 +2047,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     attempt_count: 1,
                     lease_version: 1,
                     next_attempt_at: null,
+                    work_identity: "b".repeat(64),
                 });
             await database(tables.v2PublicationOutbox).insert({
                 ...v2OutboxRow(outboxId, application, releaseId, now),
@@ -2003,7 +2070,11 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     role,
                 ]);
                 await database.raw(
-                    `grant select, update on public.${tables.v2ReleaseJobs}, public.${tables.v2PublicationOutbox} to ??`,
+                    `grant select on public.${tables.v2ReleaseJobs} to ??`,
+                    [role]
+                );
+                await database.raw(
+                    `grant select, update on public.${tables.v2PublicationOutbox} to ??`,
                     [role]
                 );
                 await expectDatabaseError(
@@ -2028,7 +2099,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                                 completed_at: new Date(),
                             });
                     }),
-                    "leased release job transition must use v2_finish_release_job_attempt"
+                    `permission denied for table ${tables.v2ReleaseJobs}`
                 );
                 await expectDatabaseError(
                     database.transaction(async (transaction) => {
@@ -2044,6 +2115,16 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                             });
                     }),
                     "leased outbox transition must use a guarded function"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            "select * from public.v2_claim_release_jobs(?, ?, ?)",
+                            ["worker-role", 1000, 1]
+                        );
+                    }),
+                    "permission denied for function v2_claim_release_jobs"
                 );
                 await expectDatabaseError(
                     database.transaction(async (transaction) => {
@@ -2081,10 +2162,18 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     "permission denied for function v2_finish_publication_attempt"
                 );
 
-                await database.raw(
-                    `grant execute on function public.v2_finish_release_job_attempt(uuid, text, bigint, text, text, text, timestamptz) to ??`,
-                    [role]
-                );
+                for (const signature of [
+                    "v2_claim_release_jobs(text, integer, integer)",
+                    "v2_renew_release_job(uuid, text, bigint, integer)",
+                    "v2_assert_release_job_lease(uuid, text, bigint)",
+                    "v2_bind_release_job_work(uuid, text, bigint, text)",
+                    "v2_prepare_quarantine_cleanup(uuid, text, bigint, bigint)",
+                    "v2_finish_release_job(uuid, uuid, text, text, bigint, text, text, text, integer, text)",
+                ])
+                    await database.raw(
+                        `grant execute on function public.${signature} to ??`,
+                        [role]
+                    );
                 await database.raw(
                     `grant execute on function public.v2_finish_publication_attempt(uuid, text, bigint, text, text, timestamptz) to ??`,
                     [role]
@@ -2092,8 +2181,27 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 await database.transaction(async (transaction) => {
                     await transaction.raw("set local role ??", [role]);
                     await transaction.raw(
-                        "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
-                        [jobId, "worker-role", 1, "SUCCEEDED", null, null, null]
+                        "select public.v2_assert_release_job_lease(?, ?, ?)",
+                        [jobId, "worker-role", 1]
+                    );
+                    await transaction.raw(
+                        "select public.v2_renew_release_job(?, ?, ?, ?)",
+                        [jobId, "worker-role", 1, 1000]
+                    );
+                    await transaction.raw(
+                        "select public.v2_finish_release_job(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        [
+                            jobId,
+                            releaseId,
+                            "PROCESS_RELEASE",
+                            "worker-role",
+                            1,
+                            "SUCCEEDED",
+                            null,
+                            null,
+                            null,
+                            "b".repeat(64),
+                        ]
                     );
                     await transaction.raw(
                         "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
@@ -2325,12 +2433,13 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 FROM generate_series(1, 2000) AS generated(i);
 
                 INSERT INTO public.${tables.v2ReleaseJobs}
-                    (id, release_id, state, next_attempt_at,
+                    (id, release_id, state, max_attempts, next_attempt_at,
                      created_at, updated_at)
                 SELECT
                     ('70000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
                     ('03000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
-                    'PENDING', transaction_timestamp() - i * interval '1 second',
+                    'PENDING', CASE WHEN i <= 10 THEN 1 ELSE 5 END,
+                    transaction_timestamp() + (i - 110) * interval '1 second',
                     transaction_timestamp(), transaction_timestamp()
                 FROM generate_series(1, 2000) AS generated(i);
 
@@ -2453,7 +2562,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                       order by next_attempt_at, created_at, id
                       limit 50`
                 )
-            ).to.include("v2_release_jobs_claim_idx");
+            ).to.include("v2_release_jobs_due_idx");
             expect(
                 await explainText(
                     database,
@@ -2463,6 +2572,47 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                       limit 50`
                 )
             ).to.include("v2_release_jobs_lease_expiry_idx");
+            const dueClaimPlan = await explainText(
+                database,
+                `select id from public.${tables.v2ReleaseJobs}
+                  where state in ('PENDING', 'RETRY_WAIT')
+                    and attempt_count < max_attempts
+                    and next_attempt_at <= clock_timestamp()
+                  order by next_attempt_at, created_at, id
+                  for update skip locked
+                  limit 50`
+            );
+            expect(dueClaimPlan).to.include("Limit");
+            expect(dueClaimPlan).to.include("LockRows");
+            expect(dueClaimPlan).to.include("v2_release_jobs_due_idx");
+            const reclaimPlan = await explainText(
+                database,
+                `select id from public.${tables.v2ReleaseJobs}
+                  where state = 'LEASED'
+                    and attempt_count < max_attempts
+                    and lease_expires_at <= clock_timestamp()
+                  order by lease_expires_at, id
+                  for update skip locked
+                  limit 50`
+            );
+            expect(reclaimPlan).to.include("Limit");
+            expect(reclaimPlan).to.include("LockRows");
+            expect(reclaimPlan).to.include("v2_release_jobs_lease_expiry_idx");
+            const finalAttemptRecoveryPlan = await explainText(
+                database,
+                `select id from public.${tables.v2ReleaseJobs}
+                  where state = 'LEASED'
+                    and lease_expires_at <= clock_timestamp()
+                    and attempt_count >= max_attempts
+                  order by lease_expires_at, created_at, id
+                  for update skip locked
+                  limit 50`
+            );
+            expect(finalAttemptRecoveryPlan).to.include("Limit");
+            expect(finalAttemptRecoveryPlan).to.include("LockRows");
+            expect(finalAttemptRecoveryPlan).to.include(
+                "v2_release_jobs_lease_expiry_idx"
+            );
             expect(
                 await explainText(
                     database,

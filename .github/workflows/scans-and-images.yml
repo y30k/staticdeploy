@@ -77,15 +77,22 @@ jobs:
             - name: Compile workspaces
               run: yarn compile
             - name: Run centralized unit and integration tests with coverage
+              env:
+                  EXPECTED_POSTGRES_MAJOR: "13"
               run: yarn coverage
             - name: Run schema contracts on supported PostgreSQL 16
               env:
+                  EXPECTED_POSTGRES_MAJOR: "16"
                   POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
               run: yarn workspace @staticdeploy/pg-s3-storages test:postgres
             - name: Run M3 object contracts on supported PostgreSQL 16
               env:
                   POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
               run: yarn workspace @staticdeploy/pg-s3-storages test:v2-objects
+            - name: Run M3 job contracts on supported PostgreSQL 16
+              env:
+                  POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
+              run: yarn workspace @staticdeploy/pg-s3-storages test:v2-jobs
             - name: Record exact supported-toolchain evidence
               run:
                   node scripts/write-m2-toolchain-evidence.mjs
