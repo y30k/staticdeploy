@@ -441,7 +441,7 @@ export async function up(knex: Knex): Promise<void> {
             IF release_state <> 'FAILED' THEN
                 UPDATE public.${tables.v2Releases}
                    SET state = 'FAILED',
-                       updated_at = observed_at
+                       updated_at = release_updated_at
                  WHERE id = target_release_id
                    AND state = release_state;
             END IF;

@@ -1055,6 +1055,19 @@ describe("M3-05 release job leases, retries, and quarantine cleanup", () => {
             "listed.txt",
             Buffer.from("listed")
         );
+        const retentionMs = 60 * 60 * 1000;
+        await database(tables.v2Releases)
+            .where({ id: fixture.releaseId })
+            .update({
+                updated_at: database.raw(
+                    "clock_timestamp() - interval '2 hours'"
+                ),
+            });
+        const retainedTimestamp = (
+            await database(tables.v2Releases)
+                .where({ id: fixture.releaseId })
+                .first("updated_at")
+        ).updated_at;
         const lease = (
             await queue.claimDue({ owner: "list-failure", leaseMs: 1000 })
         )[0];
@@ -1079,12 +1092,19 @@ describe("M3-05 release job leases, retries, and quarantine cleanup", () => {
                 queue,
                 listingFailure,
                 1000,
-                100
+                retentionMs
             ).cleanupQuarantine(lease),
             "injected listing page failure"
         );
-        await queue.retry(lease, "LIST_FAILED", 100);
-        await pause(150);
+        expect(
+            (
+                await database(tables.v2Releases)
+                    .where({ id: fixture.releaseId })
+                    .first("updated_at")
+            ).updated_at
+        ).to.deep.equal(retainedTimestamp);
+        await queue.retry(lease, "LIST_FAILED", 1);
+        await pause(10);
         const retry = (
             await secondQueue.claimDue({
                 owner: "list-restart",
@@ -1095,7 +1115,7 @@ describe("M3-05 release job leases, retries, and quarantine cleanup", () => {
             secondQueue,
             objects,
             1000,
-            100
+            retentionMs
         ).cleanupQuarantine(retry);
         expect(
             await objectExists(quarantineKey(fixture.releaseId, "listed.txt"))
