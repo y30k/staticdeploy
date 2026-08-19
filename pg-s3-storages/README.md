@@ -38,18 +38,32 @@ migration and the expand-backfill-contract convention:
 
 New additive migrations must include and rehearse a real inverse `down`
 operation while their tables are empty. Once v2 data exists, migration 03
-refuses destructive rollback; application rollback leaves the additive schema
-and retained READY/audit history installed. Do not run an all-history rollback:
-the legacy `down` functions in `00.ts`-`02.ts` intentionally do nothing and
-therefore cannot restore an empty schema. Recovery across those historical
-migrations requires a verified database backup/restore procedure.
+refuses destructive rollback; migration 04 applies the same lock-before-check
+rule to sessions, idempotency records, jobs, and outbox acknowledgements.
+Application rollback leaves the additive schema and retained READY/audit or
+operational history installed. Job and outbox claims increment a monotonic
+`lease_version`; every renewal or reclaim update must include the expected
+owner/version predicate so stale workers affect zero rows. Retry, completion,
+and failure are available only through narrowly granted
+`v2_finish_release_job_attempt` and `v2_finish_publication_attempt` functions.
+Outbox acknowledgement is likewise available only through the explicitly granted
+`v2_acknowledge_publication` function, which locks application-first, checks the
+fenced lease against the post-lock database clock, atomically confirms desired
+state, advances served state, assigns the first release label, and acknowledges
+the matching row. Outbox rows retain an immutable copied idempotency ID after
+the bounded idempotency record expires and is cleaned up. Do not run an
+all-history rollback: the legacy `down` functions in `00.ts`-`02.ts`
+intentionally do nothing and therefore cannot restore an empty schema. Recovery
+across those historical migrations requires a verified database backup/restore
+procedure.
 
 PostgreSQL 16 is the supported runtime target. The CI schema gate runs SCH-01
 through SCH-05 there and retains a PostgreSQL 13 compatibility lane for the
 checksum-pinned pre/post-02 production fixtures. Coverage verifies empty and
 legacy upgrades, data and foreign-key preservation, migration atomicity,
-non-destructive down/reapply, publication concurrency, immutable records,
-bounded query indexes, and connection/pool recovery. Production acceptance
-remains **BLOCKED-EXTERNAL on B-PG** until the production PostgreSQL roles,
-migration identity, backup destination, restore owner, and RPO/RTO are
-provisioned and the same acceptance is rehearsed there.
+non-destructive down/reapply, publication/idempotency/lease concurrency,
+immutable results and acknowledgements, session expiry/revocation, bounded query
+indexes, and connection/pool recovery. Production acceptance remains
+**BLOCKED-EXTERNAL on B-PG** until the production PostgreSQL roles, migration
+identity, backup destination, restore owner, and RPO/RTO are provisioned and the
+same acceptance is rehearsed there.
