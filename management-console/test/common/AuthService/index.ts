@@ -13,12 +13,25 @@ const getMockAuthStrategy = () => ({
 });
 const getMockStaticdeployClient = () => ({
     setApiToken: sinon.stub(),
+    setSessionCsrfToken: sinon.stub(),
     users: {
         getCurrentUser: sinon.stub().resolves({}),
     },
 });
 
 describe("AuthService", () => {
+    it("uses memory-only CSRF and does not install a bearer interceptor for server sessions", () => {
+        const strategy = {
+            ...getMockAuthStrategy(),
+            usesServerSession: true,
+            getCsrfToken: () => "memory-only-csrf",
+        };
+        const client = getMockStaticdeployClient();
+        new AuthService(true, [strategy as any], client as any);
+        expect(client.setSessionCsrfToken).to.have.callCount(1);
+        expect(client.setApiToken).to.have.callCount(0);
+    });
+
     describe("init", () => {
         it('sets the status to "logged in" if auth is not enforced', async () => {
             const authService = new AuthService(

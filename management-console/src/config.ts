@@ -7,6 +7,9 @@ interface AppConfig {
     OIDC_ENABLED?: string;
     OIDC_PROVIDER_NAME?: string;
     OIDC_REDIRECT_URL?: string;
+    SERVER_SESSION_ENABLED?: string;
+    SERVER_SESSION_AUTH_URL?: string;
+    SERVER_SESSION_PROVIDER_NAME?: string;
 }
 
 const APP_CONFIG =
@@ -25,6 +28,11 @@ export default {
     oidcClientId: APP_CONFIG.OIDC_CLIENT_ID || "clientId",
     oidcRedirectUrl: APP_CONFIG.OIDC_REDIRECT_URL || "http://127.0.0.1:5173",
     oidcProviderName: APP_CONFIG.OIDC_PROVIDER_NAME || "OpenID Connect",
+    // Server-side OIDC session strategy
+    serverSessionEnabled: APP_CONFIG.SERVER_SESSION_ENABLED === "true",
+    serverSessionAuthUrl: APP_CONFIG.SERVER_SESSION_AUTH_URL || "/api/v2/auth",
+    serverSessionProviderName:
+        APP_CONFIG.SERVER_SESSION_PROVIDER_NAME || "OpenID Connect",
     // JWT auth strategy
     jwtEnabled: APP_CONFIG.JWT_ENABLED === "true",
 };

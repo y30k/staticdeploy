@@ -8,6 +8,8 @@ import getExpressApp from "./components/expressApp";
 import getLogger from "./components/logger";
 import getManagementRouter from "./components/managementRouter";
 import getStoragesModule from "./components/storagesModule";
+import V2SessionAuthenticationStrategy from "./components/V2SessionAuthenticationStrategy";
+import getV2Sessions from "./components/v2Sessions";
 import { APP_NAME, APP_VERSION, getConfig } from "./config";
 import createRootUserAndGroup from "./init/createRootUserAndGroup";
 import setupStorages from "./init/setupStorages";
@@ -23,6 +25,7 @@ let logger = getLogger({
     logLevel: "info",
 });
 let server: Server | undefined;
+let oidcSessions: { destroy(): Promise<void> } | undefined;
 let storagesModule:
     | (IStoragesModule & { destroy?: () => Promise<void> })
     | undefined;
@@ -57,7 +60,12 @@ const closeServer = async (): Promise<void> => {
 };
 
 const destroyStorages = async (): Promise<void> => {
-    await storagesModule?.destroy?.();
+    const results = await Promise.allSettled([
+        storagesModule?.destroy?.(),
+        oidcSessions?.destroy(),
+    ]);
+    const failure = results.find((result) => result.status === "rejected");
+    if (failure?.status === "rejected") throw failure.reason;
 };
 
 const cleanupResources = async (): Promise<void> => {
@@ -141,14 +149,26 @@ const start = async (): Promise<void> => {
         const config = getConfig();
         logger = getLogger(config);
 
+        const createdStoragesModule = getStoragesModule(config, logger);
+        storagesModule = createdStoragesModule;
+        const sessions = await getV2Sessions(config, logger);
+        oidcSessions = sessions;
+        const sessionAuthentication =
+            sessions === undefined
+                ? undefined
+                : new V2SessionAuthenticationStrategy();
         const authenticationStrategies = getAuthenticationStrategies(
             config,
-            logger
+            logger,
+            sessionAuthentication
         );
-        const managementRouter = await getManagementRouter(config);
+        const managementRouter = await getManagementRouter(
+            config,
+            sessions,
+            sessionAuthentication
+        );
         if (shutdownRequested) return;
 
-        storagesModule = getStoragesModule(config, logger);
         const expressApp = getExpressApp({
             config,
             authenticationStrategies,

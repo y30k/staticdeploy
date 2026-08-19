@@ -63,12 +63,21 @@ The following environment variables can be used to configure the server:
 - `JWT_ALGORITHM`: required with `JWT_SECRET_OR_PUBLIC_KEY`; must be exactly
   `HS256` for a shared secret or `RS256` for an RSA public key. Startup fails
   closed when a key is configured without an explicit algorithm
-- `OIDC_CONFIGURATION_URL`: by setting this config (and the following one) the
-  OpenID Connect authentication strategy will be enabled. The config is the
-  configuration url of the OpenID Connect provider (e.g.
-  `https://example.com/.well-known/openid-configuration`)
-- `OIDC_CLIENT_ID`: the client id of the OpenID Connect application
-- `OIDC_PROVIDER_NAME`: the name to show in the "Login with" interface
+- Server-side OIDC sessions require `ENFORCE_AUTH=true` and the complete set
+  `OIDC_CONFIGURATION_URL`, `OIDC_EXPECTED_ISSUER`, `OIDC_CLIENT_ID`,
+  `OIDC_REDIRECT_URI`, `PORTAL_ORIGIN`, `OIDC_SESSION_PRIMARY_KEY_ID`,
+  `OIDC_SESSION_ENCRYPTION_KEYS`, and `OIDC_POSTGRES_URL`. Partial settings fail
+  startup. The registered callback is
+  `https://$MANAGEMENT_HOSTNAME/api/v2/auth/callback`; enable Authorization Code
+  with S256 PKCE and disable implicit/hybrid grants.
+- `OIDC_SESSION_ENCRYPTION_KEYS`: JSON array of unique IDs and canonical base64
+  32-byte AES keys. Keep overlap decrypt keys during rotation.
+- `OIDC_POSTGRES_URL`: dedicated least-privilege runtime identity, separate from
+  `POSTGRES_URL` and the migration owner. Production grants remain B-PG.
+- `OIDC_ALLOW_HTTP_LOOPBACK_FOR_TESTS`: loopback HTTP escape accepted only with
+  `NODE_ENV=test`; never enable it in production.
+- `OIDC_PROVIDER_NAME`: the name to show in the "Login with" interface. Real
+  provider registration and key/logout acceptance remain B-OKTA.
 
 #### pg-s3 storages configurations
 

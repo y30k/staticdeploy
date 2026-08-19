@@ -93,6 +93,10 @@ jobs:
               env:
                   POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
               run: yarn workspace @staticdeploy/pg-s3-storages test:v2-jobs
+            - name: Run M3 mock-IdP session contracts on supported PostgreSQL 16
+              env:
+                  POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
+              run: yarn workspace @staticdeploy/pg-s3-storages test:v2-sessions
             - name: Record exact supported-toolchain evidence
               run:
                   node scripts/write-m2-toolchain-evidence.mjs

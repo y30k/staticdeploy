@@ -21,6 +21,7 @@ const validate = (workflow) => {
         "run: yarn workspace @staticdeploy/pg-s3-storages test:postgres",
         "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-objects",
         "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-jobs",
+        "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-sessions",
     ])
         assert.ok(
             workflow.includes(required),
@@ -32,8 +33,8 @@ const validate = (workflow) => {
                 /POSTGRES_TEST_URL: postgres:\/\/postgres:password@127\.0\.0\.1:5433\/postgres/g
             ) || []
         ).length,
-        3,
-        "supported PostgreSQL 16 schema, object, and job lanes must be explicit"
+        4,
+        "supported PostgreSQL 16 schema, object, job, and session lanes must be explicit"
     );
     assert.match(
         workflow,
@@ -250,6 +251,7 @@ for (const required of [
     "run: yarn workspace @staticdeploy/pg-s3-storages test:postgres",
     "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-objects",
     "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-jobs",
+    "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-sessions",
 ])
     assert.throws(() => validate(workflow.replace(required, "")));
 assert.throws(() =>

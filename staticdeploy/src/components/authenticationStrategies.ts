@@ -4,12 +4,17 @@ import OidcAuthenticationStrategy from "@staticdeploy/oidc-authentication-strate
 
 import IConfig from "../common/IConfig";
 import ILogger from "../common/ILogger";
+import V2SessionAuthenticationStrategy from "./V2SessionAuthenticationStrategy";
 
 export default (
     config: IConfig,
-    logger: ILogger
+    logger: ILogger,
+    sessionAuthentication?: V2SessionAuthenticationStrategy
 ): IAuthenticationStrategy[] => {
     const authenticationStrategies: IAuthenticationStrategy[] = [];
+
+    if (sessionAuthentication !== undefined)
+        authenticationStrategies.push(sessionAuthentication);
 
     if (config.jwtSecretOrPublicKey) {
         if (!config.jwtAlgorithm) {
@@ -26,7 +31,11 @@ export default (
         );
     }
 
-    if (config.oidcConfigurationUrl && config.oidcClientId) {
+    if (
+        config.oidcConfigurationUrl &&
+        config.oidcClientId &&
+        config.oidcSessionEncryptionKeys === undefined
+    ) {
         logger.info("Using OidcAuthenticationStrategy authentication strategy");
         authenticationStrategies.push(
             new OidcAuthenticationStrategy(

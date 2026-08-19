@@ -31,9 +31,15 @@ export default class AuthService {
         staticdeployClient: StaticdeployClient
     ) {
         this.staticdeploy = staticdeployClient;
-        this.staticdeploy.setApiToken(
-            cacheFor(this.getAuthToken.bind(this), 5000)
+        const serverSession = this.authStrategies.find(
+            (strategy) => strategy.usesServerSession === true
         );
+        if (serverSession?.getCsrfToken !== undefined)
+            this.staticdeploy.setSessionCsrfToken(serverSession.getCsrfToken);
+        else
+            this.staticdeploy.setApiToken(
+                cacheFor(this.getAuthToken.bind(this), 5000)
+            );
     }
 
     async init() {
