@@ -69,7 +69,12 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const first = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(first[1]).to.deep.equal(["00.js", "01.js", "02.js"]);
+            expect(first[1]).to.deep.equal([
+                "00.js",
+                "01.js",
+                "02.js",
+                "03.js",
+            ]);
             expect(await applicationTables(database)).to.deep.equal([
                 "apps",
                 "bundles",
@@ -78,11 +83,18 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "operationLogs",
                 "users",
                 "users_groups",
+                "v2_applications",
+                "v2_audit_events",
+                "v2_bindings",
+                "v2_publication_guards",
+                "v2_releases",
+                "v2_upload_files",
             ]);
             expect(await migrationNames(database)).to.deep.equal([
                 "00.js",
                 "01.js",
                 "02.js",
+                "03.js",
             ]);
 
             const foreignKeys = await database(
@@ -99,6 +111,14 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "entrypoints",
                 "users_groups",
                 "users_groups",
+                "v2_applications",
+                "v2_applications",
+                "v2_audit_events",
+                "v2_audit_events",
+                "v2_bindings",
+                "v2_publication_guards",
+                "v2_releases",
+                "v2_upload_files",
             ]);
 
             const second = await database.migrate.latest(
@@ -109,11 +129,12 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "00.js",
                 "01.js",
                 "02.js",
+                "03.js",
             ]);
         });
     });
 
-    it("SCH-02 accepts a captured post-02 schema without changing data, FKs, or history", async () => {
+    it("SCH-02 upgrades a captured post-02 schema without changing legacy rows or FKs", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await installLegacyFixture(database, "post02");
             const before = await legacySnapshot(database);
@@ -121,14 +142,17 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const result = await database.migrate.latest(
                 productionMigrationConfig
             );
+            const after = await legacySnapshot(database);
 
-            expect(result[1]).to.deep.equal([]);
+            expect(result[1]).to.deep.equal(["03.js"]);
             expect(await migrationNames(database)).to.deep.equal([
                 "00.js",
                 "01.js",
                 "02.js",
+                "03.js",
             ]);
-            expect(await legacySnapshot(database)).to.deep.equal(before);
+            expect(after.rows).to.deep.equal(before.rows);
+            expect(after.foreignKeys).to.deep.equal(before.foreignKeys);
             const linkedEntrypoint = await database(tables.entrypoints)
                 .join(
                     tables.apps,
@@ -165,7 +189,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const first = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(first[1]).to.deep.equal(["02.js"]);
+            expect(first[1]).to.deep.equal(["02.js", "03.js"]);
             expect((await database(tables.groups).first()).roles).to.deep.equal(
                 ["app-manager:application-one", "root"]
             );
@@ -181,7 +205,702 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "00.js",
                 "01.js",
                 "02.js",
+                "03.js",
             ]);
+        });
+    });
+
+    it("SCH-01 reverses and reapplies only additive migration 03", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            await database(tables.apps).insert(appRow());
+
+            const down = await database.migrate.down(productionMigrationConfig);
+            expect(down[1]).to.deep.equal(["03.js"]);
+            expect(await database.schema.hasTable(tables.apps)).to.equal(true);
+            expect(await database(tables.apps).select("id")).to.deep.equal([
+                { id: "app-1" },
+            ]);
+            for (const table of v2TableNames()) {
+                expect(await database.schema.hasTable(table)).to.equal(false);
+            }
+
+            const reapply = await database.migrate.latest(
+                productionMigrationConfig
+            );
+            expect(reapply[1]).to.deep.equal(["03.js"]);
+            for (const table of v2TableNames()) {
+                expect(await database.schema.hasTable(table)).to.equal(true);
+            }
+        });
+    });
+
+    it("SCH-01 refuses destructive rollback when v2 history exists", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000000";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database(tables.v2AuditEvents).insert({
+                id: "30000000-0000-4000-8000-000000000000",
+                actor_id: "actor-rollback-test",
+                action: "RELEASE_READY",
+                application_id: application.id,
+                release_id: releaseId,
+                occurred_at: fixtureDate(),
+            });
+
+            await expectDatabaseError(
+                database.migrate.down(productionMigrationConfig),
+                "expand-only rollback refused"
+            );
+            expect(await migrationNames(database)).to.deep.equal([
+                "00.js",
+                "01.js",
+                "02.js",
+                "03.js",
+            ]);
+            expect(
+                await database(tables.v2Releases)
+                    .where({ id: releaseId })
+                    .first("state")
+            ).to.deep.equal({ state: "READY" });
+            expect(
+                await database(tables.v2AuditEvents)
+                    .where({ release_id: releaseId })
+                    .first("action")
+            ).to.deep.equal({ action: "RELEASE_READY" });
+        });
+    });
+
+    it("SCH-01 serializes rollback against concurrent v2 writers", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const writer = await database.transaction();
+            let writerCommitted = false;
+            let downSettled = false;
+            let downAttempt: Promise<unknown> | undefined;
+            try {
+                await writer(tables.v2Applications).insert(v2ApplicationRow());
+                downAttempt = database.migrate
+                    .down(productionMigrationConfig)
+                    .then(
+                        (result) => {
+                            downSettled = true;
+                            return result;
+                        },
+                        (error: unknown) => {
+                            downSettled = true;
+                            return error;
+                        }
+                    );
+
+                await new Promise((resolve) => setTimeout(resolve, 150));
+                expect(downSettled).to.equal(false);
+                await writer.commit();
+                writerCommitted = true;
+                const downResult = await downAttempt;
+                expect(downResult).to.be.instanceOf(Error);
+                expect(errorText(downResult)).to.include(
+                    "expand-only rollback refused"
+                );
+            } catch (error) {
+                if (!writerCommitted) {
+                    await writer.rollback();
+                }
+                await downAttempt;
+                throw error;
+            }
+
+            expect(
+                await database(tables.v2Applications).first("id")
+            ).to.deep.equal({ id: v2ApplicationRow().id });
+            expect(await migrationNames(database)).to.include("03.js");
+        });
+    });
+
+    it("SCH-03 serializes same-second version labels per application", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            await database(tables.v2Applications).insert(v2ApplicationRow());
+            const releases = [
+                "10000000-0000-4000-8000-000000000001",
+                "10000000-0000-4000-8000-000000000002",
+                "10000000-0000-4000-8000-000000000003",
+            ];
+            await database(tables.v2Releases).insert(
+                releases.map((id) => v2ReadyReleaseRow(id))
+            );
+            const publishedAt = new Date("2026-08-17T13:31:22.000Z");
+
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_claim_release_version(?, ?) as label",
+                    [releases[0], null]
+                ),
+                "publication timestamp is required"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_claim_release_version(?, ?) as label",
+                    ["10000000-0000-4000-8000-000000000099", publishedAt]
+                ),
+                "READY release not found"
+            );
+            const processingReleaseId = "10000000-0000-4000-8000-000000000098";
+            await database(tables.v2Releases).insert({
+                ...v2ReadyReleaseRow(processingReleaseId),
+                state: "PROCESSING",
+                default_path: null,
+                manifest_digest: null,
+                finalized_at: null,
+            });
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_claim_release_version(?, ?) as label",
+                    [processingReleaseId, publishedAt]
+                ),
+                "READY release not found"
+            );
+
+            const claimed = await Promise.all(
+                releases.map(async (id) => {
+                    const result = await database.raw(
+                        "select public.v2_claim_release_version(?, ?) as label",
+                        [id, publishedAt]
+                    );
+                    return result.rows[0].label as string;
+                })
+            );
+
+            expect(claimed.sort()).to.deep.equal([
+                "2026.08.17-13.31.22",
+                "2026.08.17-13.31.22-2",
+                "2026.08.17-13.31.22-3",
+            ]);
+            const stored = await database(tables.v2Releases)
+                .select("version_label", "published_at")
+                .whereNotNull("published_at")
+                .orderBy("version_label");
+            expect(stored.map((row) => row.version_label)).to.deep.equal([
+                "2026.08.17-13.31.22",
+                "2026.08.17-13.31.22-2",
+                "2026.08.17-13.31.22-3",
+            ]);
+            expect(
+                stored.every(
+                    (row) =>
+                        new Date(row.published_at).toISOString() ===
+                        publishedAt.toISOString()
+                )
+            ).to.equal(true);
+
+            const repeat = await database.raw(
+                "select public.v2_claim_release_version(?, ?) as label",
+                [releases[0], new Date("2027-01-01T00:00:00.000Z")]
+            );
+            expect(repeat.rows[0].label).to.equal(
+                (
+                    await database(tables.v2Releases)
+                        .where({ id: releases[0] })
+                        .first("version_label")
+                ).version_label
+            );
+
+            const directReleaseId = "10000000-0000-4000-8000-000000000004";
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(directReleaseId)
+            );
+            await expectDatabaseError(
+                database(tables.v2Releases)
+                    .where({ id: directReleaseId })
+                    .update({
+                        published_at: publishedAt,
+                        version_label: "2026.08.17-13.31.22-99",
+                    }),
+                "publication identity must use v2_claim_release_version"
+            );
+            const directClaim = await database.raw(
+                "select public.v2_claim_release_version(?, ?) as label",
+                [directReleaseId, publishedAt]
+            );
+            expect(directClaim.rows[0].label).to.equal("2026.08.17-13.31.22-4");
+            await expectDatabaseError(
+                database(tables.v2Releases)
+                    .where({ id: directReleaseId })
+                    .update({
+                        published_at: new Date("2027-01-01T00:00:00.000Z"),
+                        version_label: "2027.01.01-00.00.00",
+                    }),
+                "release publication identity is immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2Releases).insert({
+                    ...v2ReadyReleaseRow(
+                        "10000000-0000-4000-8000-000000000005"
+                    ),
+                    published_at: publishedAt,
+                    version_label: "2026.08.17-13.31.22-5",
+                }),
+                "publication identity must be assigned after READY finalization"
+            );
+        });
+    });
+
+    it("SCH-04 enforces the publication privilege boundary for non-owners", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000006";
+            const role = `m302_${randomBytes(8).toString("hex")}`;
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database.raw("create role ?? nologin", [role]);
+            try {
+                await database.raw("grant usage on schema public to ??", [
+                    role,
+                ]);
+                await database.raw(
+                    `grant select on public.${tables.v2Releases} to ??`,
+                    [role]
+                );
+                await database.raw(
+                    `grant update (published_at, version_label) on public.${tables.v2Releases} to ??`,
+                    [role]
+                );
+
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            `select * from public.${tables.v2PublicationGuards}`
+                        );
+                    }),
+                    `permission denied for table ${tables.v2PublicationGuards}`
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            "select public.v2_claim_release_version(?, ?) as label",
+                            [releaseId, fixtureDate()]
+                        );
+                    }),
+                    "permission denied for function v2_claim_release_version"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            `update public.${tables.v2Releases}
+                                set published_at = ?, version_label = ?
+                              where id = ?`,
+                            [fixtureDate(), "2021.11.24-23.19.33", releaseId]
+                        );
+                    }),
+                    "publication identity must use v2_claim_release_version"
+                );
+
+                await database.raw(
+                    "grant execute on function public.v2_claim_release_version(uuid, timestamptz) to ??",
+                    [role]
+                );
+                let claimedLabel: string | undefined;
+                await database.transaction(async (transaction) => {
+                    await transaction.raw("set local role ??", [role]);
+                    const claimed = await transaction.raw(
+                        "select public.v2_claim_release_version(?, ?) as label",
+                        [releaseId, fixtureDate()]
+                    );
+                    claimedLabel = claimed.rows[0].label as string;
+                });
+                expect(claimedLabel).to.equal("2021.11.24-23.19.33");
+            } finally {
+                await database.raw("drop owned by ??", [role]);
+                await database.raw("drop role ??", [role]);
+            }
+        });
+    });
+
+    it("SCH-04 enforces READY, upload, audit, state, path, role, and FK guards", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000010";
+            const uploadId = "20000000-0000-4000-8000-000000000010";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert({
+                ...v2ReadyReleaseRow(releaseId),
+                state: "PROCESSING",
+                default_path: null,
+                manifest_digest: null,
+                finalized_at: null,
+            });
+            await database(tables.v2UploadFiles).insert({
+                id: uploadId,
+                release_id: releaseId,
+                state: "OBSERVED",
+                declared_path: "nested/app.html",
+                declared_size: 12,
+                observed_path: "nested/app.html",
+                observed_size: 12,
+                observed_digest: "a".repeat(64),
+                observed_at: fixtureDate(),
+            });
+            await expectDatabaseError(
+                database(tables.v2Releases)
+                    .where({ id: releaseId })
+                    .update({
+                        state: "READY",
+                        default_path: "nested/app.html",
+                        manifest_digest: "b".repeat(64),
+                        finalized_at: fixtureDate(),
+                        published_at: fixtureDate(),
+                        version_label: "2021.11.24-23.19.33",
+                    }),
+                "release must already be READY before publication"
+            );
+            await database(tables.v2Releases)
+                .where({ id: releaseId })
+                .update({
+                    state: "READY",
+                    default_path: "nested/app.html",
+                    manifest_digest: "b".repeat(64),
+                    finalized_at: fixtureDate(),
+                });
+            await database(tables.v2AuditEvents).insert({
+                id: "30000000-0000-4000-8000-000000000010",
+                actor_id: "actor-1",
+                action: "RELEASE_READY",
+                application_id: application.id,
+                release_id: releaseId,
+                occurred_at: fixtureDate(),
+            });
+
+            await expectDatabaseError(
+                database(tables.v2Releases)
+                    .where({ id: releaseId })
+                    .update({ manifest_digest: "c".repeat(64) }),
+                "READY release content fields are immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2Releases).where({ id: releaseId }).delete(),
+                "READY release is immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2UploadFiles)
+                    .where({ id: uploadId })
+                    .update({ observed_size: 13 }),
+                "READY release upload declarations are immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2UploadFiles).insert({
+                    id: "20000000-0000-4000-8000-000000000099",
+                    release_id: releaseId,
+                    declared_path: "late.html",
+                    declared_size: 1,
+                }),
+                "READY release upload declarations are immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2UploadFiles).where({ id: uploadId }).delete(),
+                "READY release upload declarations are immutable"
+            );
+            await expectDatabaseError(
+                database.raw(`truncate table public.${tables.v2UploadFiles}`),
+                "upload declarations cannot be truncated"
+            );
+            await database.raw(
+                "create temporary table v2_releases (id uuid primary key, state text)"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    "update public.v2_upload_files set observed_size = ? where id = ?",
+                    [13, uploadId]
+                ),
+                "READY release upload declarations are immutable"
+            );
+            await database.raw("drop table pg_temp.v2_releases");
+            await expectDatabaseError(
+                database(tables.v2AuditEvents)
+                    .where({ application_id: application.id })
+                    .update({ action: "ALTERED" }),
+                "audit events are append-only"
+            );
+            await expectDatabaseError(
+                database(tables.v2AuditEvents)
+                    .where({ application_id: application.id })
+                    .delete(),
+                "audit events are append-only"
+            );
+            await expectDatabaseError(
+                database.raw(`truncate table ${tables.v2AuditEvents}`),
+                "audit events are append-only"
+            );
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({ desired_generation: 2, served_generation: 1 });
+            await expectDatabaseError(
+                database(tables.v2Applications)
+                    .where({ id: application.id })
+                    .update({ desired_generation: 1 }),
+                "application routing generations cannot decrease"
+            );
+            await expectDatabaseError(
+                database(tables.v2Applications)
+                    .where({ id: application.id })
+                    .update({ served_generation: 0 }),
+                "application routing generations cannot decrease"
+            );
+            await expectDatabaseError(
+                database(tables.v2Bindings).insert({
+                    id: "40000000-0000-4000-8000-000000000010",
+                    application_id: application.id,
+                    group_id: "group-1",
+                    role: "ADMINISTRATOR",
+                    created_by: "actor-1",
+                }),
+                "v2_bindings_role_check"
+            );
+            const processingReleaseId = "10000000-0000-4000-8000-000000000011";
+            await database(tables.v2Releases).insert({
+                ...v2ReadyReleaseRow(processingReleaseId),
+                state: "PROCESSING",
+                default_path: null,
+                manifest_digest: null,
+                finalized_at: null,
+            });
+            await expectDatabaseError(
+                database(tables.v2UploadFiles)
+                    .where({ id: uploadId })
+                    .update({ release_id: processingReleaseId }),
+                "READY release upload declarations are immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2UploadFiles).insert({
+                    id: "20000000-0000-4000-8000-000000000011",
+                    release_id: processingReleaseId,
+                    declared_path: "/escape.html",
+                    declared_size: 1,
+                }),
+                "v2_upload_files_declared_path_check"
+            );
+            await expectDatabaseError(
+                database(tables.v2Releases).insert({
+                    id: "10000000-0000-4000-8000-000000000099",
+                    application_id: "00000000-0000-4000-8000-000000000099",
+                    state: "PENDING_UPLOAD",
+                }),
+                "v2_releases_application_fk"
+            );
+
+            const otherApplication = {
+                ...v2ApplicationRow(),
+                id: "00000000-0000-4000-8000-000000000011",
+                name: "application-v2-two",
+                routing_id: "00000000-0000-4000-8000-000000000012",
+            };
+            const otherReleaseId = "10000000-0000-4000-8000-000000000013";
+            await database(tables.v2Applications).insert(otherApplication);
+            await database(tables.v2Releases).insert({
+                ...v2ReadyReleaseRow(otherReleaseId),
+                application_id: otherApplication.id,
+            });
+            await expectDatabaseError(
+                database(tables.v2Applications)
+                    .where({ id: application.id })
+                    .update({
+                        desired_current_release_id: otherReleaseId,
+                        desired_generation: 3,
+                    }),
+                "v2_applications_desired_release_fk"
+            );
+            await expectDatabaseError(
+                database(tables.v2AuditEvents).insert({
+                    id: "30000000-0000-4000-8000-000000000011",
+                    actor_id: "actor-1",
+                    action: "RELEASE_READY",
+                    application_id: application.id,
+                    release_id: otherReleaseId,
+                    occurred_at: fixtureDate(),
+                }),
+                "v2_audit_events_release_fk"
+            );
+            await database(tables.v2AuditEvents).insert({
+                id: "30000000-0000-4000-8000-000000000012",
+                actor_id: "actor-global",
+                action: "AUTHENTICATION_SUCCEEDED",
+                occurred_at: fixtureDate(),
+            });
+        });
+    });
+
+    it("SCH-04 serializes upload mutation before READY finalization", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000012";
+            const uploadId = "20000000-0000-4000-8000-000000000012";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert({
+                ...v2ReadyReleaseRow(releaseId),
+                state: "PROCESSING",
+                default_path: null,
+                manifest_digest: null,
+                finalized_at: null,
+            });
+
+            const uploadTransaction = await database.transaction();
+            let uploadCommitted = false;
+            let transitionSettled = false;
+            let readyTransition: Promise<void> | undefined;
+            try {
+                await uploadTransaction(tables.v2UploadFiles).insert({
+                    id: uploadId,
+                    release_id: releaseId,
+                    state: "OBSERVED",
+                    declared_path: "index.html",
+                    declared_size: 12,
+                    observed_path: "index.html",
+                    observed_size: 12,
+                    observed_digest: "a".repeat(64),
+                    observed_at: fixtureDate(),
+                });
+                readyTransition = database(tables.v2Releases)
+                    .where({ id: releaseId })
+                    .update({
+                        state: "READY",
+                        default_path: "index.html",
+                        manifest_digest: "b".repeat(64),
+                        finalized_at: fixtureDate(),
+                    })
+                    .then(() => {
+                        transitionSettled = true;
+                    });
+
+                await new Promise((resolve) => setTimeout(resolve, 150));
+                expect(transitionSettled).to.equal(false);
+                await uploadTransaction.commit();
+                uploadCommitted = true;
+                await readyTransition;
+            } catch (error) {
+                if (!uploadCommitted) {
+                    await uploadTransaction.rollback();
+                }
+                await readyTransition?.catch(() => undefined);
+                throw error;
+            }
+
+            await expectDatabaseError(
+                database(tables.v2UploadFiles)
+                    .where({ id: uploadId })
+                    .update({ observed_size: 13 }),
+                "READY release upload declarations are immutable"
+            );
+        });
+    });
+
+    it("SCH-05 uses bounded application and audit indexes", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            await database.raw(`
+                insert into public.${tables.v2Applications}
+                    (id, name, routing_id, created_at, updated_at)
+                select
+                    ('00000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'application-' || lpad(i::text, 4, '0'),
+                    ('10000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    timestamptz '2026-08-17T00:00:00Z' + i * interval '1 second',
+                    timestamptz '2026-08-17T00:00:00Z' + i * interval '1 second'
+                from generate_series(1, 2000) as generated(i);
+
+                insert into public.${tables.v2AuditEvents}
+                    (id, actor_id, action, application_id, occurred_at)
+                select
+                    ('30000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'actor-' || lpad((i % 100)::text, 3, '0'),
+                    case i % 4
+                        when 0 then 'APPLICATION_CREATED'
+                        when 1 then 'APPLICATION_VIEWED'
+                        when 2 then 'RELEASE_LISTED'
+                        else 'AUDIT_VIEWED'
+                    end,
+                    ('00000000-0000-4000-8000-' || lpad(((i % 2000) + 1)::text, 12, '0'))::uuid,
+                    timestamptz '2026-08-17T00:00:00Z' + i * interval '1 second'
+                from generate_series(1, 20000) as generated(i);
+
+                analyze public.${tables.v2Applications};
+                analyze public.${tables.v2AuditEvents};
+            `);
+
+            const applicationPlan = await explainText(
+                database,
+                `select id from public.${tables.v2Applications}
+                  where status = 'ACTIVE'
+                  order by created_at desc, id desc
+                  limit 50`
+            );
+            expect(applicationPlan).to.include(
+                "v2_applications_status_created_idx"
+            );
+
+            const applicationSearchPlan = await explainText(
+                database,
+                `select id from public.${tables.v2Applications}
+                  where lower(name) like 'application-019%'
+                  order by lower(name), id
+                  limit 20`
+            );
+            expect(applicationSearchPlan).to.include(
+                "v2_applications_name_search_idx"
+            );
+
+            const applicationId = "00000000-0000-4000-8000-000000000001";
+            const applicationAuditPlan = await explainText(
+                database,
+                `select id from public.${tables.v2AuditEvents}
+                  where application_id = '${applicationId}'
+                  order by occurred_at desc, id desc
+                  limit 100`
+            );
+            expect(applicationAuditPlan).to.include(
+                "v2_audit_events_application_time_idx"
+            );
+
+            const actorAuditPlan = await explainText(
+                database,
+                `select id from public.${tables.v2AuditEvents}
+                  where actor_id = 'actor-001'
+                    and occurred_at >= timestamptz '2026-08-17T04:00:00Z'
+                  order by occurred_at desc, id desc
+                  limit 100`
+            );
+            expect(actorAuditPlan).to.include("v2_audit_events_actor_time_idx");
+
+            const actionAuditPlan = await explainText(
+                database,
+                `select id from public.${tables.v2AuditEvents}
+                  where action = 'RELEASE_LISTED'
+                  order by occurred_at desc, id desc
+                  limit 100`
+            );
+            expect(actionAuditPlan).to.include(
+                "v2_audit_events_action_time_idx"
+            );
+
+            const timeAuditPlan = await explainText(
+                database,
+                `select id from public.${tables.v2AuditEvents}
+                  where occurred_at >= timestamptz '2026-08-17T05:30:00Z'
+                  order by occurred_at desc, id desc
+                  limit 100`
+            );
+            expect(timeAuditPlan).to.include("v2_audit_events_time_idx");
         });
     });
 
@@ -570,7 +1289,7 @@ async function prepareProductionMigrationConfig(): Promise<{
         const fallbackDirectory = await mkdtemp(
             join(tmpdir(), "staticdeploy-migration-wrappers-")
         );
-        for (const name of ["00", "01", "02"]) {
+        for (const name of ["00", "01", "02", "03"]) {
             const sourcePath = join(__dirname, `../src/migrations/${name}.ts`);
             await writeFile(
                 join(fallbackDirectory, `${name}.js`),
@@ -638,6 +1357,7 @@ async function legacySnapshot(database: Knex): Promise<LegacySnapshot> {
                from pg_constraint
               where contype = 'f'
                 and connamespace = 'public'::regnamespace
+                and conrelid::regclass::text in ('entrypoints', 'users_groups')
               order by conrelid::regclass::text, conname`
         )
     ).rows;
@@ -680,6 +1400,64 @@ async function migrationNames(database: Knex): Promise<string[]> {
     }
     const rows = await database("knex_migrations").select("name").orderBy("id");
     return rows.map((row) => row.name);
+}
+
+function v2TableNames(): string[] {
+    return [
+        tables.v2Applications,
+        tables.v2AuditEvents,
+        tables.v2Bindings,
+        tables.v2PublicationGuards,
+        tables.v2Releases,
+        tables.v2UploadFiles,
+    ];
+}
+
+function v2ApplicationRow() {
+    return {
+        id: "00000000-0000-4000-8000-000000000001",
+        name: "application-v2-one",
+        description: "Schema contract fixture",
+        tags: JSON.stringify(["fixture"]),
+        owner_metadata: JSON.stringify({ source: "test" }),
+        routing_id: "00000000-0000-4000-8000-000000000002",
+        created_at: fixtureDate(),
+        updated_at: fixtureDate(),
+    };
+}
+
+function v2ReadyReleaseRow(id: string) {
+    return {
+        id,
+        application_id: v2ApplicationRow().id,
+        state: "READY",
+        default_path: "nested/app.html",
+        manifest_digest: "b".repeat(64),
+        finalized_at: fixtureDate(),
+        created_at: fixtureDate(),
+        updated_at: fixtureDate(),
+    };
+}
+
+async function expectDatabaseError(
+    operation: PromiseLike<unknown>,
+    expectedText: string
+): Promise<void> {
+    let failure: unknown;
+    try {
+        await operation;
+    } catch (error) {
+        failure = error;
+    }
+    expect(failure).to.be.instanceOf(Error);
+    expect(errorText(failure)).to.include(expectedText);
+}
+
+async function explainText(database: Knex, statement: string): Promise<string> {
+    const result = await database.raw(`explain ${statement}`);
+    return result.rows
+        .map((row: Record<string, string>) => row["QUERY PLAN"])
+        .join("\n");
 }
 
 function errorText(value: unknown, seen = new Set<object>()): string {

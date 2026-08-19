@@ -92,8 +92,9 @@ omissions.
   remain unchanged.
 - `SCH-03` — concurrent same-second first publications produce base, `-2`, `-3`
   labels with one winner each.
-- `SCH-04` — READY fields and immutable audit records reject update/delete
-  through application and database guard paths.
+- `SCH-04` — READY fields and immutable audit records reject update/delete;
+  M3-02 proves database guard paths, and M3-05 must add the application guard
+  path before runtime finalization can close.
 - `SCH-05` — bounded audit/application queries use expected indexes on
   representative data.
 - `API-01` — generated requests/responses conform to committed OpenAPI v2.
