@@ -97,6 +97,11 @@ jobs:
               env:
                   POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
               run: yarn workspace @staticdeploy/pg-s3-storages test:v2-sessions
+            - name: Run focused M3-07 authorization evidence on supported PostgreSQL 16
+              env:
+                  EXPECTED_POSTGRES_MAJOR: "16"
+                  POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres
+              run: ./scripts/gates/m3-foundation.sh authorization
             - name: Record exact supported-toolchain evidence
               run:
                   node scripts/write-m2-toolchain-evidence.mjs
@@ -110,6 +115,7 @@ jobs:
                       coverage/
                       management-console/coverage/
                       reports/toolchain-evidence.json
+                      reports/m3-foundation-evidence.json
                   if-no-files-found: error
 
     scans-evidence:

@@ -91,16 +91,56 @@ memory. Server-session API requests use the opaque cookie plus CSRF and never a
 browser OIDC bearer token.
 
 Server-side OIDC requires a separately provisioned `OIDC_POSTGRES_URL`, complete
-keyring, and grants for only the migration-06 entry functions. Startup verifies
-that the identity has no elevated role attributes or memberships, object
-ownership, schema/database creation, direct authentication/audit table access,
-or unrelated `SECURITY DEFINER` wrapper access, while every required wrapper is
-executable; schema migration remains a distinct command. The focused local mock
-AUTH component suites are not a real-provider or production IdP acceptance and
-do not claim the later M3 foundation gate. AUTH-06 and production
+keyring, and grants for the exact combined migration-06 session and migration-07
+authorization entry functions—never either set alone. Startup verifies that the
+identity has no elevated role attributes or memberships, object ownership,
+schema/database creation, direct authentication/audit table access, or unrelated
+`SECURITY DEFINER` wrapper access, while every required wrapper is executable;
+schema migration remains a distinct command. The focused local mock AUTH
+component suites are not a real-provider or production IdP acceptance and do not
+claim the later M3 foundation gate. AUTH-06 and production
 issuer/client/redirect/logout/group/key-rotation acceptance remain
 **BLOCKED-EXTERNAL on B-OKTA**; final production identity/grant acceptance
 remains **B-PG**.
+
+## V2 authorization and audit policy
+
+Migration 07 adds the application `binding_version`, immutable actor-scoped
+binding request identities, an immutable initialize-once authorization policy,
+and narrow wrappers for authorization and whole-set binding replacement. Global
+administrator authority comes only from exact configured stable group IDs in
+that policy row; `v2_bindings` remains application-scoped and permits only
+OWNER, PUBLISHER, or VIEWER. Unknown, differently cased, renamed, malformed, or
+stale groups grant nothing.
+
+`V2Authorization` evaluates the committed administrator/owner/publisher/viewer/
+denied capability registry against the current application bindings on every
+decision. It fences the exact active session ID, subject-derived audit identity,
+group set, and `claims_version` under PostgreSQL locks, so binding or session
+changes cannot use a process cache. Complete binding replacement validates the
+entire desired set before mutation, authorizes before idempotency lookup,
+linearizes on the application row, scopes immutable retry identity by actor and
+application, applies either one complete set or none, and appends its audit in
+the same transaction. Owners may hand off or demote their own binding while
+adding or promoting only the application roles they are allowed to delegate;
+global administrator cannot be represented as an application binding.
+
+Authorization decisions and replacements emit only closed role/source/action/
+result values, counts, versions, and SHA-256 request identity. Migration 07
+extends the append-only trigger with a 4096-byte serialized-UTF-8, 12-key,
+scalar-only metadata allowlist; raw bodies, headers, queries, cookies, CSRF/OIDC
+tokens, emails, display names, idempotency keys, and free-form errors are never
+copied. Audit query/pagination remains M4-03 scope. The combined control runtime
+receives EXECUTE only on the exact session and authorization wrappers and cannot
+read or mutate bindings, policy, requests, or audits directly. Startup
+initializes the policy once, then compares its actual canonical groups, claims
+version, and SHA-256 configuration digest before serving; later conflicts fail
+closed.
+
+AUTHZ-01 and TM-AUD-01 are local logical evidence only. Real Okta stable group
+IDs, rename behavior, propagation, accepted stale interval, users, and group
+mapping remain **BLOCKED-EXTERNAL on B-OKTA**; production role provisioning and
+capability acceptance remain **B-PG**.
 
 ## PostgreSQL migrations and connections
 

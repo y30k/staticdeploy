@@ -1,6 +1,6 @@
 import { createServer, Server } from "node:http";
 
-import { IStoragesModule } from "@staticdeploy/core";
+import { IStoragesModule, IV2AuthorizationStorage } from "@staticdeploy/core";
 
 import usecases from "./common/usecases";
 import getAuthenticationStrategies from "./components/authenticationStrategies";
@@ -8,6 +8,7 @@ import getExpressApp from "./components/expressApp";
 import getLogger from "./components/logger";
 import getManagementRouter from "./components/managementRouter";
 import getStoragesModule from "./components/storagesModule";
+import getV2Authorization from "./components/v2Authorization";
 import V2SessionAuthenticationStrategy from "./components/V2SessionAuthenticationStrategy";
 import getV2Sessions from "./components/v2Sessions";
 import { APP_NAME, APP_VERSION, getConfig } from "./config";
@@ -26,6 +27,9 @@ let logger = getLogger({
 });
 let server: Server | undefined;
 let oidcSessions: { destroy(): Promise<void> } | undefined;
+let v2Authorization:
+    | (IV2AuthorizationStorage & { destroy(): Promise<void> })
+    | undefined;
 let storagesModule:
     | (IStoragesModule & { destroy?: () => Promise<void> })
     | undefined;
@@ -63,6 +67,7 @@ const destroyStorages = async (): Promise<void> => {
     const results = await Promise.allSettled([
         storagesModule?.destroy?.(),
         oidcSessions?.destroy(),
+        v2Authorization?.destroy(),
     ]);
     const failure = results.find((result) => result.status === "rejected");
     if (failure?.status === "rejected") throw failure.reason;
@@ -153,6 +158,7 @@ const start = async (): Promise<void> => {
         storagesModule = createdStoragesModule;
         const sessions = await getV2Sessions(config, logger);
         oidcSessions = sessions;
+        v2Authorization = await getV2Authorization(config);
         const sessionAuthentication =
             sessions === undefined
                 ? undefined
@@ -176,6 +182,7 @@ const start = async (): Promise<void> => {
             managementRouter,
             storagesModule,
             usecases,
+            v2Authorization,
         });
 
         await setupStorages(storagesModule);

@@ -27,6 +27,8 @@ export default interface IConfig {
     portalOrigin?: string;
     oidcSessionPrimaryKeyId?: string;
     oidcSessionEncryptionKeys?: Array<{ id: string; key: Buffer }>;
+    oidcAdministratorGroupIds?: string[];
+    oidcAuthorizationClaimsVersion?: number;
     oidcPostgresUrl?: string;
     oidcTrustedProxyHops?: number;
     oidcAllowHttpLoopbackForTests?: boolean;

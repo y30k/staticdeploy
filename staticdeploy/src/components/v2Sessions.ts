@@ -18,6 +18,8 @@ export default async function getV2Sessions(
         config.portalOrigin,
         config.oidcSessionPrimaryKeyId,
         config.oidcSessionEncryptionKeys,
+        config.oidcAdministratorGroupIds,
+        config.oidcAuthorizationClaimsVersion,
         config.oidcPostgresUrl,
         config.oidcTrustedProxyHops,
     ];

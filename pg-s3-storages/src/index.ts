@@ -23,6 +23,7 @@ import GroupsStorage from "./GroupsStorage";
 import OperationLogsStorage from "./OperationLogsStorage";
 import { createPostgresKnex } from "./postgres";
 import UsersStorage from "./UsersStorage";
+export * from "./V2Authorization";
 export * from "./V2ObjectStorage";
 export * from "./V2ReleaseJobs";
 export * from "./V2Sessions";

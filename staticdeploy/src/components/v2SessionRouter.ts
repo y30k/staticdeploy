@@ -99,6 +99,11 @@ export function requireV2ApiSession(
                 "authorization"
             );
             if (authorizationHeaders > 1) return reject(response);
+            if (
+                authorizationHeaders === 1 &&
+                /^\/v2(?:\/|$)/i.test(request.path)
+            )
+                return reject(response);
             if (authorizationHeaders === 1) return next("router");
             if (!isUnsafe(request.method)) {
                 const accepted = await sessions.authenticate(
@@ -107,6 +112,16 @@ export function requireV2ApiSession(
                 if (accepted === null)
                     return reject(response, 401, sessions.clearSessionCookie);
                 (request as V2SessionRequest).v2Session = accepted;
+                (request as IRequestWithAuthToken).v2Principal = {
+                    sessionId: accepted.id,
+                    subjectId: accepted.subjectId,
+                    issuer: accepted.issuer,
+                    groups: [
+                        ...((accepted.claims.groups as string[] | undefined) ??
+                            []),
+                    ],
+                    claimsVersion: accepted.claimsVersion,
+                };
                 (request as IRequestWithAuthToken).authToken =
                     authentication.issue(accepted);
                 return next();
@@ -143,6 +158,16 @@ export function requireV2ApiSession(
                 if (accepted === null)
                     return reject(response, 401, sessions.clearSessionCookie);
                 request.v2Session = accepted;
+                (request as IRequestWithAuthToken).v2Principal = {
+                    sessionId: accepted.id,
+                    subjectId: accepted.subjectId,
+                    issuer: accepted.issuer,
+                    groups: [
+                        ...((accepted.claims.groups as string[] | undefined) ??
+                            []),
+                    ],
+                    claimsVersion: accepted.claimsVersion,
+                };
                 (request as IRequestWithAuthToken).authToken =
                     authentication.issue(accepted);
                 return next();
