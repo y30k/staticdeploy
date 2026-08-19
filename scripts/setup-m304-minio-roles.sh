@@ -52,7 +52,10 @@ install_policy staticdeploy-m304-worker '{
     {
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
-      "Resource": ["arn:aws:s3:::m304-*/v2/releases/*"]
+      "Resource": [
+        "arn:aws:s3:::m304-*/v2/releases/*",
+        "arn:aws:s3:::m304-*/v2/routing/*"
+      ]
     }
   ]
 }'
@@ -61,7 +64,10 @@ install_policy staticdeploy-m304-content '{
   "Statement": [{
     "Effect": "Allow",
     "Action": ["s3:GetObject"],
-    "Resource": ["arn:aws:s3:::m304-*/v2/releases/*"]
+    "Resource": [
+      "arn:aws:s3:::m304-*/v2/releases/*",
+      "arn:aws:s3:::m304-*/v2/routing/*"
+    ]
   }]
 }'
 

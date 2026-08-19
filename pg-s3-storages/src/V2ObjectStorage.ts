@@ -521,7 +521,7 @@ function deterministicZip(
     return Buffer.concat([...local, directoryBytes, end]);
 }
 
-function parseManifest(
+export function parseV2ReleaseManifest(
     bytes: Buffer,
     expected: V2ObjectDigest,
     applicationId: string,
@@ -687,7 +687,12 @@ class WorkerObjectStorage
         );
         if (bytes === null) throw new Error("READY release manifest missing");
         expected.size = bytes.length;
-        return parseManifest(bytes, expected, applicationId, releaseId);
+        return parseV2ReleaseManifest(
+            bytes,
+            expected,
+            applicationId,
+            releaseId
+        );
     }
 
     async finalizeRelease(input: {
@@ -956,7 +961,7 @@ class ContentObjectStorage
             V2_OBJECT_LIMITS.maxManifestBytes
         );
         if (manifestBytes === null) return null;
-        const manifest = parseManifest(
+        const manifest = parseV2ReleaseManifest(
             manifestBytes,
             { sha256: manifestDigest, size: manifestBytes.length },
             applicationId,

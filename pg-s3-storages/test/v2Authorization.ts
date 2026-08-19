@@ -10,6 +10,7 @@ import {
     V2Actor,
 } from "../src/V2Authorization";
 import { V2OidcSessions } from "../src/V2Sessions";
+import { V2PublicationQueue } from "../src/V2RoutingProjection";
 import { createPostgresKnex } from "../src/postgres";
 import tables from "../src/common/tables";
 
@@ -1259,9 +1260,11 @@ describe("M3-07 role bindings and authorization policy", () => {
                 administratorGroupIds: [administratorGroup],
                 requiredClaimsVersion: 1,
             });
+            const publicationQueue = new V2PublicationQueue(connection);
             try {
                 await sessionService.verifyReady();
                 await authorizationService.verifyReady();
+                await publicationQueue.verifyReady("CONTROL");
             } finally {
                 await sessionService.destroy();
             }
@@ -1285,9 +1288,22 @@ describe("M3-07 role bindings and authorization policy", () => {
                     public.v2_initialize_authorization_policy(text[],bigint,text),
                     public.v2_authorization_policy_identity(),
                     public.v2_authorize_operation(uuid,uuid,text[],bigint,uuid,text),
-                    public.v2_replace_bindings(uuid,uuid,text[],bigint,uuid,bigint,text,text,jsonb)
+                    public.v2_replace_bindings(uuid,uuid,text[],bigint,uuid,bigint,text,text,jsonb),
+                    public.v2_request_publication(uuid,uuid,text,uuid,uuid,uuid,uuid,uuid,text[],bigint,text,text),
+                    public.v2_publication_operation(uuid)
                 TO ${runtimeRole}
             `);
+            await verifyLoginRole();
+            await rootDatabase.raw(
+                `REVOKE EXECUTE ON FUNCTION public.v2_publication_operation(uuid) FROM ${runtimeRole}`
+            );
+            await expectRejected(
+                verifyLoginRole(),
+                "publication control PostgreSQL identity is not least privilege"
+            );
+            await rootDatabase.raw(
+                `GRANT EXECUTE ON FUNCTION public.v2_publication_operation(uuid) TO ${runtimeRole}`
+            );
             await verifyLoginRole();
 
             for (const [grant, revoke] of [

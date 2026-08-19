@@ -25,6 +25,7 @@
     "test:v2-jobs": "NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha -t 30000 -r ts-node/register --extension ts test/v2ReleaseJobs.ts",
     "test:v2-sessions": "NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha -t 30000 -r ts-node/register --extension ts test/v2Sessions.ts",
     "test:v2-authorization": "yarn compile && NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha -t 30000 -r ts-node/register --extension ts test/v2Authorization.ts",
+    "test:v2-projection": "yarn compile && NODE_ENV=test NODE_PATH=src TS_NODE_FILES=true TS_NODE_COMPILER_OPTIONS='{\"types\":[\"mocha\",\"node\"]}' mocha -t 30000 -r ts-node/register --extension ts test/v2RoutingProjection.ts",
     "start-test-containers:minio": "docker run --rm -p 127.0.0.1:9000:9000 -e MINIO_ROOT_USER=accessKeyId -e MINIO_ROOT_PASSWORD=secretAccessKey minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e server /data",
     "start-test-containers:pg": "docker run --rm -p 127.0.0.1:5432:5432 -e POSTGRES_PASSWORD=password postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777"
   },
