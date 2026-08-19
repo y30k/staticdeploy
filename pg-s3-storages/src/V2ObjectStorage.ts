@@ -19,11 +19,19 @@ const ALLOWED_FINALIZE_STATES = new Set([
 ]);
 const CREATE_ATTEMPTS = 3;
 
+const MAX_FILE_BYTES = 64 * 1024 * 1024;
+const MAX_RELEASE_BYTES = 512 * 1024 * 1024;
+const MAX_FILES = 1024;
+const MAX_PATH_BYTES = 1024;
+const ZIP_ENTRY_OVERHEAD_BYTES = 30 + 46 + 2 * MAX_PATH_BYTES;
+
 export const V2_OBJECT_LIMITS = Object.freeze({
-    maxFileBytes: 64 * 1024 * 1024,
-    maxReleaseBytes: 512 * 1024 * 1024,
-    maxFiles: 1024,
+    maxFileBytes: MAX_FILE_BYTES,
+    maxReleaseBytes: MAX_RELEASE_BYTES,
+    maxFiles: MAX_FILES,
     maxManifestBytes: 8 * 1024 * 1024,
+    maxSourceDownloadBytes:
+        MAX_RELEASE_BYTES + MAX_FILES * ZIP_ENTRY_OVERHEAD_BYTES + 22,
     maxConcurrentObjectWrites: 4,
 });
 
@@ -503,7 +511,10 @@ function parseManifest(
     }
     if (total > V2_OBJECT_LIMITS.maxReleaseBytes)
         throw new Error("release exceeds byte limit");
-    assertDigest(manifest.sourceDownload, V2_OBJECT_LIMITS.maxReleaseBytes);
+    assertDigest(
+        manifest.sourceDownload,
+        V2_OBJECT_LIMITS.maxSourceDownloadBytes
+    );
     return manifest;
 }
 
@@ -681,7 +692,7 @@ class WorkerObjectStorage
             ),
             sourceDownloadBytes,
             sourceDownload,
-            V2_OBJECT_LIMITS.maxReleaseBytes
+            V2_OBJECT_LIMITS.maxSourceDownloadBytes
         );
         const manifest: V2ReleaseManifest = {
             version: 1,
