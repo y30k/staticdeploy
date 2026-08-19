@@ -32,6 +32,7 @@ export { default as GetOperationLogs } from "./usecases/GetOperationLogs";
 export { default as GetUser } from "./usecases/GetUser";
 export { default as GetUsers } from "./usecases/GetUsers";
 export { default as RespondToEndpointRequest } from "./usecases/RespondToEndpointRequest";
+export { default as ReplaceV2Bindings } from "./usecases/ReplaceV2Bindings";
 export { default as UpdateApp } from "./usecases/UpdateApp";
 export { default as UpdateEntrypoint } from "./usecases/UpdateEntrypoint";
 export { default as UpdateGroup } from "./usecases/UpdateGroup";
@@ -46,6 +47,12 @@ export { default as IEntrypointsStorage } from "./dependencies/IEntrypointsStora
 export { default as IGroupsStorage } from "./dependencies/IGroupsStorage";
 export { default as IOperationLogsStorage } from "./dependencies/IOperationLogsStorage";
 export { default as IRequestContext } from "./dependencies/IRequestContext";
+export {
+    default as IV2AuthorizationStorage,
+    IV2AuthorizationDecision,
+    IV2DesiredBinding,
+    IV2BindingReplacementResult,
+} from "./dependencies/IV2AuthorizationStorage";
 export { default as IStorages } from "./dependencies/IStorages";
 export { default as IStoragesModule } from "./dependencies/IStoragesModule";
 export { default as IUsecaseConfig } from "./dependencies/IUsecaseConfig";
@@ -85,6 +92,14 @@ export {
     fromRoleTuple,
     toRoleTuple,
 } from "./entities/Role";
+export { default as V2Authorizer } from "./services/V2Authorizer";
+export {
+    V2_CAPABILITIES,
+    V2_ROLE_CAPABILITIES,
+    V2Capability,
+    V2EffectiveRole,
+    IV2RequestPrincipal,
+} from "./entities/V2Authorization";
 export {
     IUser,
     IIdpUser,

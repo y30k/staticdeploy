@@ -78,6 +78,7 @@ export interface V2AuthenticatedSession {
     subjectId: string;
     issuer: string;
     claims: Record<string, unknown>;
+    claimsVersion: number;
     csrfToken: string;
     csrfTokenDigest: string;
 }
@@ -109,6 +110,7 @@ interface SessionRow {
     subject_id: string;
     issuer: string;
     claims: Record<string, unknown>;
+    claims_version: string | number;
     csrf_token_digest: string;
     token_key_id: string;
     token_nonce: Buffer;
@@ -132,6 +134,11 @@ const digest = (value: string): string =>
 const randomOpaque = (): string => randomBytes(32).toString("base64url");
 const record = (value: unknown): value is Record<string, unknown> =>
     value !== null && typeof value === "object" && !Array.isArray(value);
+const hasControlCharacter = (value: string): boolean =>
+    [...value].some((character) => {
+        const code = character.codePointAt(0)!;
+        return code <= 31 || code === 127;
+    });
 
 const globalIpv4 = (address: string): boolean => {
     const octets = address.split(".").map(Number);
@@ -442,12 +449,8 @@ export class V2OidcSessions {
                 EXISTS (
                     SELECT 1 FROM pg_class c
                      JOIN pg_namespace n ON n.oid = c.relnamespace
-                     WHERE n.nspname = 'public'
-                       AND c.relname IN (
-                           'v2_sessions', 'v2_login_transactions',
-                           'v2_audit_events', 'knex_migrations',
-                           'knex_migrations_lock'
-                       )
+                     WHERE n.nspname <> 'information_schema'
+                       AND n.nspname !~ '^pg_(catalog|toast|temp_|toasted_temp_)'
                        AND c.relowner = r.oid
                 ) OR EXISTS (
                     SELECT 1 FROM pg_proc p
@@ -462,12 +465,9 @@ export class V2OidcSessions {
                 EXISTS (
                     SELECT 1 FROM pg_class c
                     JOIN pg_namespace n ON n.oid = c.relnamespace
-                    WHERE n.nspname = 'public'
-                      AND c.relname IN (
-                          'v2_sessions', 'v2_login_transactions',
-                          'v2_audit_events', 'knex_migrations',
-                          'knex_migrations_lock'
-                      )
+                    WHERE n.nspname <> 'information_schema'
+                      AND n.nspname !~ '^pg_(catalog|toast|temp_|toasted_temp_)'
+                      AND c.relkind IN ('r', 'p', 'v', 'm', 'f')
                       AND (
                           has_table_privilege(
                               current_user, c.oid,
@@ -482,7 +482,9 @@ export class V2OidcSessions {
                 EXISTS (
                     SELECT 1 FROM pg_proc p
                     JOIN pg_namespace n ON n.oid = p.pronamespace
-                    WHERE n.nspname = 'public' AND p.prosecdef
+                    WHERE n.nspname <> 'information_schema'
+                      AND n.nspname !~ '^pg_(catalog|toast|temp_|toasted_temp_)'
+                      AND p.prosecdef
                       AND p.prorettype NOT IN (
                         'trigger'::regtype, 'event_trigger'::regtype
                       )
@@ -495,7 +497,11 @@ export class V2OidcSessions {
                         to_regprocedure('public.v2_use_session(uuid,integer)'),
                         to_regprocedure('public.v2_rotate_session_envelope(uuid,text,text,bytea,bytea)'),
                         to_regprocedure('public.v2_revoke_session(uuid,text)'),
-                        to_regprocedure('public.v2_cleanup_auth_state(bigint,integer)')
+                        to_regprocedure('public.v2_cleanup_auth_state(bigint,integer)'),
+                        to_regprocedure('public.v2_initialize_authorization_policy(text[],bigint,text)'),
+                        to_regprocedure('public.v2_authorization_policy_identity()'),
+                        to_regprocedure('public.v2_authorize_operation(uuid,uuid,text[],bigint,uuid,text)'),
+                        to_regprocedure('public.v2_replace_bindings(uuid,uuid,text[],bigint,uuid,bigint,text,text,jsonb)')
                       ]::oid[])
                 ) as unrelated_definer_execute,
                 has_function_privilege(current_user, 'public.v2_begin_oidc_login(uuid,text,text,text,bytea,bytea,text,text,text,integer)', 'EXECUTE') as begin_ok,
@@ -675,7 +681,12 @@ export class V2OidcSessions {
             Array.isArray(payload.groups) &&
             payload.groups.length <= 256 &&
             payload.groups.every(
-                (group) => typeof group === "string" && group.length <= 512
+                (group) =>
+                    typeof group === "string" &&
+                    group.length >= 1 &&
+                    group.length <= 512 &&
+                    group.trim() === group &&
+                    !hasControlCharacter(group)
             )
         )
             claims.groups = [...new Set(payload.groups)].sort();
@@ -872,6 +883,7 @@ export class V2OidcSessions {
             subjectId: row.subject_id,
             issuer: row.issuer,
             claims: row.claims,
+            claimsVersion: Number(row.claims_version),
             csrfToken,
             csrfTokenDigest: row.csrf_token_digest,
         };

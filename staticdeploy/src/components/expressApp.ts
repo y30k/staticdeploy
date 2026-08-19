@@ -1,4 +1,8 @@
-import { IAuthenticationStrategy, IStoragesModule } from "@staticdeploy/core";
+import {
+    IAuthenticationStrategy,
+    IStoragesModule,
+    IV2AuthorizationStorage,
+} from "@staticdeploy/core";
 import {
     IUsecasesByName,
     staticServerAdapter,
@@ -20,6 +24,7 @@ export default function getExpressApp(options: {
     managementRouter: express.Router;
     storagesModule: IStoragesModule;
     usecases: IUsecasesByName;
+    v2Authorization?: IV2AuthorizationStorage;
 }): express.Application {
     const {
         authenticationStrategies,
@@ -28,6 +33,7 @@ export default function getExpressApp(options: {
         managementRouter,
         storagesModule,
         usecases,
+        v2Authorization,
     } = options;
 
     return express()
@@ -40,6 +46,7 @@ export default function getExpressApp(options: {
                 authenticationStrategies: authenticationStrategies,
                 config: { enforceAuth: config.enforceAuth },
                 storages: storagesModule.getStorages(),
+                v2Authorization,
             }),
             vhost(config.managementHostname, managementRouter),
             staticServerAdapter({ hostnameHeader: config.hostnameHeader }),

@@ -17,7 +17,8 @@ const session = {
     id: "10000000-0000-4000-8000-000000000001",
     subjectId: "subject",
     issuer: "https://idp.example",
-    claims: { sub: "subject" },
+    claims: { sub: "subject", groups: ["stable-group"] },
+    claimsVersion: 1,
     csrfToken: "csrf-browser-value",
     csrfTokenDigest: "digest",
 };
@@ -156,11 +157,13 @@ describe("M3-06 v2 session control routes", () => {
     it("AUTH-01 bridges a cookie session to API identity without a browser bearer", async () => {
         const authentication = new V2SessionAuthenticationStrategy();
         let browserAuthorization: string | undefined;
+        let principal: unknown;
         const api = express().use(
             "/api",
             requireV2ApiSession(sessions, authentication, "1kb"),
             async (req, res) => {
                 browserAuthorization = req.headers.authorization;
+                principal = (req as any).v2Principal;
                 const token = (req as any).authToken as string;
                 const user =
                     await authentication.getIdpUserFromAuthToken(token);
@@ -176,6 +179,13 @@ describe("M3-06 v2 session control routes", () => {
             idp: "https://idp.example",
         });
         expect(browserAuthorization).to.equal(undefined);
+        expect(principal).to.deep.equal({
+            sessionId: session.id,
+            subjectId: "subject",
+            issuer: "https://idp.example",
+            groups: ["stable-group"],
+            claimsVersion: 1,
+        });
     });
 
     it("AUTH-01 preserves exactly one bearer for the existing machine authentication pipeline", async () => {
@@ -226,6 +236,32 @@ describe("M3-06 v2 session control routes", () => {
             ] as any)
             .expect(401);
         expect(downstreamCalls).to.equal(2);
+        expect(databaseReads).to.equal(0);
+        expect(touches).to.equal(0);
+    });
+
+    it("AUTHZ-01 rejects browser bearer credentials on every v2 path", async () => {
+        const authentication = new V2SessionAuthenticationStrategy();
+        let downstreamCalls = 0;
+        const api = express().use(
+            "/api",
+            requireV2ApiSession(sessions, authentication, "1kb"),
+            (_req, res) => {
+                downstreamCalls++;
+                res.status(200).end();
+            }
+        );
+        for (const path of [
+            "/api/v2/applications",
+            "/api/V2/applications",
+            "/api/v2",
+            "/api/V2",
+        ])
+            await request(api)
+                .get(path)
+                .set("authorization", "Bearer browser-token")
+                .expect(401);
+        expect(downstreamCalls).to.equal(0);
         expect(databaseReads).to.equal(0);
         expect(touches).to.equal(0);
     });

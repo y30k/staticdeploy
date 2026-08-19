@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import IConfig from "../src/common/IConfig";
 import getV2Sessions from "../src/components/v2Sessions";
 import {
+    parseAdministratorGroupIds,
+    parseAuthorizationClaimsVersion,
     parseLogLevel,
     parseSessionEncryptionKeys,
     parseTrustedProxyHops,
@@ -47,6 +49,8 @@ describe("service config", () => {
             oidcSessionEncryptionKeys: [
                 { id: "key-1", key: Buffer.alloc(32, 7) },
             ],
+            oidcAdministratorGroupIds: ["stable-admin-id"],
+            oidcAuthorizationClaimsVersion: 1,
             oidcPostgresUrl: "postgres://runtime",
             oidcTrustedProxyHops: 0,
         } as IConfig;
@@ -76,6 +80,18 @@ describe("service config", () => {
         assert.equal(parseTrustedProxyHops("8"), 8);
         for (const invalid of ["", "-1", "01", "9", "1.5", "true"])
             assert.throws(() => parseTrustedProxyHops(invalid));
+    });
+
+    it("parses exact stable authorization policy configuration", () => {
+        assert.deepEqual(
+            parseAdministratorGroupIds('["z-stable","a-stable"]'),
+            ["a-stable", "z-stable"]
+        );
+        for (const invalid of ["[]", '[""]', '["duplicate","duplicate"]'])
+            assert.throws(() => parseAdministratorGroupIds(invalid));
+        assert.equal(parseAuthorizationClaimsVersion("1"), 1);
+        for (const invalid of ["0", "2", "01", "1.0"])
+            assert.throws(() => parseAuthorizationClaimsVersion(invalid));
     });
 
     it("parses only canonical 32-byte OIDC session encryption keys", () => {

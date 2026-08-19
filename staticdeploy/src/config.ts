@@ -50,6 +50,49 @@ export const parseSessionEncryptionKeys = (
     });
 };
 
+const hasControlCharacter = (value: string): boolean =>
+    [...value].some((character) => {
+        const code = character.codePointAt(0)!;
+        return code <= 31 || code === 127;
+    });
+
+export const parseAdministratorGroupIds = (value: string): string[] => {
+    let parsed: unknown;
+    try {
+        parsed = JSON.parse(value);
+    } catch {
+        throw new Error("OIDC_ADMINISTRATOR_GROUP_IDS must be valid JSON");
+    }
+    if (
+        !Array.isArray(parsed) ||
+        parsed.length < 1 ||
+        parsed.length > 32 ||
+        parsed.some(
+            (group) =>
+                typeof group !== "string" ||
+                group.length < 1 ||
+                group.length > 512 ||
+                group.trim() !== group ||
+                hasControlCharacter(group)
+        ) ||
+        new Set(parsed).size !== parsed.length
+    )
+        throw new Error(
+            "OIDC_ADMINISTRATOR_GROUP_IDS must contain unique stable group IDs"
+        );
+    return [...parsed].sort((left, right) =>
+        Buffer.compare(Buffer.from(left, "utf8"), Buffer.from(right, "utf8"))
+    );
+};
+
+export const parseAuthorizationClaimsVersion = (value: string): number => {
+    if (value !== "1")
+        throw new Error(
+            "OIDC_AUTHORIZATION_CLAIMS_VERSION must be 1 until claims-schema rotation is implemented"
+        );
+    return 1;
+};
+
 export const parseTrustedProxyHops = (value: string): number => {
     if (!/^(?:0|[1-8])$/.test(value))
         throw new Error(
@@ -115,6 +158,12 @@ export const getConfig = (): IConfig => ({
     oidcSessionPrimaryKeyId: env("OIDC_SESSION_PRIMARY_KEY_ID"),
     oidcSessionEncryptionKeys: env("OIDC_SESSION_ENCRYPTION_KEYS", {
         parse: parseSessionEncryptionKeys,
+    }),
+    oidcAdministratorGroupIds: env("OIDC_ADMINISTRATOR_GROUP_IDS", {
+        parse: parseAdministratorGroupIds,
+    }),
+    oidcAuthorizationClaimsVersion: env("OIDC_AUTHORIZATION_CLAIMS_VERSION", {
+        parse: parseAuthorizationClaimsVersion,
     }),
     oidcPostgresUrl: env("OIDC_POSTGRES_URL"),
     oidcTrustedProxyHops: env("OIDC_TRUSTED_PROXY_HOPS", {
