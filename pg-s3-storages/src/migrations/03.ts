@@ -421,6 +421,21 @@ export async function up(knex: Knex): Promise<void> {
             BEFORE INSERT OR UPDATE OR DELETE ON public.${tables.v2UploadFiles}
             FOR EACH ROW EXECUTE FUNCTION public.v2_guard_upload_file();
 
+        CREATE FUNCTION public.v2_guard_upload_truncate()
+        RETURNS trigger
+        LANGUAGE plpgsql
+        SET search_path = pg_catalog
+        AS $function$
+        BEGIN
+            RAISE EXCEPTION 'upload declarations cannot be truncated'
+                USING ERRCODE = '55000';
+        END;
+        $function$;
+
+        CREATE TRIGGER v2_upload_files_no_truncate
+            BEFORE TRUNCATE ON public.${tables.v2UploadFiles}
+            FOR EACH STATEMENT EXECUTE FUNCTION public.v2_guard_upload_truncate();
+
         CREATE FUNCTION public.v2_guard_audit_event()
         RETURNS trigger
         LANGUAGE plpgsql
@@ -563,6 +578,7 @@ export async function down(knex: Knex): Promise<void> {
         DROP TABLE IF EXISTS public.${tables.v2Releases};
         DROP TABLE IF EXISTS public.${tables.v2Applications};
         DROP FUNCTION IF EXISTS public.v2_guard_audit_event();
+        DROP FUNCTION IF EXISTS public.v2_guard_upload_truncate();
         DROP FUNCTION IF EXISTS public.v2_guard_upload_file();
         DROP FUNCTION IF EXISTS public.v2_enforce_publication_identity();
         DROP FUNCTION IF EXISTS public.v2_guard_ready_release();

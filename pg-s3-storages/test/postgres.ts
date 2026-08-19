@@ -611,6 +611,10 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 database(tables.v2UploadFiles).where({ id: uploadId }).delete(),
                 "READY release upload declarations are immutable"
             );
+            await expectDatabaseError(
+                database.raw(`truncate table public.${tables.v2UploadFiles}`),
+                "upload declarations cannot be truncated"
+            );
             await database.raw(
                 "create temporary table v2_releases (id uuid primary key, state text)"
             );
