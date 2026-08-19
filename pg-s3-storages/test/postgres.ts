@@ -74,6 +74,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "01.js",
                 "02.js",
                 "03.js",
+                "04.js",
             ]);
             expect(await applicationTables(database)).to.deep.equal([
                 "apps",
@@ -86,8 +87,14 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "v2_applications",
                 "v2_audit_events",
                 "v2_bindings",
+                "v2_idempotency",
+                "v2_outbox_transition_guards",
                 "v2_publication_guards",
+                "v2_publication_outbox",
+                "v2_release_job_transition_guards",
+                "v2_release_jobs",
                 "v2_releases",
+                "v2_sessions",
                 "v2_upload_files",
             ]);
             expect(await migrationNames(database)).to.deep.equal([
@@ -95,6 +102,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "01.js",
                 "02.js",
                 "03.js",
+                "04.js",
             ]);
 
             const foreignKeys = await database(
@@ -116,7 +124,12 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "v2_audit_events",
                 "v2_audit_events",
                 "v2_bindings",
+                "v2_outbox_transition_guards",
                 "v2_publication_guards",
+                "v2_publication_outbox",
+                "v2_publication_outbox",
+                "v2_release_job_transition_guards",
+                "v2_release_jobs",
                 "v2_releases",
                 "v2_upload_files",
             ]);
@@ -130,6 +143,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "01.js",
                 "02.js",
                 "03.js",
+                "04.js",
             ]);
         });
     });
@@ -144,12 +158,13 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             );
             const after = await legacySnapshot(database);
 
-            expect(result[1]).to.deep.equal(["03.js"]);
+            expect(result[1]).to.deep.equal(["03.js", "04.js"]);
             expect(await migrationNames(database)).to.deep.equal([
                 "00.js",
                 "01.js",
                 "02.js",
                 "03.js",
+                "04.js",
             ]);
             expect(after.rows).to.deep.equal(before.rows);
             expect(after.foreignKeys).to.deep.equal(before.foreignKeys);
@@ -189,7 +204,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const first = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(first[1]).to.deep.equal(["02.js", "03.js"]);
+            expect(first[1]).to.deep.equal(["02.js", "03.js", "04.js"]);
             expect((await database(tables.groups).first()).roles).to.deep.equal(
                 ["app-manager:application-one", "root"]
             );
@@ -206,17 +221,31 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 "01.js",
                 "02.js",
                 "03.js",
+                "04.js",
             ]);
         });
     });
 
-    it("SCH-01 reverses and reapplies only additive migration 03", async () => {
+    it("SCH-01 reverses and reapplies additive migrations 04 and 03", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
             await database(tables.apps).insert(appRow());
 
-            const down = await database.migrate.down(productionMigrationConfig);
-            expect(down[1]).to.deep.equal(["03.js"]);
+            const down04 = await database.migrate.down(
+                productionMigrationConfig
+            );
+            expect(down04[1]).to.deep.equal(["04.js"]);
+            for (const table of v2OperationalTableNames()) {
+                expect(await database.schema.hasTable(table)).to.equal(false);
+            }
+            for (const table of v2TableNames()) {
+                expect(await database.schema.hasTable(table)).to.equal(true);
+            }
+
+            const down03 = await database.migrate.down(
+                productionMigrationConfig
+            );
+            expect(down03[1]).to.deep.equal(["03.js"]);
             expect(await database.schema.hasTable(tables.apps)).to.equal(true);
             expect(await database(tables.apps).select("id")).to.deep.equal([
                 { id: "app-1" },
@@ -228,8 +257,11 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             const reapply = await database.migrate.latest(
                 productionMigrationConfig
             );
-            expect(reapply[1]).to.deep.equal(["03.js"]);
-            for (const table of v2TableNames()) {
+            expect(reapply[1]).to.deep.equal(["03.js", "04.js"]);
+            for (const table of [
+                ...v2TableNames(),
+                ...v2OperationalTableNames(),
+            ]) {
                 expect(await database.schema.hasTable(table)).to.equal(true);
             }
         });
@@ -252,6 +284,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 release_id: releaseId,
                 occurred_at: fixtureDate(),
             });
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["04.js"]);
 
             await expectDatabaseError(
                 database.migrate.down(productionMigrationConfig),
@@ -279,6 +314,9 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
     it("SCH-01 serializes rollback against concurrent v2 writers", async () => {
         await withDisposableDatabase(admin, async (database) => {
             await database.migrate.latest(productionMigrationConfig);
+            expect(
+                (await database.migrate.down(productionMigrationConfig))[1]
+            ).to.deep.equal(["04.js"]);
             const writer = await database.transaction();
             let writerCommitted = false;
             let downSettled = false;
@@ -644,7 +682,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             );
             await database(tables.v2Applications)
                 .where({ id: application.id })
-                .update({ desired_generation: 2, served_generation: 1 });
+                .update({ desired_generation: 2 });
             await expectDatabaseError(
                 database(tables.v2Applications)
                     .where({ id: application.id })
@@ -654,8 +692,8 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
             await expectDatabaseError(
                 database(tables.v2Applications)
                     .where({ id: application.id })
-                    .update({ served_generation: 0 }),
-                "application routing generations cannot decrease"
+                    .update({ served_generation: 1 }),
+                "served projection must use v2_acknowledge_publication"
             );
             await expectDatabaseError(
                 database(tables.v2Bindings).insert({
@@ -901,6 +939,1556 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                   limit 100`
             );
             expect(timeAuditPlan).to.include("v2_audit_events_time_idx");
+        });
+    });
+
+    it("M3-03 refuses operational rollback with retained data and concurrent writers", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            await database(tables.v2Sessions).insert(
+                v2SessionRow("50000000-0000-4000-8000-000000000001", now)
+            );
+            await expectDatabaseError(
+                database.migrate.down(productionMigrationConfig),
+                "migration 04 contains retained v2 operational data"
+            );
+            expect(await migrationNames(database)).to.include("04.js");
+            expect(
+                await database(tables.v2Sessions).first("subject_id")
+            ).to.deep.equal({ subject_id: "subject-1" });
+        });
+
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const writer = await database.transaction();
+            let writerCommitted = false;
+            let downSettled = false;
+            let downAttempt: Promise<unknown> | undefined;
+            try {
+                await writer(tables.v2Idempotency).insert(
+                    v2IdempotencyRow(
+                        "60000000-0000-4000-8000-000000000001",
+                        new Date()
+                    )
+                );
+                downAttempt = database.migrate
+                    .down(productionMigrationConfig)
+                    .then(
+                        (result) => {
+                            downSettled = true;
+                            return result;
+                        },
+                        (error: unknown) => {
+                            downSettled = true;
+                            return error;
+                        }
+                    );
+                await new Promise((resolve) => setTimeout(resolve, 150));
+                expect(downSettled).to.equal(false);
+                await writer.commit();
+                writerCommitted = true;
+                const result = await downAttempt;
+                expect(result).to.be.instanceOf(Error);
+                expect(errorText(result)).to.include(
+                    "expand-only rollback refused"
+                );
+            } catch (error) {
+                if (!writerCommitted) await writer.rollback();
+                await downAttempt;
+                throw error;
+            }
+            expect(
+                await database(tables.v2Idempotency).first("actor_id")
+            ).to.deep.equal({ actor_id: "actor-1" });
+        });
+    });
+
+    it("M3-03 enforces session envelope, expiry, version, and revocation guards", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const activeId = "50000000-0000-4000-8000-000000000010";
+            await database(tables.v2Sessions).insert(
+                v2SessionRow(activeId, now)
+            );
+            await database(tables.v2Sessions)
+                .where({ id: activeId })
+                .update({
+                    claims: JSON.stringify({ groups: ["publisher"] }),
+                    claims_version: 2,
+                    last_seen_at: now,
+                    idle_expires_at: new Date(now.getTime() + 7_200_000),
+                });
+            await expectDatabaseError(
+                database(tables.v2Sessions)
+                    .where({ id: activeId })
+                    .update({ claims: JSON.stringify({ groups: ["owner"] }) }),
+                "session identity and time bounds cannot regress"
+            );
+            await expectDatabaseError(
+                database(tables.v2Sessions)
+                    .where({ id: activeId })
+                    .update({ claims_version: 1 }),
+                "session identity and time bounds cannot regress"
+            );
+            await expectDatabaseError(
+                database(tables.v2Sessions).where({ id: activeId }).delete(),
+                "active session cannot be deleted"
+            );
+            await expectDatabaseError(
+                database(tables.v2Sessions).insert({
+                    ...v2SessionRow(
+                        "50000000-0000-4000-8000-000000000011",
+                        now
+                    ),
+                    token_nonce: Buffer.alloc(4),
+                }),
+                "v2_sessions_token_envelope_check"
+            );
+            await expectDatabaseError(
+                database(tables.v2Sessions).insert({
+                    ...v2SessionRow(
+                        "50000000-0000-4000-8000-000000000012",
+                        now
+                    ),
+                    token_key_id: null,
+                }),
+                "v2_sessions_token_envelope_check"
+            );
+            await expectDatabaseError(
+                database(tables.v2Sessions).insert({
+                    ...v2SessionRow(
+                        "50000000-0000-4000-8000-000000000013",
+                        now
+                    ),
+                    revoked_at: now,
+                    revocation_reason: null,
+                }),
+                "v2_sessions_revocation_check"
+            );
+            const expiredId = "50000000-0000-4000-8000-000000000014";
+            await database(tables.v2Sessions).insert({
+                ...v2SessionRow(expiredId, now),
+                created_at: new Date(now.getTime() - 10_800_000),
+                last_seen_at: new Date(now.getTime() - 7_200_000),
+                idle_expires_at: new Date(now.getTime() - 3_600_000),
+            });
+            await expectDatabaseError(
+                database(tables.v2Sessions)
+                    .where({ id: expiredId })
+                    .update({
+                        idle_expires_at: new Date(now.getTime() + 3_600_000),
+                    }),
+                "expired session is immutable"
+            );
+            await database(tables.v2Sessions).where({ id: expiredId }).delete();
+            await database(tables.v2Sessions).where({ id: activeId }).update({
+                revoked_at: now,
+                revocation_reason: "LOGOUT",
+            });
+            await expectDatabaseError(
+                database(tables.v2Sessions)
+                    .where({ id: activeId })
+                    .update({ revocation_reason: "ALTERED" }),
+                "revoked session is immutable"
+            );
+            await database(tables.v2Sessions).where({ id: activeId }).delete();
+            await expectDatabaseError(
+                database.raw(`truncate table public.${tables.v2Sessions}`),
+                "sessions cannot be truncated"
+            );
+        });
+    });
+
+    it("M3-03 enforces one immutable idempotency result under concurrency", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const attempts = await Promise.allSettled([
+                database(tables.v2Idempotency).insert(
+                    v2IdempotencyRow(
+                        "60000000-0000-4000-8000-000000000010",
+                        now
+                    )
+                ),
+                database(tables.v2Idempotency).insert({
+                    ...v2IdempotencyRow(
+                        "60000000-0000-4000-8000-000000000011",
+                        now
+                    ),
+                    request_digest: "b".repeat(64),
+                }),
+            ]);
+            expect(
+                attempts.filter((result) => result.status === "fulfilled")
+            ).to.have.length(1);
+            expect(
+                attempts.filter((result) => result.status === "rejected")
+            ).to.have.length(1);
+            const [record] = await database(tables.v2Idempotency);
+            expect(record.request_digest).to.be.oneOf([
+                "a".repeat(64),
+                "b".repeat(64),
+            ]);
+
+            const resultIds = [
+                "61000000-0000-4000-8000-000000000010",
+                "61000000-0000-4000-8000-000000000011",
+            ];
+            const completions = await Promise.all(
+                resultIds.map((resultId) =>
+                    database(tables.v2Idempotency)
+                        .where({ id: record.id, state: "IN_PROGRESS" })
+                        .update({
+                            state: "COMPLETED",
+                            result_kind: "OPERATION",
+                            result_id: resultId,
+                            result_status: "SUCCEEDED",
+                            completed_at: new Date(now.getTime() + 1_000),
+                        })
+                )
+            );
+            expect(completions.sort()).to.deep.equal([0, 1]);
+            expect(
+                (
+                    await database(tables.v2Idempotency)
+                        .where({ id: record.id })
+                        .first("result_id")
+                ).result_id
+            ).to.be.oneOf(resultIds);
+            await expectDatabaseError(
+                database(tables.v2Idempotency)
+                    .where({ id: record.id })
+                    .update({ result_status: "FAILED" }),
+                "completed idempotency result is immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2Idempotency)
+                    .where({ id: record.id })
+                    .delete(),
+                "unexpired idempotency record cannot be deleted"
+            );
+            const expiredId = "60000000-0000-4000-8000-000000000012";
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(expiredId, now),
+                actor_id: "actor-expired",
+                idempotency_key: "expired-idempotency-key",
+                created_at: new Date(now.getTime() - 7_200_000),
+                expires_at: new Date(now.getTime() - 3_600_000),
+            });
+            await expectDatabaseError(
+                database(tables.v2Idempotency).where({ id: expiredId }).update({
+                    state: "COMPLETED",
+                    result_kind: "OPERATION",
+                    result_id: "61000000-0000-4000-8000-000000000012",
+                    result_status: "SUCCEEDED",
+                    completed_at: now,
+                }),
+                "expired idempotency record is immutable"
+            );
+            await database(tables.v2Idempotency)
+                .where({ id: expiredId })
+                .delete();
+            await expectDatabaseError(
+                database.raw(
+                    `truncate table public.${tables.v2Idempotency}, public.${tables.v2PublicationOutbox}, public.${tables.v2OutboxTransitionGuards}`
+                ),
+                "idempotency records cannot be truncated"
+            );
+        });
+    });
+
+    it("M3-03 serializes release-job leases and preserves terminal state", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            await database(tables.v2Applications).insert(v2ApplicationRow());
+            const releaseId = "10000000-0000-4000-8000-000000000020";
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            const futureReleaseId = "10000000-0000-4000-8000-000000000022";
+            const futureJobId = "70000000-0000-4000-8000-000000000022";
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(futureReleaseId)
+            );
+            await database(tables.v2ReleaseJobs).insert({
+                ...v2ReleaseJobRow(futureJobId, futureReleaseId, now),
+                next_attempt_at: new Date(now.getTime() + 3_600_000),
+            });
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs)
+                    .where({ id: futureJobId })
+                    .update({
+                        state: "LEASED",
+                        lease_owner: "worker-early",
+                        lease_expires_at: new Date(now.getTime() + 7_200_000),
+                        attempt_count: 1,
+                        lease_version: 1,
+                        next_attempt_at: null,
+                    }),
+                "release job is not due for claim"
+            );
+            const jobId = "70000000-0000-4000-8000-000000000020";
+            await database(tables.v2ReleaseJobs).insert(
+                v2ReleaseJobRow(jobId, releaseId, now)
+            );
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs).insert({
+                    id: "70000000-0000-4000-8000-000000000019",
+                    release_id: releaseId,
+                    kind: "CLEANUP_QUARANTINE",
+                    state: "SUCCEEDED",
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    completed_at: now,
+                    created_at: now,
+                    updated_at: now,
+                }),
+                "release job must start pending and unclaimed"
+            );
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs).where({ id: jobId }).update({
+                    state: "SUCCEEDED",
+                    next_attempt_at: null,
+                    completed_at: now,
+                }),
+                "illegal release job state transition"
+            );
+
+            const leaseUntil = new Date(now.getTime() + 3_600_000);
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs).where({ id: jobId }).update({
+                    state: "LEASED",
+                    lease_owner: "worker-unfenced",
+                    lease_expires_at: leaseUntil,
+                    attempt_count: 1,
+                    next_attempt_at: null,
+                    updated_at: now,
+                }),
+                "release job claim must advance attempt and lease version"
+            );
+            const claims = await Promise.all([
+                database(tables.v2ReleaseJobs)
+                    .where({ id: jobId, state: "PENDING" })
+                    .update({
+                        state: "LEASED",
+                        lease_owner: "worker-a",
+                        lease_expires_at: leaseUntil,
+                        attempt_count: 1,
+                        lease_version: 1,
+                        next_attempt_at: null,
+                        updated_at: now,
+                    }),
+                database(tables.v2ReleaseJobs)
+                    .where({ id: jobId, state: "PENDING" })
+                    .update({
+                        state: "LEASED",
+                        lease_owner: "worker-b",
+                        lease_expires_at: leaseUntil,
+                        attempt_count: 1,
+                        lease_version: 1,
+                        next_attempt_at: null,
+                        updated_at: now,
+                    }),
+            ]);
+            expect(claims.sort()).to.deep.equal([0, 1]);
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs).where({ id: jobId }).update({
+                    state: "RETRY_WAIT",
+                    lease_owner: null,
+                    lease_expires_at: null,
+                    next_attempt_at: now,
+                    last_error_code: "EARLY_RETRY",
+                }),
+                "leased release job transition must use v2_finish_release_job_attempt"
+            );
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs)
+                    .where({ id: jobId })
+                    .update({
+                        lease_owner: "worker-c",
+                        lease_expires_at: new Date(now.getTime() + 7_200_000),
+                        attempt_count: 2,
+                        lease_version: 2,
+                    }),
+                "live release job lease cannot be reclaimed"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                    [jobId, "worker-a", 1, null, "NULL_OUTCOME", null, null]
+                ),
+                "release job transition arguments are invalid"
+            );
+            await database.raw(
+                "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                [jobId, "worker-a", 1, "RETRY", "EARLY_RETRY", null, null]
+            );
+            expect(
+                await database(tables.v2ReleaseJobs)
+                    .where({ id: jobId })
+                    .first("state", "attempt_count", "lease_version")
+            ).to.deep.equal({
+                state: "RETRY_WAIT",
+                attempt_count: 1,
+                lease_version: "1",
+            });
+            await database(tables.v2ReleaseJobs)
+                .where({ id: jobId, state: "RETRY_WAIT" })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-b",
+                    lease_expires_at: new Date(Date.now() + 3_600_000),
+                    attempt_count: 2,
+                    lease_version: 2,
+                    next_attempt_at: null,
+                    last_error_code: null,
+                    updated_at: new Date(),
+                });
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                    [jobId, "worker-a", 1, "SUCCEEDED", null, null, null]
+                ),
+                "active release job lease fencing does not match"
+            );
+            await database.raw(
+                "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                [jobId, "worker-b", 2, "SUCCEEDED", null, null, null]
+            );
+
+            const expiredJobId = "70000000-0000-4000-8000-000000000021";
+            const expiredUpdatedAt = new Date(now.getTime() - 7_200_000);
+            const expiredAt = new Date(Date.now() + 300);
+            await database(tables.v2ReleaseJobs).insert({
+                id: expiredJobId,
+                release_id: releaseId,
+                kind: "CLEANUP_QUARANTINE",
+                state: "PENDING",
+                max_attempts: 2,
+                next_attempt_at: expiredUpdatedAt,
+                created_at: expiredUpdatedAt,
+                updated_at: expiredUpdatedAt,
+            });
+            await database(tables.v2ReleaseJobs)
+                .where({ id: expiredJobId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-old",
+                    lease_expires_at: expiredAt,
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    updated_at: expiredUpdatedAt,
+                });
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            expect(
+                await database(tables.v2ReleaseJobs)
+                    .where({ id: expiredJobId, state: "LEASED" })
+                    .where("lease_expires_at", "<", new Date())
+                    .update({
+                        lease_owner: "worker-c",
+                        lease_expires_at: new Date(Date.now() + 2_000),
+                        attempt_count: 2,
+                        lease_version: 2,
+                        updated_at: now,
+                    })
+            ).to.equal(1);
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        expiredJobId,
+                        "worker-c",
+                        2,
+                        "RETRY",
+                        "RETRYABLE_FAILURE",
+                        null,
+                        null,
+                    ]
+                ),
+                "final release job attempt cannot be retried"
+            );
+            expect(
+                await database(tables.v2ReleaseJobs)
+                    .where({
+                        id: expiredJobId,
+                        state: "LEASED",
+                        lease_version: 1,
+                    })
+                    .update({
+                        state: "SUCCEEDED",
+                        lease_owner: null,
+                        lease_expires_at: null,
+                        next_attempt_at: null,
+                        completed_at: now,
+                        updated_at: now,
+                    })
+            ).to.equal(0);
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs)
+                    .where({
+                        id: expiredJobId,
+                        state: "LEASED",
+                        lease_version: 2,
+                    })
+                    .update({
+                        state: "SUCCEEDED",
+                        lease_owner: null,
+                        lease_expires_at: null,
+                        next_attempt_at: null,
+                        completed_at: now,
+                        updated_at: now,
+                    }),
+                "leased release job transition must use v2_finish_release_job_attempt"
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2_100));
+            await database.raw(
+                "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                [
+                    expiredJobId,
+                    "worker-c",
+                    2,
+                    "FAILED",
+                    "RETRY_EXHAUSTED",
+                    "RETRY_EXHAUSTED",
+                    null,
+                ]
+            );
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs)
+                    .where({ id: jobId })
+                    .update({ state: "FAILED", terminal_reason: "ALTERED" }),
+                "terminal release job is immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2ReleaseJobs).where({ id: jobId }).delete(),
+                "release job rows cannot be deleted"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    `truncate table public.${tables.v2ReleaseJobs}, public.${tables.v2ReleaseJobTransitionGuards}`
+                ),
+                "release jobs cannot be truncated"
+            );
+        });
+    });
+
+    it("M3-03 binds outbox payloads and makes acknowledgement immutable", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000030";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database(tables.v2Idempotency).insert(
+                v2IdempotencyRow("60000000-0000-4000-8000-000000000030", now)
+            );
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(
+                    "60000000-0000-4000-8000-000000000031",
+                    now
+                ),
+                scope: "application.unpublish",
+            });
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(
+                    "60000000-0000-4000-8000-000000000033",
+                    now
+                ),
+                idempotency_key: "idempotency-key-0033",
+                scope: "release.restore",
+            });
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({
+                    desired_current_release_id: releaseId,
+                    desired_generation: 1,
+                });
+            const outboxId = "80000000-0000-4000-8000-000000000030";
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000026",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    state: "ACKNOWLEDGED",
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    acknowledged_at: now,
+                    projection_digest: "c".repeat(64),
+                }),
+                "outbox row must start pending and unclaimed"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000023",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    operation: "RESTORE",
+                    idempotency_id: "60000000-0000-4000-8000-000000000033",
+                }),
+                "outbox release payload must match immutable READY release"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000029",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    manifest_digest: "e".repeat(64),
+                }),
+                "outbox release payload must match immutable READY release"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000028",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    operation: "UNPUBLISH",
+                }),
+                "outbox idempotency scope or state does not match operation"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000025",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    idempotency_id: "60000000-0000-4000-8000-000000000031",
+                }),
+                "outbox idempotency scope or state does not match operation"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000024",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    operation: "UNPUBLISH",
+                    idempotency_id: "60000000-0000-4000-8000-000000000031",
+                }),
+                "v2_publication_outbox_payload_check"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000027",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    idempotency_id: "60000000-0000-4000-8000-000000000099",
+                }),
+                "outbox idempotency identity not found"
+            );
+            await database(tables.v2PublicationOutbox).insert(
+                v2OutboxRow(outboxId, application, releaseId, now)
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000031",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    generation: 2,
+                }),
+                "outbox payload must match desired application generation"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        state: "FAILED",
+                        next_attempt_at: null,
+                        last_error_code: "DIRECT_FAILURE",
+                    }),
+                "illegal publication outbox state transition"
+            );
+            await database(tables.v2PublicationOutbox)
+                .where({ id: outboxId })
+                .update({
+                    next_attempt_at: new Date(now.getTime() + 3_600_000),
+                });
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        state: "LEASED",
+                        lease_owner: "worker-early",
+                        lease_expires_at: new Date(now.getTime() + 7_200_000),
+                        attempt_count: 1,
+                        lease_version: 1,
+                        next_attempt_at: null,
+                    }),
+                "publication outbox row is not due for claim"
+            );
+            await database(tables.v2PublicationOutbox)
+                .where({ id: outboxId })
+                .update({ next_attempt_at: now });
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        state: "LEASED",
+                        lease_owner: "worker-unfenced",
+                        lease_expires_at: new Date(now.getTime() + 3_600_000),
+                        attempt_count: 1,
+                        next_attempt_at: null,
+                        updated_at: now,
+                    }),
+                "outbox claim must advance attempt and lease version"
+            );
+            await database(tables.v2PublicationOutbox)
+                .where({ id: outboxId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-a",
+                    lease_expires_at: new Date(now.getTime() + 3_600_000),
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    updated_at: now,
+                });
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        state: "PENDING",
+                        lease_owner: null,
+                        lease_expires_at: null,
+                        next_attempt_at: now,
+                        last_error_code: "EARLY_RETRY",
+                    }),
+                "leased outbox transition must use a guarded function"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        lease_owner: "worker-b",
+                        lease_expires_at: new Date(now.getTime() + 7_200_000),
+                        attempt_count: 2,
+                        lease_version: 2,
+                    }),
+                "live outbox lease cannot be reclaimed"
+            );
+            const acknowledgementTime = new Date(now.getTime() + 1_000);
+            await expectDatabaseError(
+                database(tables.v2Applications)
+                    .where({ id: application.id })
+                    .update({
+                        served_current_release_id: releaseId,
+                        served_generation: 1,
+                    }),
+                "served projection must use v2_acknowledge_publication"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({
+                        state: "ACKNOWLEDGED",
+                        lease_owner: null,
+                        lease_expires_at: null,
+                        next_attempt_at: null,
+                        acknowledged_at: acknowledgementTime,
+                        projection_digest: "c".repeat(64),
+                        updated_at: acknowledgementTime,
+                    }),
+                "leased outbox transition must use a guarded function"
+            );
+            const beforeAcknowledgement = (
+                await database.raw("select clock_timestamp() as now")
+            ).rows[0].now as Date;
+            const acknowledgement = await database.raw(
+                "select public.v2_acknowledge_publication(?, ?, ?, ?) as label",
+                [outboxId, "worker-a", 1, "c".repeat(64)]
+            );
+            const afterAcknowledgement = (
+                await database.raw("select clock_timestamp() as now")
+            ).rows[0].now as Date;
+            const acknowledgedAt = (
+                await database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .first("acknowledged_at")
+            ).acknowledged_at as Date;
+            expect(acknowledgedAt.getTime()).to.be.at.least(
+                beforeAcknowledgement.getTime()
+            );
+            expect(acknowledgedAt.getTime()).to.be.at.most(
+                afterAcknowledgement.getTime()
+            );
+            expect(acknowledgement.rows[0].label).to.match(
+                /^\d{4}\.\d{2}\.\d{2}-\d{2}\.\d{2}\.\d{2}$/
+            );
+            expect(
+                await database(tables.v2Applications)
+                    .where({ id: application.id })
+                    .first("served_current_release_id", "served_generation")
+            ).to.deep.equal({
+                served_current_release_id: releaseId,
+                served_generation: "1",
+            });
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(
+                    "60000000-0000-4000-8000-000000000034",
+                    now
+                ),
+                idempotency_key: "idempotency-key-0034",
+            });
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox).insert({
+                    ...v2OutboxRow(
+                        "80000000-0000-4000-8000-000000000034",
+                        application,
+                        releaseId,
+                        now
+                    ),
+                    idempotency_id: "60000000-0000-4000-8000-000000000034",
+                }),
+                "outbox release payload must match immutable READY release"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .update({ projection_digest: "d".repeat(64) }),
+                "terminal outbox row is immutable"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .delete(),
+                "publication outbox rows cannot be deleted"
+            );
+
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({
+                    desired_current_release_id: null,
+                    desired_generation: 2,
+                });
+            await database.raw(
+                "create temporary table v2_applications (id uuid primary key)"
+            );
+            const tombstoneId = "80000000-0000-4000-8000-000000000032";
+            const tombstoneIdempotencyId =
+                "60000000-0000-4000-8000-000000000032";
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(tombstoneIdempotencyId, now),
+                idempotency_key: "idempotency-key-0032",
+                scope: "application.unpublish",
+            });
+            const tombstoneCreatedAt = new Date(now.getTime() - 7_200_000);
+            await database(tables.v2PublicationOutbox).insert({
+                id: tombstoneId,
+                application_id: application.id,
+                routing_id: application.routing_id,
+                generation: 2,
+                operation: "UNPUBLISH",
+                idempotency_id: tombstoneIdempotencyId,
+                payload_kind: "TOMBSTONE",
+                max_attempts: 3,
+                created_at: tombstoneCreatedAt,
+                updated_at: tombstoneCreatedAt,
+                next_attempt_at: tombstoneCreatedAt,
+            });
+            await database.raw("drop table pg_temp.v2_applications");
+            await database(tables.v2PublicationOutbox)
+                .where({ id: tombstoneId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-old",
+                    lease_expires_at: new Date(Date.now() + 300),
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    updated_at: tombstoneCreatedAt,
+                });
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            await database(tables.v2PublicationOutbox)
+                .where({ id: tombstoneId, state: "LEASED" })
+                .where("lease_expires_at", "<", new Date())
+                .update({
+                    lease_owner: "worker-tombstone",
+                    lease_expires_at: new Date(now.getTime() + 3_600_000),
+                    attempt_count: 2,
+                    lease_version: 2,
+                    updated_at: now,
+                });
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_acknowledge_publication(?, ?, ?, ?)",
+                    [tombstoneId, "worker-old", 1, "d".repeat(64)]
+                ),
+                "active outbox lease fencing does not match"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                    [
+                        tombstoneId,
+                        "worker-tombstone",
+                        2,
+                        null,
+                        "NULL_OUTCOME",
+                        null,
+                    ]
+                ),
+                "publication attempt arguments are invalid"
+            );
+            await database.raw(
+                "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                [
+                    tombstoneId,
+                    "worker-tombstone",
+                    2,
+                    "RETRY",
+                    "RETRYABLE_FAILURE",
+                    null,
+                ]
+            );
+            await database(tables.v2PublicationOutbox)
+                .where({ id: tombstoneId, state: "PENDING" })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-final",
+                    lease_expires_at: new Date(Date.now() + 2_000),
+                    attempt_count: 3,
+                    lease_version: 3,
+                    next_attempt_at: null,
+                    last_error_code: null,
+                    updated_at: new Date(),
+                });
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                    [
+                        tombstoneId,
+                        "worker-final",
+                        3,
+                        "RETRY",
+                        "RETRYABLE_FAILURE",
+                        null,
+                    ]
+                ),
+                "final publication attempt cannot be retried"
+            );
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({ desired_generation: 3 });
+            await expectDatabaseError(
+                database.raw(
+                    "select public.v2_acknowledge_publication(?, ?, ?, ?)",
+                    [tombstoneId, "worker-final", 3, "d".repeat(64)]
+                ),
+                "outbox generation is no longer desired"
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: tombstoneId })
+                    .update({
+                        state: "FAILED",
+                        lease_owner: null,
+                        lease_expires_at: null,
+                        next_attempt_at: null,
+                        last_error_code: "RETRY_EXHAUSTED",
+                    }),
+                "leased outbox transition must use a guarded function"
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2_100));
+            await database.raw(
+                "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                [
+                    tombstoneId,
+                    "worker-final",
+                    3,
+                    "FAILED",
+                    "RETRY_EXHAUSTED",
+                    null,
+                ]
+            );
+            await expectDatabaseError(
+                database(tables.v2PublicationOutbox)
+                    .where({ id: tombstoneId })
+                    .update({ last_error_code: "ALTERED" }),
+                "terminal outbox row is immutable"
+            );
+            await expectDatabaseError(
+                database.raw(
+                    `truncate table public.${tables.v2PublicationOutbox}, public.${tables.v2OutboxTransitionGuards}`
+                ),
+                "publication outbox cannot be truncated"
+            );
+        });
+    });
+
+    it("M3-03 enforces worker transition privilege boundaries", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000036";
+            const jobId = "70000000-0000-4000-8000-000000000036";
+            const outboxId = "80000000-0000-4000-8000-000000000036";
+            const idempotencyId = "60000000-0000-4000-8000-000000000036";
+            const role = `m303_worker_${randomBytes(6).toString("hex")}`;
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(idempotencyId, now),
+                idempotency_key: "idempotency-key-0036",
+            });
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({
+                    desired_current_release_id: releaseId,
+                    desired_generation: 1,
+                });
+            await database(tables.v2ReleaseJobs).insert(
+                v2ReleaseJobRow(jobId, releaseId, now)
+            );
+            await database(tables.v2ReleaseJobs)
+                .where({ id: jobId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-role",
+                    lease_expires_at: new Date(now.getTime() + 3_600_000),
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                });
+            await database(tables.v2PublicationOutbox).insert({
+                ...v2OutboxRow(outboxId, application, releaseId, now),
+                idempotency_id: idempotencyId,
+            });
+            await database(tables.v2PublicationOutbox)
+                .where({ id: outboxId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-role",
+                    lease_expires_at: new Date(now.getTime() + 3_600_000),
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                });
+
+            await database.raw("create role ?? nologin", [role]);
+            try {
+                await database.raw("grant usage on schema public to ??", [
+                    role,
+                ]);
+                await database.raw(
+                    `grant select, update on public.${tables.v2ReleaseJobs}, public.${tables.v2PublicationOutbox} to ??`,
+                    [role]
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            `select * from public.${tables.v2ReleaseJobTransitionGuards}`
+                        );
+                    }),
+                    `permission denied for table ${tables.v2ReleaseJobTransitionGuards}`
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction(tables.v2ReleaseJobs)
+                            .where({ id: jobId })
+                            .update({
+                                state: "SUCCEEDED",
+                                lease_owner: null,
+                                lease_expires_at: null,
+                                next_attempt_at: null,
+                                completed_at: new Date(),
+                            });
+                    }),
+                    "leased release job transition must use v2_finish_release_job_attempt"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction(tables.v2PublicationOutbox)
+                            .where({ id: outboxId })
+                            .update({
+                                state: "FAILED",
+                                lease_owner: null,
+                                lease_expires_at: null,
+                                next_attempt_at: null,
+                                last_error_code: "DIRECT_FAILURE",
+                            });
+                    }),
+                    "leased outbox transition must use a guarded function"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                            [
+                                jobId,
+                                "worker-role",
+                                1,
+                                "SUCCEEDED",
+                                null,
+                                null,
+                                null,
+                            ]
+                        );
+                    }),
+                    "permission denied for function v2_finish_release_job_attempt"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                            [
+                                outboxId,
+                                "worker-role",
+                                1,
+                                "FAILED",
+                                "WORKER_FAILURE",
+                                null,
+                            ]
+                        );
+                    }),
+                    "permission denied for function v2_finish_publication_attempt"
+                );
+
+                await database.raw(
+                    `grant execute on function public.v2_finish_release_job_attempt(uuid, text, bigint, text, text, text, timestamptz) to ??`,
+                    [role]
+                );
+                await database.raw(
+                    `grant execute on function public.v2_finish_publication_attempt(uuid, text, bigint, text, text, timestamptz) to ??`,
+                    [role]
+                );
+                await database.transaction(async (transaction) => {
+                    await transaction.raw("set local role ??", [role]);
+                    await transaction.raw(
+                        "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
+                        [jobId, "worker-role", 1, "SUCCEEDED", null, null, null]
+                    );
+                    await transaction.raw(
+                        "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
+                        [
+                            outboxId,
+                            "worker-role",
+                            1,
+                            "FAILED",
+                            "WORKER_FAILURE",
+                            null,
+                        ]
+                    );
+                });
+            } finally {
+                await database.raw("drop owned by ??", [role]);
+                await database.raw("drop role ??", [role]);
+            }
+            expect(
+                await database(tables.v2ReleaseJobs)
+                    .where({ id: jobId })
+                    .first("state")
+            ).to.deep.equal({ state: "SUCCEEDED" });
+            expect(
+                await database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .first("state")
+            ).to.deep.equal({ state: "FAILED" });
+        });
+    });
+
+    it("M3-03 retains copied outbox identity after idempotency expiry cleanup", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000035";
+            const outboxId = "80000000-0000-4000-8000-000000000035";
+            const idempotencyId = "60000000-0000-4000-8000-000000000035";
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database(tables.v2Idempotency).insert({
+                ...v2IdempotencyRow(idempotencyId, now),
+                idempotency_key: "idempotency-key-0035",
+                expires_at: new Date(now.getTime() + 1_500),
+            });
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({
+                    desired_current_release_id: releaseId,
+                    desired_generation: 1,
+                });
+            await database(tables.v2PublicationOutbox).insert({
+                ...v2OutboxRow(outboxId, application, releaseId, now),
+                idempotency_id: idempotencyId,
+            });
+
+            await new Promise((resolve) => setTimeout(resolve, 1_600));
+            await database(tables.v2Idempotency)
+                .where({ id: idempotencyId })
+                .delete();
+            expect(
+                await database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .first("idempotency_id")
+            ).to.deep.equal({ idempotency_id: idempotencyId });
+        });
+    });
+
+    it("M3-03 enforces the acknowledgement privilege boundary", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            const now = new Date();
+            const application = v2ApplicationRow();
+            const releaseId = "10000000-0000-4000-8000-000000000040";
+            const outboxId = "80000000-0000-4000-8000-000000000040";
+            const idempotencyId = "60000000-0000-4000-8000-000000000040";
+            const role = `m303_${randomBytes(8).toString("hex")}`;
+            await database(tables.v2Applications).insert(application);
+            await database(tables.v2Releases).insert(
+                v2ReadyReleaseRow(releaseId)
+            );
+            await database(tables.v2Idempotency).insert(
+                v2IdempotencyRow(idempotencyId, now)
+            );
+            await database(tables.v2Applications)
+                .where({ id: application.id })
+                .update({
+                    desired_current_release_id: releaseId,
+                    desired_generation: 1,
+                });
+            await database(tables.v2PublicationOutbox).insert({
+                ...v2OutboxRow(outboxId, application, releaseId, now),
+                idempotency_id: idempotencyId,
+            });
+            await database(tables.v2PublicationOutbox)
+                .where({ id: outboxId })
+                .update({
+                    state: "LEASED",
+                    lease_owner: "worker-privilege",
+                    lease_expires_at: new Date(now.getTime() + 3_600_000),
+                    attempt_count: 1,
+                    lease_version: 1,
+                    next_attempt_at: null,
+                    updated_at: now,
+                });
+
+            await database.raw("create role ?? nologin", [role]);
+            try {
+                await database.raw("grant usage on schema public to ??", [
+                    role,
+                ]);
+                await database.raw(
+                    `grant select, update on public.${tables.v2PublicationOutbox} to ??`,
+                    [role]
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            `select * from public.${tables.v2OutboxTransitionGuards}`
+                        );
+                    }),
+                    `permission denied for table ${tables.v2OutboxTransitionGuards}`
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction.raw(
+                            "select public.v2_acknowledge_publication(?, ?, ?, ?)",
+                            [outboxId, "worker-privilege", 1, "e".repeat(64)]
+                        );
+                    }),
+                    "permission denied for function v2_acknowledge_publication"
+                );
+                await expectDatabaseError(
+                    database.transaction(async (transaction) => {
+                        await transaction.raw("set local role ??", [role]);
+                        await transaction(tables.v2PublicationOutbox)
+                            .where({ id: outboxId })
+                            .update({
+                                state: "ACKNOWLEDGED",
+                                lease_owner: null,
+                                lease_expires_at: null,
+                                next_attempt_at: null,
+                                acknowledged_at: new Date(
+                                    now.getTime() + 1_000
+                                ),
+                                projection_digest: "e".repeat(64),
+                            });
+                    }),
+                    "leased outbox transition must use a guarded function"
+                );
+
+                await database.raw(
+                    `grant execute on function public.v2_acknowledge_publication(uuid, text, bigint, text) to ??`,
+                    [role]
+                );
+                await database.transaction(async (transaction) => {
+                    await transaction.raw("set local role ??", [role]);
+                    await transaction.raw(
+                        "select public.v2_acknowledge_publication(?, ?, ?, ?)",
+                        [outboxId, "worker-privilege", 1, "e".repeat(64)]
+                    );
+                });
+            } finally {
+                await database.raw("drop owned by ??", [role]);
+                await database.raw("drop role ??", [role]);
+            }
+            expect(
+                await database(tables.v2PublicationOutbox)
+                    .where({ id: outboxId })
+                    .first("state")
+            ).to.deep.equal({ state: "ACKNOWLEDGED" });
+        });
+    });
+
+    it("M3-03 uses operational expiry, claim, and generation indexes", async () => {
+        await withDisposableDatabase(admin, async (database) => {
+            await database.migrate.latest(productionMigrationConfig);
+            await database.raw(`
+                INSERT INTO public.${tables.v2Sessions}
+                    (id, subject_id, issuer, claims, claims_version,
+                     csrf_token_digest, created_at, last_seen_at,
+                     idle_expires_at, absolute_expires_at)
+                SELECT
+                    ('50000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'subject-' || lpad((i % 100)::text, 3, '0'),
+                    'https://issuer.example.test', '{}'::jsonb, 1,
+                    repeat('a', 64),
+                    transaction_timestamp() - interval '1 hour',
+                    transaction_timestamp() - interval '30 minutes',
+                    transaction_timestamp() + (i + 1) * interval '1 minute',
+                    transaction_timestamp() + interval '30 days'
+                FROM generate_series(1, 5000) AS generated(i);
+
+                INSERT INTO public.${tables.v2Idempotency}
+                    (id, actor_id, scope, idempotency_key, request_digest,
+                     created_at, expires_at)
+                SELECT
+                    ('60000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'actor-' || lpad((i % 100)::text, 3, '0'),
+                    'release.publish',
+                    'idempotency-key-' || lpad(i::text, 8, '0'),
+                    repeat('b', 64),
+                    transaction_timestamp() - i * interval '1 second',
+                    transaction_timestamp() + interval '1 day'
+                FROM generate_series(1, 10000) AS generated(i);
+
+                INSERT INTO public.${tables.v2Applications}
+                    (id, name, routing_id, created_at, updated_at)
+                SELECT
+                    ('01000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'operational-app-' || lpad(i::text, 4, '0'),
+                    ('02000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    transaction_timestamp(), transaction_timestamp()
+                FROM generate_series(1, 2000) AS generated(i);
+
+                INSERT INTO public.${tables.v2Releases}
+                    (id, application_id, state, default_path, manifest_digest,
+                     finalized_at, created_at, updated_at)
+                SELECT
+                    ('03000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    ('01000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'READY', 'index.html', repeat('c', 64),
+                    transaction_timestamp(), transaction_timestamp(),
+                    transaction_timestamp()
+                FROM generate_series(1, 2000) AS generated(i);
+
+                INSERT INTO public.${tables.v2ReleaseJobs}
+                    (id, release_id, state, next_attempt_at,
+                     created_at, updated_at)
+                SELECT
+                    ('70000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    ('03000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'PENDING', transaction_timestamp() - i * interval '1 second',
+                    transaction_timestamp(), transaction_timestamp()
+                FROM generate_series(1, 2000) AS generated(i);
+
+                UPDATE public.${tables.v2Applications} AS application
+                   SET desired_current_release_id = release.id,
+                       desired_generation = 1
+                  FROM public.${tables.v2Releases} AS release
+                 WHERE release.application_id = application.id;
+
+                WITH numbered AS (
+                    SELECT application.*,
+                           row_number() OVER (ORDER BY application.id) AS i
+                      FROM public.${tables.v2Applications} AS application
+                )
+                INSERT INTO public.${tables.v2PublicationOutbox}
+                    (id, application_id, routing_id, release_id, generation,
+                     operation, idempotency_id, payload_kind, manifest_digest,
+                     object_prefix, state, next_attempt_at, created_at, updated_at)
+                SELECT
+                    ('80000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    id, routing_id, desired_current_release_id, 1,
+                    'PUBLISH',
+                    ('60000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
+                    'RELEASE', repeat('c', 64),
+                    'v2/releases/' || id::text || '/' ||
+                        desired_current_release_id::text,
+                    'PENDING', transaction_timestamp() - i * interval '1 second',
+                    transaction_timestamp(), transaction_timestamp()
+                FROM numbered;
+
+                UPDATE public.${tables.v2Sessions}
+                   SET revoked_at = transaction_timestamp(),
+                       revocation_reason = 'PLAN_CLEANUP'
+                 WHERE id IN (
+                    SELECT id FROM public.${tables.v2Sessions}
+                    ORDER BY id LIMIT 500
+                 );
+
+                UPDATE public.${tables.v2ReleaseJobs}
+                   SET state = 'LEASED',
+                       lease_owner = 'plan-worker',
+                       lease_expires_at = transaction_timestamp() + interval '1 hour',
+                       attempt_count = 1,
+                       lease_version = 1,
+                       next_attempt_at = NULL
+                 WHERE id IN (
+                    SELECT id FROM public.${tables.v2ReleaseJobs}
+                    ORDER BY id LIMIT 100
+                 );
+
+                UPDATE public.${tables.v2PublicationOutbox}
+                   SET state = 'LEASED',
+                       lease_owner = 'plan-worker',
+                       lease_expires_at = transaction_timestamp() + interval '1 hour',
+                       attempt_count = 1,
+                       lease_version = 1,
+                       next_attempt_at = NULL
+                 WHERE id IN (
+                    SELECT id FROM public.${tables.v2PublicationOutbox}
+                    ORDER BY id LIMIT 100
+                 );
+
+                ANALYZE public.${tables.v2Sessions};
+                ANALYZE public.${tables.v2Idempotency};
+                ANALYZE public.${tables.v2ReleaseJobs};
+                ANALYZE public.${tables.v2PublicationOutbox};
+            `);
+
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2Sessions}
+                      where subject_id = 'subject-001'
+                        and revoked_at is null
+                      order by absolute_expires_at, id
+                      limit 50`
+                )
+            ).to.include("v2_sessions_subject_active_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2Sessions}
+                      where revoked_at is null
+                      order by idle_expires_at, absolute_expires_at, id
+                      limit 50`
+                )
+            ).to.include("v2_sessions_active_expiry_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2Sessions}
+                      where revoked_at is not null
+                      order by revoked_at, id
+                      limit 50`
+                )
+            ).to.include("v2_sessions_revoked_cleanup_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2Idempotency}
+                      where actor_id = 'actor-001'
+                        and scope = 'release.publish'
+                      order by created_at desc, id desc
+                      limit 50`
+                )
+            ).to.include("v2_idempotency_actor_scope_created_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2Idempotency}
+                      order by expires_at, id
+                      limit 50`
+                )
+            ).to.include("v2_idempotency_expiry_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2ReleaseJobs}
+                      where state = 'PENDING'
+                      order by next_attempt_at, created_at, id
+                      limit 50`
+                )
+            ).to.include("v2_release_jobs_claim_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2ReleaseJobs}
+                      where state = 'LEASED'
+                      order by lease_expires_at, id
+                      limit 50`
+                )
+            ).to.include("v2_release_jobs_lease_expiry_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2PublicationOutbox}
+                      where state = 'PENDING'
+                      order by next_attempt_at, created_at, id
+                      limit 50`
+                )
+            ).to.include("v2_publication_outbox_claim_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2PublicationOutbox}
+                      where state = 'LEASED'
+                      order by lease_expires_at, id
+                      limit 50`
+                )
+            ).to.include("v2_publication_outbox_lease_expiry_idx");
+            expect(
+                await explainText(
+                    database,
+                    `select id from public.${tables.v2PublicationOutbox}
+                      order by application_id, generation desc, id desc
+                      limit 50`
+                )
+            ).to.include("v2_publication_outbox_application_generation_idx");
         });
     });
 
@@ -1289,7 +2877,7 @@ async function prepareProductionMigrationConfig(): Promise<{
         const fallbackDirectory = await mkdtemp(
             join(tmpdir(), "staticdeploy-migration-wrappers-")
         );
-        for (const name of ["00", "01", "02", "03"]) {
+        for (const name of ["00", "01", "02", "03", "04"]) {
             const sourcePath = join(__dirname, `../src/migrations/${name}.ts`);
             await writeFile(
                 join(fallbackDirectory, `${name}.js`),
@@ -1413,6 +3001,17 @@ function v2TableNames(): string[] {
     ];
 }
 
+function v2OperationalTableNames(): string[] {
+    return [
+        tables.v2Idempotency,
+        tables.v2OutboxTransitionGuards,
+        tables.v2PublicationOutbox,
+        tables.v2ReleaseJobTransitionGuards,
+        tables.v2ReleaseJobs,
+        tables.v2Sessions,
+    ];
+}
+
 function v2ApplicationRow() {
     return {
         id: "00000000-0000-4000-8000-000000000001",
@@ -1436,6 +3035,72 @@ function v2ReadyReleaseRow(id: string) {
         finalized_at: fixtureDate(),
         created_at: fixtureDate(),
         updated_at: fixtureDate(),
+    };
+}
+
+function v2SessionRow(id: string, now: Date) {
+    return {
+        id,
+        subject_id: "subject-1",
+        issuer: "https://issuer.example.test",
+        claims: JSON.stringify({ groups: ["viewer"] }),
+        claims_version: 1,
+        csrf_token_digest: "d".repeat(64),
+        token_key_id: "session-key-1",
+        token_nonce: Buffer.alloc(12, 0x11),
+        encrypted_token_material: Buffer.alloc(32, 0x22),
+        created_at: new Date(now.getTime() - 3_600_000),
+        last_seen_at: new Date(now.getTime() - 1_800_000),
+        idle_expires_at: new Date(now.getTime() + 3_600_000),
+        absolute_expires_at: new Date(now.getTime() + 86_400_000),
+    };
+}
+
+function v2IdempotencyRow(id: string, now: Date) {
+    return {
+        id,
+        actor_id: "actor-1",
+        scope: "release.publish",
+        idempotency_key: "idempotency-key-0001",
+        request_digest: "a".repeat(64),
+        created_at: new Date(now.getTime() - 1_000),
+        expires_at: new Date(now.getTime() + 86_400_000),
+    };
+}
+
+function v2ReleaseJobRow(id: string, releaseId: string, now: Date) {
+    return {
+        id,
+        release_id: releaseId,
+        kind: "PROCESS_RELEASE",
+        state: "PENDING",
+        next_attempt_at: now,
+        created_at: now,
+        updated_at: now,
+    };
+}
+
+function v2OutboxRow(
+    id: string,
+    application: ReturnType<typeof v2ApplicationRow>,
+    releaseId: string,
+    now: Date
+) {
+    return {
+        id,
+        application_id: application.id,
+        routing_id: application.routing_id,
+        release_id: releaseId,
+        generation: 1,
+        operation: "PUBLISH",
+        idempotency_id: "60000000-0000-4000-8000-000000000030",
+        payload_kind: "RELEASE",
+        manifest_digest: "b".repeat(64),
+        object_prefix: `v2/releases/${application.id}/${releaseId}`,
+        state: "PENDING",
+        next_attempt_at: now,
+        created_at: now,
+        updated_at: now,
     };
 }
 

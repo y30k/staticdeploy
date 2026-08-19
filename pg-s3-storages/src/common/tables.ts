@@ -9,7 +9,13 @@ export default {
     v2Applications: "v2_applications",
     v2AuditEvents: "v2_audit_events",
     v2Bindings: "v2_bindings",
+    v2Idempotency: "v2_idempotency",
+    v2OutboxTransitionGuards: "v2_outbox_transition_guards",
+    v2ReleaseJobTransitionGuards: "v2_release_job_transition_guards",
     v2PublicationGuards: "v2_publication_guards",
+    v2PublicationOutbox: "v2_publication_outbox",
+    v2ReleaseJobs: "v2_release_jobs",
     v2Releases: "v2_releases",
+    v2Sessions: "v2_sessions",
     v2UploadFiles: "v2_upload_files",
 };
