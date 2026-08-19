@@ -129,12 +129,14 @@ omissions.
   issuer, audience, normalized host, app/release IDs, `iat`/`nbf`, exact
   `exchange_exp`/`session_exp`, same signed token in the exact preview cookie,
   303 query stripping before subresources, app/proxy/CDN leakage canaries,
-  third-party-cookie fallback, rejection outside each window, and explicitly
-  accepted in-window URL/cookie replay residuals.
+  fail-closed denial when the embedded preview cookie is blocked, rejection
+  outside each window, and explicitly accepted in-window URL/cookie replay
+  residuals.
 - `TM-ISO-01` — minimum M4 CSP/header matrix for
   preview/published/assets/errors; exact `allow-scripts allow-forms` preview
   sandbox; popup, opener, top navigation, storage, service-worker,
-  connect/form/object/base/worker denial.
+  connect/form/object/base/worker denial; fresh never-used published origin
+  evidence and permanent retirement of any origin that ever allowed workers.
 - `TM-PROJ-01` — routing signature/key/purpose/cross-field validation,
   cross-application substitution, in-process generation rollback denial, and
   detectable cold/new/lagging-replica valid-generation replay.
