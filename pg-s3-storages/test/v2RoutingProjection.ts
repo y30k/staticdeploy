@@ -126,12 +126,15 @@ function canonicalForTest(value: unknown): string {
         .join(",")}}`;
 }
 
-function manifest(): Buffer {
+function manifest(
+    manifestApplicationId = applicationId,
+    manifestReleaseId = releaseId
+): Buffer {
     return Buffer.from(
         JSON.stringify({
             version: 1,
-            applicationId,
-            releaseId,
+            applicationId: manifestApplicationId,
+            releaseId: manifestReleaseId,
             defaultPath: "index.html",
             files: [
                 {
@@ -151,6 +154,39 @@ describe("M3-08 routing projection", () => {
         const active = signingKey("routing-1");
         const overlap = signingKey("routing-old", "OVERLAP");
         const signer = new V2RoutingSigner([active, overlap]);
+        const futureActive = signingKey(
+            "routing-future",
+            "ACTIVE",
+            "2027-01-01T00:00:00.000Z",
+            later
+        );
+        const earlierOverlap = signingKey(
+            "routing-earlier",
+            "OVERLAP",
+            "2025-01-01T00:00:00.000Z",
+            later
+        );
+        const laterOverlap = signingKey(
+            "routing-later",
+            "OVERLAP",
+            "2026-01-01T00:00:00.000Z",
+            later
+        );
+        const backlogIssuedAt = new Date("2026-08-19T00:00:00.000Z");
+        expect(
+            new V2RoutingSigner([
+                futureActive,
+                earlierOverlap,
+                laterOverlap,
+            ]).kidForIssueTime(backlogIssuedAt)
+        ).to.equal("routing-later");
+        expect(
+            new V2RoutingSigner([
+                laterOverlap,
+                futureActive,
+                earlierOverlap,
+            ]).kidForIssueTime(backlogIssuedAt)
+        ).to.equal("routing-later");
         const projected = lease();
         const body = new V2RoutingProjector(
             {} as S3Client,
@@ -195,6 +231,9 @@ describe("M3-08 routing projection", () => {
                     .payload
             )
         ).to.throw("not valid");
+        expect(() => expiredSigner.kidForIssueTime(backlogIssuedAt)).to.throw(
+            "no routing signing key"
+        );
     });
 
     it("TM-PROJ-01: rejects tampering, wrong host/context, extra members, algorithms and noncanonical envelopes", () => {
@@ -2078,6 +2117,82 @@ describe("M3-08 routing projection", () => {
                 "LAST_KNOWN_GOOD"
             );
         });
+
+        it("projects a pre-rotation backlog with the overlap key valid at its immutable issue time", async () => {
+            const backlogApplicationId = randomUUID();
+            const backlogRoutingId = randomUUID();
+            const backlogReleaseId = randomUUID();
+            const backlogHost = normalizeV2RoutingHost(
+                `route-${backlogRoutingId}.fixture.invalid`
+            );
+            const backlogManifest = manifest(
+                backlogApplicationId,
+                backlogReleaseId
+            );
+            const backlogManifestDigest = createHash("sha256")
+                .update(backlogManifest)
+                .digest("hex");
+            await seedApplication(knex, backlogManifestDigest, {
+                applicationId: backlogApplicationId,
+                routingId: backlogRoutingId,
+                releaseId: backlogReleaseId,
+            });
+            await admin.send(
+                new PutObjectCommand({
+                    Bucket: bucket,
+                    Key: `v2/releases/${backlogApplicationId}/${backlogReleaseId}/manifest.json`,
+                    Body: backlogManifest,
+                    IfNoneMatch: "*",
+                })
+            );
+            const requestDigest = "4".repeat(64);
+            const idempotencyId = await seedIdempotency(
+                knex,
+                "release.publish",
+                requestDigest
+            );
+            const requested = await queue.request({
+                actor: principal(),
+                applicationId: backlogApplicationId,
+                routingHost: backlogHost,
+                releaseId: backlogReleaseId,
+                operation: "PUBLISH",
+                idempotencyId,
+                requestDigest,
+            });
+            const claimed = await claimForApplication(
+                queue,
+                requested.id,
+                "worker-key-rotation"
+            );
+            const issuedAt = claimed.createdAt.getTime();
+            const oldOverlap = signingKey(
+                "routing-pre-rotation",
+                "OVERLAP",
+                new Date(issuedAt - 86_400_000).toISOString(),
+                new Date(issuedAt + 86_400_000).toISOString()
+            );
+            const newActive = signingKey(
+                "routing-post-rotation",
+                "ACTIVE",
+                new Date(issuedAt + 1_000).toISOString(),
+                new Date(issuedAt + 31_536_000_000).toISOString()
+            );
+            const rotationSigner = new V2RoutingSigner([newActive, oldOverlap]);
+            const receipt = await new V2PublicationWorker(
+                queue,
+                new V2RoutingProjector(workerS3, bucket, rotationSigner),
+                rotationSigner
+            ).apply(claimed);
+            expect(receipt.document.kid).to.equal("routing-pre-rotation");
+            expect(
+                (
+                    await knex("v2_publication_outbox")
+                        .where({ id: requested.id })
+                        .first()
+                ).routing_kid
+            ).to.equal("routing-pre-rotation");
+        });
     });
 });
 
@@ -2140,25 +2255,30 @@ async function seedAuthorization(knex: Knex): Promise<void> {
 }
 async function seedApplication(
     knex: Knex,
-    manifestDigest: string
+    manifestDigest: string,
+    identities: {
+        applicationId: string;
+        routingId: string;
+        releaseId: string;
+    } = { applicationId, routingId, releaseId }
 ): Promise<void> {
     await knex("v2_applications")
         .insert({
-            id: applicationId,
+            id: identities.applicationId,
             name: `m308-${randomUUID()}`,
             description: "",
             tags: JSON.stringify([]),
             owner_metadata: JSON.stringify({}),
             visibility: "INTERNAL",
             status: "ACTIVE",
-            routing_id: routingId,
+            routing_id: identities.routingId,
         })
         .onConflict("id")
         .ignore();
     await knex("v2_releases")
         .insert({
-            id: releaseId,
-            application_id: applicationId,
+            id: identities.releaseId,
+            application_id: identities.applicationId,
             state: "READY",
             default_path: "index.html",
             manifest_digest: manifestDigest,

@@ -42,8 +42,8 @@ result, disjointness, object-source, and plan contracts without services.
 The accepted raw report, including samples and full
 `EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)` plans, is retained at
 [`evidence/m3-08-routing-projection-baseline.json`](evidence/m3-08-routing-projection-baseline.json).
-It binds source HEAD `2506916153689b1b5acdacbb72a6cebd50cc37b2`, tested staged
-tree `ef13182ba43a973f7a0f15d17c0b2573698566b0`, and SHA-256 digests for the
+It binds source HEAD `600f38931d11dc1c23807bd0ef87b956c61901fc`, tested staged
+tree `4a1c92e3f39f32fc0399b1c1cf145e22ee96cd3b`, and SHA-256 digests for the
 migration, projection runtime/test, benchmark/contract test, MinIO policy
 fixture, and the executed compiled index/projection/migration artifacts. Adding
 this evidence file changes the final Git tree but not any tested executable
@@ -78,16 +78,16 @@ artifact; artifact digests provide the non-recursive exact-candidate binding.
 
 | Path                                 | Iterations |  min ms |  p50 ms |  p95 ms |  max ms | mean ms | p95 budget |
 | ------------------------------------ | ---------: | ------: | ------: | ------: | ------: | ------: | ---------: |
-| Pending claim batch 1                |         20 |  55.285 |  55.973 |  58.066 |  64.483 |  56.771 |     100 ms |
-| Pending claim batch 100              |         20 |  88.315 |  90.469 |  93.366 |  95.409 |  90.831 |     200 ms |
-| Expired-lease claim batch 100        |         20 |  64.954 |  67.021 |  69.885 |  70.668 |  67.200 |     200 ms |
-| Mixed pending/expired batch 100      |         20 |  67.492 |  68.616 |  71.217 |  78.895 |  69.345 |     200 ms |
-| 8 concurrent batch-100 claimers      |         15 | 154.903 | 163.093 | 181.436 | 181.436 | 164.503 |     400 ms |
-| `assertKeyRetirable` query           |         20 |   8.681 |   8.741 |  10.025 |  10.079 |   8.904 |      20 ms |
-| Reconciliation database query        |         20 |   1.122 |   1.266 |   1.387 |   1.387 |   1.263 |      10 ms |
-| Content refresh, 1,024-file manifest |         25 |  70.590 |  73.152 |  92.799 |  92.839 |  76.415 |     200 ms |
+| Pending claim batch 1                |         20 |  55.224 |  56.003 |  57.260 |  59.920 |  56.133 |     100 ms |
+| Pending claim batch 100              |         20 |  86.840 |  89.118 |  92.404 |  94.582 |  89.447 |     200 ms |
+| Expired-lease claim batch 100        |         20 |  64.395 |  66.974 |  69.442 |  69.556 |  67.124 |     200 ms |
+| Mixed pending/expired batch 100      |         20 |  73.721 |  75.141 |  79.800 |  87.867 |  76.414 |     200 ms |
+| 8 concurrent batch-100 claimers      |         15 | 160.902 | 168.120 | 193.845 | 193.845 | 169.333 |     400 ms |
+| `assertKeyRetirable` query           |         20 |   8.787 |   8.879 |   9.554 |   9.657 |   8.998 |      20 ms |
+| Reconciliation database query        |         20 |   1.240 |   1.282 |   1.556 |   1.619 |   1.331 |      10 ms |
+| Content refresh, 1,024-file manifest |         25 |  71.461 |  76.021 |  94.075 |  99.335 |  79.579 |     200 ms |
 
-Content refresh process RSS rose by **56,266,752 bytes**, below the initial
+Content refresh process RSS rose by **63,193,088 bytes**, below the initial
 **201,326,592-byte (192 MiB)** delta budget. This process-level sentinel
 includes Node/V8 retained allocation and is not a live-heap claim.
 
@@ -95,13 +95,13 @@ includes Node/V8 retained allocation and is not a live-heap claim.
 
 | Query                               | Root/access                         | Planning ms | Execution ms | Shared hits | Required evidence                                  |
 | ----------------------------------- | ----------------------------------- | ----------: | -----------: | ----------: | -------------------------------------------------- |
-| Dense due claim, limit 100          | `Limit`; sequential scans/hash join |       0.663 |       24.537 |       2,728 | Dense 50%-due scan is expected                     |
-| Key retirement                      | aggregate; bitmap index             |       0.910 |        9.467 |         614 | `v2_outbox_routing_kid_active_idx`                 |
-| Reconciliation with superseded scan | nested loop plus indexed subplan    |       0.385 |        0.174 |          56 | `v2_publication_outbox_application_generation_idx` |
+| Dense due claim, limit 100          | `Limit`; sequential scans/hash join |       0.658 |       24.390 |       2,726 | Dense 50%-due scan is expected                     |
+| Key retirement                      | aggregate; bitmap index             |       0.976 |        9.576 |         591 | `v2_outbox_routing_kid_active_idx`                 |
+| Reconciliation with superseded scan | nested loop plus indexed subplan    |       0.360 |        0.217 |          70 | `v2_publication_outbox_application_generation_idx` |
 
 The initial per-row claim implementation measured roughly 6.5 seconds p95 for
 batch 100 and 16.1 seconds for concurrent claimers. Set-based pending and
-expired claims reduce accepted p95 to 93.366 ms and 181.436 ms while preserving
+expired claims reduce accepted p95 to 92.404 ms and 193.845 ms while preserving
 selected priority, fencing, exact limits, and `SKIP LOCKED` disjointness. The
 retirement plan justified `v2_outbox_routing_kid_active_idx`.
 

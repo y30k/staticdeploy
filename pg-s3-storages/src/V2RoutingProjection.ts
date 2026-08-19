@@ -479,6 +479,32 @@ export class V2RoutingSigner {
     get activeKid(): string {
         return this.active.kid;
     }
+    kidForIssueTime(issuedAt: Date): string {
+        const instant = issuedAt.getTime();
+        if (!Number.isFinite(instant))
+            throw new Error("invalid routing issue time");
+        const valid = [...this.keys.values()]
+            .filter(
+                (key) =>
+                    (key.status === "ACTIVE" || key.status === "OVERLAP") &&
+                    instant >=
+                        parseInstant(key.notBefore, "routing key not-before") &&
+                    instant <
+                        parseInstant(key.notAfter, "routing key not-after")
+            )
+            .sort((left, right) => {
+                if (left.status !== right.status)
+                    return left.status === "ACTIVE" ? -1 : 1;
+                const byNotBefore =
+                    parseInstant(right.notBefore, "routing key not-before") -
+                    parseInstant(left.notBefore, "routing key not-before");
+                if (byNotBefore !== 0) return byNotBefore;
+                return left.kid < right.kid ? -1 : left.kid > right.kid ? 1 : 0;
+            });
+        if (valid.length === 0)
+            throw new Error("no routing signing key is valid at issue time");
+        return valid[0].kid;
+    }
     sign(payload: V2RoutingPayload, boundKid = this.active.kid): Buffer {
         assertPayload(payload);
         const key = this.keys.get(boundKid);
@@ -1267,7 +1293,10 @@ export class V2PublicationWorker {
     async apply(input: V2PublicationLease): Promise<V2ProjectionReceipt> {
         let lease =
             input.routingKid === null
-                ? await this.queue.bindKey(input, this.signer.activeKid)
+                ? await this.queue.bindKey(
+                      input,
+                      this.signer.kidForIssueTime(input.createdAt)
+                  )
                 : input;
         const checkpoint = async (): Promise<void> => {
             lease = await this.queue.renew(lease, this.leaseMs);
