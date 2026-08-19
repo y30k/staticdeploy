@@ -1,6 +1,7 @@
 import {
     DeleteObjectCommand,
     GetObjectCommand,
+    ListObjectsV2Command,
     PutObjectCommand,
     S3Client,
 } from "@aws-sdk/client-s3";
@@ -18,6 +19,8 @@ const ALLOWED_FINALIZE_STATES = new Set([
     "AWAITING_DEFAULT_DOCUMENT",
 ]);
 const CREATE_ATTEMPTS = 3;
+const S3_OPERATION_TIMEOUT_MS = 30_000;
+const MAX_QUARANTINE_LIST_PAGES = 2;
 
 const MAX_FILE_BYTES = 64 * 1024 * 1024;
 const MAX_RELEASE_BYTES = 512 * 1024 * 1024;
@@ -63,14 +66,26 @@ export interface V2ControlObjectStorage {
     ): Promise<void>;
 }
 
+export interface V2ReleaseFinalizationFence {
+    assertActive(transaction: Knex.Transaction): Promise<void>;
+    bindWorkIdentity(identity: string): Promise<void>;
+    checkpoint(): Promise<void>;
+}
+
 export interface V2WorkerObjectStorage {
     readQuarantineFile(uploadId: string, path: string): Promise<Buffer>;
+    listQuarantineObjects(uploadId: string): Promise<string[]>;
+    deleteQuarantineObject(
+        uploadId: string,
+        relativeKey: string
+    ): Promise<void>;
     deleteQuarantineFile(uploadId: string, path: string): Promise<void>;
     finalizeRelease(input: {
         applicationId: string;
         releaseId: string;
         uploadId: string;
         defaultPath: string;
+        finalizationFence?: V2ReleaseFinalizationFence;
     }): Promise<V2ReleaseManifest>;
 }
 
@@ -207,10 +222,24 @@ function assertS3Key(key: string): string {
     return key;
 }
 
-function quarantineKey(uploadId: string, path: string): string {
+function quarantineRootPrefix(uploadId: string): string {
     assertId(uploadId, "upload id");
+    return `v2/quarantine/${uploadId}/`;
+}
+
+function quarantineFilesPrefix(uploadId: string): string {
+    return `${quarantineRootPrefix(uploadId)}files/`;
+}
+
+function quarantineObjectKey(uploadId: string, relativeKey: string): string {
+    if (typeof relativeKey !== "string")
+        throw new Error("invalid quarantine object key");
+    return assertS3Key(`${quarantineRootPrefix(uploadId)}${relativeKey}`);
+}
+
+function quarantineKey(uploadId: string, path: string): string {
     return assertS3Key(
-        `v2/quarantine/${uploadId}/files/${normalizeV2RelativePath(path)}`
+        `${quarantineFilesPrefix(uploadId)}${normalizeV2RelativePath(path)}`
     );
 }
 
@@ -276,7 +305,8 @@ class V2ObjectStoreBase {
     ): Promise<Buffer | null> {
         try {
             const response = await this.client.send(
-                new GetObjectCommand({ Bucket: this.bucket, Key: key })
+                new GetObjectCommand({ Bucket: this.bucket, Key: key }),
+                { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
             );
             if (response.Body === undefined)
                 throw new Error("object response has no body");
@@ -316,7 +346,12 @@ class V2ObjectStoreBase {
                         ContentLength: expected.size,
                         IfNoneMatch: "*",
                         Metadata: { "staticdeploy-sha256": expected.sha256 },
-                    })
+                    }),
+                    {
+                        abortSignal: AbortSignal.timeout(
+                            S3_OPERATION_TIMEOUT_MS
+                        ),
+                    }
                 );
                 const created = await this.read(key, maximum, expected);
                 if (created === null)
@@ -359,24 +394,39 @@ class ControlObjectStorage
         assertId(uploadId, "upload id");
         const safePath = normalizeV2RelativePath(path);
         assertDigest(expected, V2_OBJECT_LIMITS.maxFileBytes);
-        const declaration = await this.knex(tables.v2UploadFiles)
-            .select("declared_size", "declared_digest", "state")
-            .where({ release_id: uploadId, declared_path: safePath })
-            .first();
-        if (
-            declaration === undefined ||
-            declaration.state !== "DECLARED" ||
-            Number(declaration.declared_size) !== expected.size ||
-            declaration.declared_digest !== expected.sha256
-        )
-            throw new Error(
-                "quarantine object does not match its database declaration"
+        await this.knex.transaction(async (transaction) => {
+            const release = await transaction(tables.v2Releases)
+                .select("state")
+                .where({ id: uploadId })
+                .forShare()
+                .first();
+            const declaration = await transaction(tables.v2UploadFiles)
+                .select("declared_size", "declared_digest", "state")
+                .where({ release_id: uploadId, declared_path: safePath })
+                .forShare()
+                .first();
+            if (
+                release === undefined ||
+                ![
+                    "PENDING_UPLOAD",
+                    "UPLOADED",
+                    "PROCESSING",
+                    "AWAITING_DEFAULT_DOCUMENT",
+                ].includes(release.state) ||
+                declaration === undefined ||
+                declaration.state !== "DECLARED" ||
+                Number(declaration.declared_size) !== expected.size ||
+                declaration.declared_digest !== expected.sha256
+            )
+                throw new Error(
+                    "quarantine object does not match an active database declaration"
+                );
+            await this.putCreateOnly(
+                quarantineKey(uploadId, safePath),
+                content,
+                expected
             );
-        await this.putCreateOnly(
-            quarantineKey(uploadId, safePath),
-            content,
-            expected
-        );
+        });
     }
 }
 
@@ -539,12 +589,77 @@ class WorkerObjectStorage
         return content;
     }
 
+    async listQuarantineObjects(uploadId: string): Promise<string[]> {
+        const prefix = quarantineRootPrefix(uploadId);
+        const relativeKeys: string[] = [];
+        const seenTokens = new Set<string>();
+        let continuationToken: string | undefined;
+        let pages = 0;
+        let keepListing = true;
+        while (keepListing) {
+            pages += 1;
+            if (pages > MAX_QUARANTINE_LIST_PAGES)
+                throw new Error(
+                    "quarantine listing page count is outside bounds"
+                );
+            const response = await this.client.send(
+                new ListObjectsV2Command({
+                    Bucket: this.bucket,
+                    Prefix: prefix,
+                    ContinuationToken: continuationToken,
+                    MaxKeys: 1000,
+                }),
+                { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
+            );
+            for (const object of response.Contents ?? []) {
+                if (object.Key === undefined || !object.Key.startsWith(prefix))
+                    throw new Error(
+                        "quarantine listing escaped its exact prefix"
+                    );
+                assertS3Key(object.Key);
+                relativeKeys.push(object.Key.slice(prefix.length));
+            }
+            if (!response.IsTruncated) {
+                keepListing = false;
+                continue;
+            }
+            const next = response.NextContinuationToken;
+            if (
+                !next ||
+                next === continuationToken ||
+                seenTokens.has(next) ||
+                (response.Contents ?? []).length === 0
+            )
+                throw new Error(
+                    "quarantine listing pagination made no progress"
+                );
+            if (pages >= MAX_QUARANTINE_LIST_PAGES) return relativeKeys;
+            seenTokens.add(next);
+            continuationToken = next;
+        }
+        return relativeKeys;
+    }
+
+    async deleteQuarantineObject(
+        uploadId: string,
+        relativeKey: string
+    ): Promise<void> {
+        await this.client.send(
+            new DeleteObjectCommand({
+                Bucket: this.bucket,
+                Key: quarantineObjectKey(uploadId, relativeKey),
+            }),
+            { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
+        );
+    }
+
     async deleteQuarantineFile(uploadId: string, path: string): Promise<void> {
         await this.client.send(
             new DeleteObjectCommand({
                 Bucket: this.bucket,
                 Key: quarantineKey(uploadId, path),
-            })
+            }),
+            { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
         );
     }
 
@@ -580,6 +695,7 @@ class WorkerObjectStorage
         releaseId: string;
         uploadId: string;
         defaultPath: string;
+        finalizationFence?: V2ReleaseFinalizationFence;
     }): Promise<V2ReleaseManifest> {
         assertId(input.applicationId, "application id");
         assertId(input.releaseId, "release id");
@@ -636,6 +752,7 @@ class WorkerObjectStorage
         )
             throw new Error("release exceeds byte limit");
 
+        const checkpoint = async () => input.finalizationFence?.checkpoint();
         const buffered: Array<{
             path: string;
             content: Buffer;
@@ -647,10 +764,12 @@ class WorkerObjectStorage
                 sha256: declaration.sha256,
                 size: declaration.size,
             };
+            await checkpoint();
             const content = await this.readQuarantineFile(
                 input.uploadId,
                 declaration.path
             );
+            await checkpoint();
             assertContent(content, expected, V2_OBJECT_LIMITS.maxFileBytes);
             buffered.push({ path: declaration.path, content, expected });
             files.push({
@@ -660,7 +779,25 @@ class WorkerObjectStorage
             });
         }
 
+        const sourceDownloadBytes = deterministicZip(buffered);
+        const sourceDownload = digest(sourceDownloadBytes);
+        const manifest: V2ReleaseManifest = {
+            version: 1,
+            applicationId: input.applicationId,
+            releaseId: input.releaseId,
+            defaultPath,
+            files,
+            sourceDownload,
+        };
+        const manifestBytes = Buffer.from(JSON.stringify(manifest));
+        const manifestDigest = digest(manifestBytes);
+        if (input.finalizationFence !== undefined)
+            await input.finalizationFence.bindWorkIdentity(
+                manifestDigest.sha256
+            );
+
         for (const file of buffered) {
+            await checkpoint();
             await this.putCreateOnly(
                 releaseKey(
                     input.applicationId,
@@ -671,6 +808,7 @@ class WorkerObjectStorage
                 file.content,
                 file.expected
             );
+            await checkpoint();
             await this.putCreateOnly(
                 releaseKey(
                     input.applicationId,
@@ -682,8 +820,7 @@ class WorkerObjectStorage
                 file.expected
             );
         }
-        const sourceDownloadBytes = deterministicZip(buffered);
-        const sourceDownload = digest(sourceDownloadBytes);
+        await checkpoint();
         await this.putCreateOnly(
             releaseObjectKey(
                 input.applicationId,
@@ -694,16 +831,7 @@ class WorkerObjectStorage
             sourceDownload,
             V2_OBJECT_LIMITS.maxSourceDownloadBytes
         );
-        const manifest: V2ReleaseManifest = {
-            version: 1,
-            applicationId: input.applicationId,
-            releaseId: input.releaseId,
-            defaultPath,
-            files,
-            sourceDownload,
-        };
-        const manifestBytes = Buffer.from(JSON.stringify(manifest));
-        const manifestDigest = digest(manifestBytes);
+        await checkpoint();
         await this.putCreateOnly(
             releaseObjectKey(
                 input.applicationId,
@@ -714,8 +842,11 @@ class WorkerObjectStorage
             manifestDigest,
             V2_OBJECT_LIMITS.maxManifestBytes
         );
+        await checkpoint();
 
         await this.knex.transaction(async (transaction) => {
+            if (input.finalizationFence !== undefined)
+                await input.finalizationFence.assertActive(transaction);
             await transaction(tables.v2Applications)
                 .where({ id: input.applicationId })
                 .forUpdate()
@@ -917,7 +1048,8 @@ export async function verifyV2CreateOnlyCapability(
                 Key: key,
                 Body: Buffer.from("first"),
                 IfNoneMatch: "*",
-            })
+            }),
+            { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
         ),
         second.send(
             new PutObjectCommand({
@@ -925,7 +1057,8 @@ export async function verifyV2CreateOnlyCapability(
                 Key: key,
                 Body: Buffer.from("second"),
                 IfNoneMatch: "*",
-            })
+            }),
+            { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
         ),
     ]);
     if (results.filter((result) => result.status === "fulfilled").length !== 1)
@@ -939,7 +1072,8 @@ export async function verifyV2CreateOnlyCapability(
             "conditional create probe failed for an unrelated reason"
         );
     const response = await first.send(
-        new GetObjectCommand({ Bucket: bucket, Key: key })
+        new GetObjectCommand({ Bucket: bucket, Key: key }),
+        { abortSignal: AbortSignal.timeout(S3_OPERATION_TIMEOUT_MS) }
     );
     if (response.Body === undefined)
         throw new Error("conditional create probe read-back mismatch");

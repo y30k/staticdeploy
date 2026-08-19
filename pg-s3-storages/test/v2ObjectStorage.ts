@@ -237,6 +237,17 @@ describe("M3-04 quarantine and immutable release objects", () => {
         await expectAccessDenied(
             workerClient.send(new ListObjectsV2Command({ Bucket: bucket }))
         );
+        for (const Prefix of [
+            "v2/releases/",
+            "v2/routing/",
+            "quarantine/",
+            "v2/quarantine-sibling/",
+        ])
+            await expectAccessDenied(
+                workerClient.send(
+                    new ListObjectsV2Command({ Bucket: bucket, Prefix })
+                )
+            );
         await expectAccessDenied(
             workerClient.send(
                 new DeleteObjectCommand({

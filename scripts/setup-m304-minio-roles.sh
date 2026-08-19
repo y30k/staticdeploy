@@ -38,6 +38,14 @@ install_policy staticdeploy-m304-worker '{
   "Statement": [
     {
       "Effect": "Allow",
+      "Action": ["s3:ListBucket"],
+      "Resource": ["arn:aws:s3:::m304-*"],
+      "Condition": {
+        "StringLike": {"s3:prefix": ["v2/quarantine/*"]}
+      }
+    },
+    {
+      "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:DeleteObject"],
       "Resource": ["arn:aws:s3:::m304-*/v2/quarantine/*"]
     },

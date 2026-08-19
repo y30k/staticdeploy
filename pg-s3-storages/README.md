@@ -34,6 +34,33 @@ rejection is explicitly not claimed. Production credential/prefix policy,
 conditional-header enforcement, retention, and provider acceptance remain
 blocked on B-S3.
 
+## V2 release jobs and cleanup
+
+`createV2ReleaseJobQueue()` uses the migration-05 `SECURITY DEFINER` entry
+points for atomic due claims, live renewal, expired-lease reclaim, final-attempt
+crash terminalization, and transaction-held finalization fences. All transitions
+bind the job ID, owner, and monotonic `lease_version`; retry timing is computed
+from the post-lock PostgreSQL clock and is exponentially bounded. The migration
+revokes `PUBLIC`; deployment grants are limited to explicit function `EXECUTE`
+capabilities rather than direct job-table mutation.
+
+`V2ReleaseJobWorker` binds the exact manifest/declaration/default-document work
+identity before its first release-object write, renews at every S3 boundary, and
+completes a processing job only when that identity matches the immutable READY
+manifest. Cleanup requires a caller-configured bounded minimum age, checked
+against the post-lock database clock, and refuses every nonterminal processing
+job before sealing the release FAILED. Upload writes hold a shared release lock
+through S3 read-back, so cleanup cannot race a late write. Cleanup lists,
+deletes, and re-lists the complete exact `v2/quarantine/{release-id}/` prefix,
+including `original.zip` and orphan objects, with bounded pagination and
+restart-safe partial failure. It never targets release or routing prefixes.
+
+Disposable MinIO JOB-03 evidence intentionally uses an unversioned quarantine
+bucket: deleting an object removes its bytes there. Production quarantine
+versioning/lifecycle purge behavior, credentials, and provider-policy acceptance
+remain **BLOCKED-EXTERNAL on B-S3**; a versioned production bucket cannot be
+accepted from the local current-version list/delete proof.
+
 ## PostgreSQL migrations and connections
 
 This package uses the directly pinned and supported Knex `3.1.0` and PostgreSQL
@@ -66,19 +93,21 @@ rule to sessions, idempotency records, jobs, and outbox acknowledgements.
 Application rollback leaves the additive schema and retained READY/audit or
 operational history installed. Job and outbox claims increment a monotonic
 `lease_version`; every renewal or reclaim update must include the expected
-owner/version predicate so stale workers affect zero rows. Retry, completion,
-and failure are available only through narrowly granted
-`v2_finish_release_job_attempt` and `v2_finish_publication_attempt` functions.
-Outbox acknowledgement is likewise available only through the explicitly granted
-`v2_acknowledge_publication` function, which locks application-first, checks the
-fenced lease against the post-lock database clock, atomically confirms desired
-state, advances served state, assigns the first release label, and acknowledges
-the matching row. Outbox rows retain an immutable copied idempotency ID after
-the bounded idempotency record expires and is cleaned up. Do not run an
-all-history rollback: the legacy `down` functions in `00.ts`-`02.ts`
-intentionally do nothing and therefore cannot restore an empty schema. Recovery
-across those historical migrations requires a verified database backup/restore
-procedure.
+owner/version predicate so stale workers affect zero rows. Release-job claim,
+renewal, work binding, cleanup sealing, retry, completion, and failure are
+available only through the migration-05 validated wrappers;
+`v2_finish_release_job_attempt` remains an internal, non-granted transition
+primitive. Publication attempt completion remains narrowly granted through
+`v2_finish_publication_attempt`. Outbox acknowledgement is likewise available
+only through the explicitly granted `v2_acknowledge_publication` function, which
+locks application-first, checks the fenced lease against the post-lock database
+clock, atomically confirms desired state, advances served state, assigns the
+first release label, and acknowledges the matching row. Outbox rows retain an
+immutable copied idempotency ID after the bounded idempotency record expires and
+is cleaned up. Do not run an all-history rollback: the legacy `down` functions
+in `00.ts`-`02.ts` intentionally do nothing and therefore cannot restore an
+empty schema. Recovery across those historical migrations requires a verified
+database backup/restore procedure.
 
 PostgreSQL 16 is the supported runtime target. The CI schema gate runs SCH-01
 through SCH-05 there and retains a PostgreSQL 13 compatibility lane for the
