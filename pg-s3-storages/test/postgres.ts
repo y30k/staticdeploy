@@ -1362,7 +1362,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
 
             const expiredJobId = "70000000-0000-4000-8000-000000000021";
             const expiredUpdatedAt = new Date(now.getTime() - 7_200_000);
-            const expiredAt = new Date(now.getTime() - 3_600_000);
+            const expiredAt = new Date(Date.now() + 300);
             await database(tables.v2ReleaseJobs).insert({
                 id: expiredJobId,
                 release_id: releaseId,
@@ -1384,13 +1384,14 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     next_attempt_at: null,
                     updated_at: expiredUpdatedAt,
                 });
+            await new Promise((resolve) => setTimeout(resolve, 400));
             expect(
                 await database(tables.v2ReleaseJobs)
                     .where({ id: expiredJobId, state: "LEASED" })
                     .where("lease_expires_at", "<", new Date())
                     .update({
                         lease_owner: "worker-c",
-                        lease_expires_at: new Date(now.getTime() + 7_200_000),
+                        lease_expires_at: new Date(Date.now() + 2_000),
                         attempt_count: 2,
                         lease_version: 2,
                         updated_at: now,
@@ -1444,9 +1445,18 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     }),
                 "leased release job transition must use v2_finish_release_job_attempt"
             );
+            await new Promise((resolve) => setTimeout(resolve, 2_100));
             await database.raw(
                 "select public.v2_finish_release_job_attempt(?, ?, ?, ?, ?, ?, ?)",
-                [expiredJobId, "worker-c", 2, "SUCCEEDED", null, null, null]
+                [
+                    expiredJobId,
+                    "worker-c",
+                    2,
+                    "FAILED",
+                    "RETRY_EXHAUSTED",
+                    "RETRY_EXHAUSTED",
+                    null,
+                ]
             );
             await expectDatabaseError(
                 database(tables.v2ReleaseJobs)
@@ -1811,12 +1821,13 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 .update({
                     state: "LEASED",
                     lease_owner: "worker-old",
-                    lease_expires_at: new Date(now.getTime() - 3_600_000),
+                    lease_expires_at: new Date(Date.now() + 300),
                     attempt_count: 1,
                     lease_version: 1,
                     next_attempt_at: null,
                     updated_at: tombstoneCreatedAt,
                 });
+            await new Promise((resolve) => setTimeout(resolve, 400));
             await database(tables.v2PublicationOutbox)
                 .where({ id: tombstoneId, state: "LEASED" })
                 .where("lease_expires_at", "<", new Date())
@@ -1864,7 +1875,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                 .update({
                     state: "LEASED",
                     lease_owner: "worker-final",
-                    lease_expires_at: new Date(Date.now() + 3_600_000),
+                    lease_expires_at: new Date(Date.now() + 2_000),
                     attempt_count: 3,
                     lease_version: 3,
                     next_attempt_at: null,
@@ -1907,6 +1918,7 @@ describe("Knex 3 PostgreSQL migration and failure contracts", () => {
                     }),
                 "leased outbox transition must use a guarded function"
             );
+            await new Promise((resolve) => setTimeout(resolve, 2_100));
             await database.raw(
                 "select public.v2_finish_publication_attempt(?, ?, ?, ?, ?, ?)",
                 [

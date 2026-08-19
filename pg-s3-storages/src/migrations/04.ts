@@ -563,6 +563,10 @@ export async function up(knex: Knex): Promise<void> {
                     RAISE EXCEPTION 'release job is not due for claim'
                         USING ERRCODE = '55000';
                 END IF;
+                IF NEW.lease_expires_at <= clock_timestamp() THEN
+                    RAISE EXCEPTION 'release job claim must create a live lease'
+                        USING ERRCODE = '55000';
+                END IF;
                 IF NEW.attempt_count <> OLD.attempt_count + 1
                     OR NEW.lease_version <> OLD.lease_version + 1
                 THEN
@@ -579,7 +583,8 @@ export async function up(knex: Knex): Promise<void> {
                         RAISE EXCEPTION 'live release job lease cannot be reclaimed'
                             USING ERRCODE = '55000';
                     END IF;
-                ELSIF NEW.attempt_count <> OLD.attempt_count + 1
+                ELSIF NEW.lease_expires_at <= clock_timestamp()
+                    OR NEW.attempt_count <> OLD.attempt_count + 1
                     OR NEW.lease_version <> OLD.lease_version + 1
                 THEN
                     RAISE EXCEPTION 'expired release job reclaim must advance fencing'
@@ -676,7 +681,9 @@ export async function up(knex: Knex): Promise<void> {
             IF current_state <> 'LEASED'
                 OR current_owner IS DISTINCT FROM expected_lease_owner
                 OR current_version IS DISTINCT FROM expected_lease_version
-                OR current_lease_expires_at <= observed_at
+                OR (current_lease_expires_at <= observed_at
+                    AND NOT (outcome = 'FAILED'
+                        AND current_attempt_count >= current_max_attempts))
             THEN
                 RAISE EXCEPTION 'active release job lease fencing does not match'
                     USING ERRCODE = '55000';
@@ -891,6 +898,10 @@ export async function up(knex: Knex): Promise<void> {
                     RAISE EXCEPTION 'publication outbox row is not due for claim'
                         USING ERRCODE = '55000';
                 END IF;
+                IF NEW.lease_expires_at <= clock_timestamp() THEN
+                    RAISE EXCEPTION 'outbox claim must create a live lease'
+                        USING ERRCODE = '55000';
+                END IF;
                 IF NEW.attempt_count <> OLD.attempt_count + 1
                     OR NEW.lease_version <> OLD.lease_version + 1
                 THEN
@@ -907,7 +918,8 @@ export async function up(knex: Knex): Promise<void> {
                         RAISE EXCEPTION 'live outbox lease cannot be reclaimed'
                             USING ERRCODE = '55000';
                     END IF;
-                ELSIF NEW.attempt_count <> OLD.attempt_count + 1
+                ELSIF NEW.lease_expires_at <= clock_timestamp()
+                    OR NEW.attempt_count <> OLD.attempt_count + 1
                     OR NEW.lease_version <> OLD.lease_version + 1
                 THEN
                     RAISE EXCEPTION 'expired outbox reclaim must advance fencing'
@@ -1003,7 +1015,9 @@ export async function up(knex: Knex): Promise<void> {
             IF current_state <> 'LEASED'
                 OR current_owner IS DISTINCT FROM expected_lease_owner
                 OR current_version IS DISTINCT FROM expected_lease_version
-                OR current_lease_expires_at <= observed_at
+                OR (current_lease_expires_at <= observed_at
+                    AND NOT (outcome = 'FAILED'
+                        AND current_attempt_count >= current_max_attempts))
             THEN
                 RAISE EXCEPTION 'active outbox lease fencing does not match'
                     USING ERRCODE = '55000';
