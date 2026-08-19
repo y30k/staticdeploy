@@ -11,6 +11,29 @@ const validate = (workflow) => {
     assert.match(workflow, /cron: "23 5 \* \* \*"/);
     assert.match(workflow, /^permissions:\n\s+contents: read$/m);
     assert.doesNotMatch(workflow, /^\s+(?:packages|id-token):\s*write$/m);
+    for (const required of [
+        "image: postgres:13@sha256:4689940c683801b4ab839ab3b0a0a3555a5fe425371422310944e89eca7d8068",
+        "image: postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777",
+        "- 5432:5432",
+        "- 5433:5432",
+        "name: Start disposable MinIO",
+        "scripts/setup-m304-minio-roles.sh staticdeploy-test-minio",
+        "run: yarn workspace @staticdeploy/pg-s3-storages test:postgres",
+        "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-objects",
+    ])
+        assert.ok(
+            workflow.includes(required),
+            `workflow must retain M3 acceptance contract: ${required}`
+        );
+    assert.equal(
+        (
+            workflow.match(
+                /POSTGRES_TEST_URL: postgres:\/\/postgres:password@127\.0\.0\.1:5433\/postgres/g
+            ) || []
+        ).length,
+        2,
+        "supported PostgreSQL 16 schema and object lanes must be explicit"
+    );
     assert.match(
         workflow,
         /docker\/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8/
@@ -87,7 +110,7 @@ const validate = (workflow) => {
         "returntocorp/semgrep@sha256:a265d09a9ca712e6624aca09056304ce4314a695b7028d65c041dd53fd44c700",
         "anchore/syft@sha256:678bfa565b60f747aac0f8e964fe5588a24445b8d0a480e91f6efd70020dfbb0",
         "anchore/grype@sha256:ddf9e9f204049f3a4a0955ef70873cabab6a31432125ad4f20a490b54950a253",
-        "minio/minio:RELEASE.2021-11-24T23-19-33Z@sha256:0b72f427261aa0d37f3c42d46ab6d2e5e47309bf5922bed5fbbbd68518521b08",
+        "minio/minio:RELEASE.2025-04-22T22-12-26Z@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e",
         "rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667",
     ];
     const lines = workflow.split("\n");
@@ -213,6 +236,25 @@ assert.throws(() =>
         workflow.replace(
             "trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33",
             "evil.example/image trufflesecurity/trufflehog@sha256:ff4c95e9df7d645daf2140e3ca1039031c63106268d5fbb25feb43ceca1bcc33"
+        )
+    )
+);
+for (const required of [
+    "image: postgres:13@sha256:4689940c683801b4ab839ab3b0a0a3555a5fe425371422310944e89eca7d8068",
+    "image: postgres:16.14-alpine3.24@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777",
+    "- 5432:5432",
+    "- 5433:5432",
+    "name: Start disposable MinIO",
+    "scripts/setup-m304-minio-roles.sh staticdeploy-test-minio",
+    "run: yarn workspace @staticdeploy/pg-s3-storages test:postgres",
+    "run: yarn workspace @staticdeploy/pg-s3-storages test:v2-objects",
+])
+    assert.throws(() => validate(workflow.replace(required, "")));
+assert.throws(() =>
+    validate(
+        workflow.replaceAll(
+            "POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5433/postgres",
+            "POSTGRES_TEST_URL: postgres://postgres:password@127.0.0.1:5432/postgres"
         )
     )
 );
