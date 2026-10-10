@@ -221,8 +221,8 @@ validate(workflow);
 assert.throws(() =>
     validate(
         workflow.replace(
-            "on:\n",
-            'on:\n    schedule:\n        - cron: "23 5 * * *"\n'
+            "        branches: [main]\n",
+            '        branches: [main]\n    schedule:\n        - cron: "23 5 * * *"\n'
         )
     )
 );
