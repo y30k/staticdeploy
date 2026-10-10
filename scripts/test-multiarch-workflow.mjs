@@ -6,9 +6,9 @@ const workflowPath = ".github/workflows/scans-and-images.yml";
 const validate = (workflow) => {
     assert.match(
         workflow,
-        /^on:\n\s+pull_request:\n\s+push:\n\s+branches: \[main\]\n\s+schedule:/m
+        /^on:\n\s+pull_request:\n\s+push:\n\s+branches: \[main\]$/m
     );
-    assert.match(workflow, /cron: "23 5 \* \* \*"/);
+    assert.doesNotMatch(workflow, /^\s+schedule:/m);
     assert.match(workflow, /^permissions:\n\s+contents: read$/m);
     assert.doesNotMatch(workflow, /^\s+(?:packages|id-token):\s*write$/m);
     for (const required of [
@@ -218,6 +218,14 @@ const validate = (workflow) => {
 
 const workflow = fs.readFileSync(workflowPath, "utf8");
 validate(workflow);
+assert.throws(() =>
+    validate(
+        workflow.replace(
+            "        branches: [main]\n",
+            '        branches: [main]\n    schedule:\n        - cron: "23 5 * * *"\n'
+        )
+    )
+);
 for (const publicationCommand of [
     "docker push registry.example/app",
     "docker image push registry.example/app",
